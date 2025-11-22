@@ -30,4 +30,4 @@ fdset_test.o: test/fdset_test.c
 
 clean:
 	rm -rf *.o *.a *.so *.out
-	rm -rf tcp_srvd tcp_clid *_test
+	rm -rf tcp_srvd tcp_clid *_testd
