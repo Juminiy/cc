@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "socket.h": "c",
+        "string.h": "c",
+        "un.h": "c",
+        "stdlib.h": "c",
+        "malloc.h": "c",
+        "sockaddr.h": "c",
+        "errno.h": "c",
+        "cerrno": "c",
+        "error.h": "c",
+        "internet": "c",
+        "in.h": "c",
+        "inet.h": "c",
+        "time.h": "c",
+        "select.h": "c"
+    }
+}
