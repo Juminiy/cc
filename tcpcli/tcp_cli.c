@@ -11,8 +11,13 @@
 #include <time.h>
 #include <unistd.h>
 
-#define ERRF(msg) \
-    do { fprintf(stderr, "[Error] "#msg", error: %s\n", strerror(errno)); exit(EXIT_FAILURE); } while(0)
+int glb_skt_fd = -1;
+void __attribute__((destructor)) __inexit() {
+    fprintf(stdout, "[INFO ] clean socket\n");
+    if (glb_skt_fd != -1) {
+        close(glb_skt_fd);
+    }
+}
 
 int main(int argc, char** argv) {
 
@@ -27,19 +32,20 @@ int main(int argc, char** argv) {
         return 1;
     }
     fprintf(stdout, "[DEBUG] Create Socket success, [client_fd:%d]\n", skt_fd);
+    glb_skt_fd = skt_fd;
 
     struct sockaddr_in skt_addr;
     sktaddrin_set(skt_addr, AF_INET, srv_port, srv_addr);
     int conn_err = connect(skt_fd, (struct sockaddr*) &skt_addr, sizeof(skt_addr));
     if (conn_err == -1) {
-        fprintf(stderr, "connect to host %s:%d\n", srv_addr, srv_port);
+        fprintf(stderr, "[ERROR] Connect to host %s:%d\n", srv_addr, srv_port);
         return 1;
     }
     fprintf(stdout, "[INFO ] Connect to host %s:%d success\n", srv_addr, srv_port);
 
     char *wrbuf = (char*)malloc(cli_send_max_sz);
     for (;;) {
-        fprintf(stdout, "please write to: ");
+        fprintf(stdout, "[INFO ] > ");
         int cinsz = fscanf(stdin, "%s", wrbuf);
         if (cinsz == -1) {
             ERRF(CIN Scan Bytes);
@@ -53,6 +59,9 @@ int main(int argc, char** argv) {
         if (wr_sz == -1) {
             ERRF(Client Write buffer);
             break;
+        } else if (strcmp(wrbuf, TCP_CLIENT_EXIT_STR) == 0) {
+            fprintf(stdout, "[INFO ] client disconnected\n");
+            break;
         }
         sleep(1);
     }
@@ -60,3 +69,4 @@ int main(int argc, char** argv) {
     close(skt_fd);
     return 0;
 }
+

@@ -13,6 +13,17 @@
         "in.h": "c",
         "inet.h": "c",
         "time.h": "c",
-        "select.h": "c"
+        "select.h": "c",
+        "adlist.h": "c",
+        "queue.h": "c",
+        "stdbool.h": "c",
+        "tcp_set.h": "c",
+        "limits": "c",
+        "cstdlib": "cpp",
+        "stdio.h": "c",
+        "tcp_lib.h": "c",
+        "util.h": "c",
+        "skt_fdset.h": "c",
+        "fcntl.h": "c"
     }
 }
