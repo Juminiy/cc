@@ -24,6 +24,11 @@
         "tcp_lib.h": "c",
         "util.h": "c",
         "skt_fdset.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "poll.h": "c",
+        "file.h": "c",
+        "features.h": "c",
+        "epoll.h": "c",
+        "unistd.h": "c"
     }
 }

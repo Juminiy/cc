@@ -6,17 +6,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-void fd_nonblock(int fd) {
-    int fd_flag = fcntl(fd, F_GETFL);
-    fcntl(fd, fd_flag | O_NONBLOCK);
-}
-
 int accept_clients_by_select(
     int srv_skt_fd, // server_fd
     int cli_max_sz, 
     int buf_max_sz
 ) {
-    fd_nonblock(srv_skt_fd);
+    fd_nonblocking(srv_skt_fd);
     optfdset *fdlis = create_optfdset(cli_max_sz + 1); // srv_skt_fd + cli_skt_fds
     optfdset_add(fdlis, srv_skt_fd);
 
@@ -55,13 +50,14 @@ int accept_clients_by_select(
                             close(cli_skt_fd);
                             fprintf(stdout, "[WARN ] Client[client_fd:%d] connect exceed cli_max_sz:%d, rejected\n", cli_skt_fd, cli_max_sz);
                         } else {
-                            fd_nonblock(cli_skt_fd);
+                            fd_nonblocking(cli_skt_fd);
                             fprintf(stdout, "[INFO ] Client[client_fd:%d] success enqueue the connections\n", cli_skt_fd);
                         }
                     } else { // client socket buffer read
                         int rd_res = read_client(curfd, cli_buf, buf_max_sz);
                         if (rd_res == TCP_CLIENT_EXIT || rd_res == TCP_CLIENT_ERR) {
                             int del_cli_res = optfdset_del(fdlis, curfd);
+                            close(curfd);
                             if (del_cli_res != OPT_OK) {
                                 fprintf(stderr, "[ERROR] delete client Client[client_fd:%d]\n", curfd);
                             }

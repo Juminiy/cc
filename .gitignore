@@ -56,5 +56,5 @@ dkms.conf
 
 # local binary file
 *.out
-tcpclid
-tcpsrvd
+
+data/

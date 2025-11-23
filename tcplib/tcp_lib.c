@@ -1,14 +1,33 @@
 #include "tcp_lib.h"
 #include "skt_fdset.h"
-#include <unistd.h>
 
-int accept_clients(int srv_skt_fd, int buf_max_sz) {
+#include <unistd.h>
+#include <fcntl.h>
+
+int accept_clients_blocking(
+    int srv_skt_fd,
+    int __attribute__((unused)) cli_max_sz, // assured to 1
+    int buf_max_sz
+) {
     int cli_skt_fd = accept_client(srv_skt_fd);
-    return read_client_infinite(
-        cli_skt_fd, 
-        (char*)malloc(sizeof(char)*buf_max_sz), 
-        buf_max_sz
-    );
+    char* cli_buf = (char*)malloc(sizeof(char)*buf_max_sz);
+
+    int cli_res = 0;
+    do {
+        cli_res = read_client(cli_skt_fd, cli_buf, buf_max_sz);
+        switch (cli_res) {
+            case TCP_CLIENT_ERR: {
+                break;
+            }
+            case TCP_CLIENT_EXIT: {
+                break;
+            }
+        }
+    } while(cli_res == TCP_CLIENT_SEND);
+
+    free(cli_buf);
+    close(cli_skt_fd);
+    return cli_res;
 }
 
 // only receive 1 client
@@ -29,26 +48,6 @@ int accept_client(int srv_skt_fd) {
     return cli_skt_fd;
 }
 
-int read_client_infinite(int cli_skt_fd, char *cli_buf, int buf_max_sz) {
-    // Read From Client Data
-
-    int cli_res = 0;
-    do {
-        cli_res = read_client(cli_skt_fd, cli_buf, buf_max_sz);
-        switch (cli_res) {
-            case TCP_CLIENT_ERR: {
-                break;
-            }
-            case TCP_CLIENT_EXIT: {
-                break;
-            }
-        }
-    } while(cli_res == TCP_CLIENT_SEND);
-
-    close(cli_skt_fd);
-    return 0;
-}
-
 int read_client(int cli_skt_fd, char *cli_buf, int buf_max_sz) {
     ssize_t rd_sz = read(cli_skt_fd, cli_buf, buf_max_sz);
     if (rd_sz == -1) { // client <-> server error
@@ -62,4 +61,9 @@ int read_client(int cli_skt_fd, char *cli_buf, int buf_max_sz) {
         fprintf(stdout, "[INFO ] Read From Client[client_fd:%d], Msg: %s\n", cli_skt_fd, cli_buf);
         return TCP_CLIENT_SEND;
     }
+}
+
+void fd_nonblocking(int fd) {
+    int fd_flag = fcntl(fd, F_GETFL);
+    fcntl(fd, fd_flag | O_NONBLOCK);
 }

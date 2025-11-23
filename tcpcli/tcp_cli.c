@@ -10,6 +10,7 @@
 
 #include <time.h>
 #include <unistd.h>
+#include <getopt.h>
 
 int glb_skt_fd = -1;
 void __attribute__((destructor)) __inexit() {
@@ -21,11 +22,78 @@ void __attribute__((destructor)) __inexit() {
 
 int main(int argc, char** argv) {
 
+    int addr_family = AF_INET;
+    char srv_addr[128] = {'\0'};
     int srv_port = 3054;
-    char *srv_addr = "192.168.3.47";
-    int cli_send_max_sz = 1<<5;
+    int cli_send_max_sz = 4096; // 4KB
 
+    const char *shrt_opts = "h46a:p:b:";
+    const struct option long_opts[] = 
+    {
+        {"help", no_argument, NULL, 'h'},
+        {"ipv4", no_argument, NULL, '4'},       
+        {"ipv6", no_argument, NULL, '6'},
+        {"addr", required_argument, NULL, 'a'},
+        {"port", optional_argument, NULL, 'p'},
+        {"bsiz", optional_argument, NULL, 'b'}
+    };
+    #define HELP_ARGS() \
+        do { \
+            fprintf(stdout, "Usage:\n"); \
+            fprintf(stdout, "Option: [-4] | [-6] | [--ipv4] | [--ipv6], ip version, (default:ipv4)\n"); \
+            fprintf(stdout, "Option: [-a] | [--addr], bind address\n"); \
+            fprintf(stdout, "Option: [-p] | [--port], bind port, (default:3054)\n"); \
+            fprintf(stdout, "Option: [-b] | [--bsiz], client max buffer size byte, (default:4096)\n"); \
+        } while(0)
 
+    int optcase = 0;
+    while((optcase = getopt_long(argc, argv, shrt_opts, long_opts, NULL)) != -1)
+    {
+        switch(optcase) {
+            // AF_INET:IPv4; AF_INET6:IPv6
+            case '4': 
+            addr_family = AF_INET;
+            break;
+
+            case '6':
+            addr_family = AF_INET6;
+            break;
+
+            case 'a':
+            strcpy(srv_addr, optarg);
+            break;
+
+            case 'p':
+            srv_port = strtol(optarg, NULL, 10);
+            break;
+
+            case 'b':
+            cli_send_max_sz = strtol(optarg, NULL, 10);
+            break;
+
+            case 'h':
+            HELP_ARGS();
+            return 0;
+
+            default: 
+            HELP_ARGS();
+            return 0;
+        }
+    }
+
+    if (strlen(srv_addr) == 0) {
+        fprintf(stderr, "[ERROR] bad address:%s with adfamily:%d\n", srv_addr, addr_family);
+        return 1;
+    }
+    if (srv_port<=0 || srv_port>65535) {
+        fprintf(stderr, "[ERROR] bad port:%d\n", srv_port);
+        return 1;
+    }
+    if (cli_send_max_sz<=0) {
+        fprintf(stderr, "[ERROR] bad bsiz:%d\n", cli_send_max_sz);
+        return 1;
+    }
+    
     int skt_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (skt_fd == -1){
         ERRF(Create Socket Error);
