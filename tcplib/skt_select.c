@@ -35,8 +35,7 @@ int accept_clients_by_select(
         // fprintf(stdout, "[DEBUG] ready_fd_cnt = %d\n", ready_fd_cnt);
 
         if (ready_fd_cnt == -1) {
-            ERRF(select fds);
-            return 1;
+            FATAL("Select FDs");
         } else if (ready_fd_cnt > 0) {
         
             for(int idx=0;idx<fdlis->cap;idx++) {
@@ -48,18 +47,18 @@ int accept_clients_by_select(
                         int add_ret = optfdset_add(fdlis, cli_skt_fd);
                         if (add_ret == SET_FULL) {
                             close(cli_skt_fd);
-                            fprintf(stdout, "[WARN ] Client[client_fd:%d] connect exceed cli_max_sz:%d, rejected\n", cli_skt_fd, cli_max_sz);
+                            WARNF("Client[client_fd:%d] connect exceed cli_max_sz:%d, rejected", cli_skt_fd, cli_max_sz);
                         } else {
                             fd_nonblocking(cli_skt_fd);
-                            fprintf(stdout, "[INFO ] Client[client_fd:%d] success enqueue the connections\n", cli_skt_fd);
+                            INFOF("Client[client_fd:%d] success enqueue the connections", cli_skt_fd);
                         }
                     } else { // client socket buffer read
                         int rd_res = read_client(curfd, cli_buf, buf_max_sz);
-                        if (rd_res == TCP_CLIENT_EXIT || rd_res == TCP_CLIENT_ERR) {
+                        if (rd_res == TCP_SRV_RD_ERR || rd_res == TCP_CLI_EXIT) {
                             int del_cli_res = optfdset_del(fdlis, curfd);
                             close(curfd);
                             if (del_cli_res != OPT_OK) {
-                                fprintf(stderr, "[ERROR] delete client Client[client_fd:%d]\n", curfd);
+                                ERRF("delete client Client[client_fd:%d]", curfd);
                             }
                         }
                     }

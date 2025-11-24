@@ -15,15 +15,7 @@ int accept_clients_blocking(
     int cli_res = 0;
     do {
         cli_res = read_client(cli_skt_fd, cli_buf, buf_max_sz);
-        switch (cli_res) {
-            case TCP_CLIENT_ERR: {
-                break;
-            }
-            case TCP_CLIENT_EXIT: {
-                break;
-            }
-        }
-    } while(cli_res == TCP_CLIENT_SEND);
+    } while(cli_res == TCP_SRV_RD_OK);
 
     free(cli_buf);
     close(cli_skt_fd);
@@ -38,29 +30,38 @@ int accept_client(int srv_skt_fd) {
 
     int cli_skt_fd = accept(srv_skt_fd, (struct sockaddr*)&cli_addr, &cli_addr_sz); 
     if (cli_skt_fd == -1) {
-        ERRF(Accepting TCP Socket);
+        FATAL("Accepting TCP Socket");
         return FD_INVALID;
     }
-    fprintf(stdout, "[DEBUG] Received Socket Conn: [client_fd:%d]\n", cli_skt_fd); 
-    fprintf(stdout, "[INFO ] Client[client_fd:%d], client_ip:%s, client_port:%d\n",
-        cli_skt_fd, inet_ntoa(cli_addr.sin_addr), cli_addr.sin_port);  
+    DEBUGF("Received Socket Conn: [client_fd:%d]", cli_skt_fd);
+    INFOF("Client[client_fd:%d], client_ip:%s, client_port:%d", 
+        cli_skt_fd, inet_ntoa(cli_addr.sin_addr), cli_addr.sin_port);
 
     return cli_skt_fd;
 }
 
 int read_client(int cli_skt_fd, char *cli_buf, int buf_max_sz) {
     ssize_t rd_sz = read(cli_skt_fd, cli_buf, buf_max_sz);
-    if (rd_sz == -1) { // client <-> server error
-        fprintf(stderr, "[ERROR] Read From Client[client_fd:%d]\n", cli_skt_fd);
-        return TCP_CLIENT_ERR;
+    if (rd_sz == -1) { // server read client error
+        ERRF("Read From Client[client_fd:%d]", cli_skt_fd);
+        return TCP_SRV_RD_ERR;
     }
-    if (rd_sz == 0 || strcmp(cli_buf, TCP_CLIENT_EXIT_STR)==0) { // client say legal exit
-        fprintf(stdout, "[INFO ] Client[client_fd:%d] closed normalized\n", cli_skt_fd);  
-        return TCP_CLIENT_EXIT; 
-    } else { // server legal received
-        fprintf(stdout, "[INFO ] Read From Client[client_fd:%d], Msg: %s\n", cli_skt_fd, cli_buf);
-        return TCP_CLIENT_SEND;
+    if (rd_sz == 0 || strcmp(cli_buf, TCP_CLI_EXIT_MSG)==0) { // client EOF or quit
+        INFOF("Client[client_fd:%d] closed, caused by: client %s", cli_skt_fd, rd_sz==0 ? "EOF": "quit");
+        return TCP_CLI_EXIT;
+    } else { // server received legally
+        INFOF("Read From Client[client_fd:%d], Msg: %s", cli_skt_fd, cli_buf);
+        return TCP_SRV_RD_OK;
     }
+}
+
+int write_client(int cli_skt_fd, char *buf, int buf_sz) {
+    ssize_t wr_sz = write(cli_skt_fd, buf, buf_sz);
+    if (wr_sz == -1) {
+        ERRF("write to client[client_fd:%d] error", cli_skt_fd);
+        return TCP_SRV_WR_ERR;
+    }
+    return TCP_SRV_WR_OK;
 }
 
 void fd_nonblocking(int fd) {

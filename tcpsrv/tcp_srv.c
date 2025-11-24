@@ -14,7 +14,7 @@
 
 int glb_skt_fd = -1;
 void __attribute__((destructor)) __inexit() {
-    fprintf(stdout, "[INFO ] clean socket\n");
+    INFOF("clean socket");
     if (glb_skt_fd != -1) {
         close(glb_skt_fd);
     }
@@ -28,8 +28,9 @@ int main(int argc, char** argv) {
     int skt_max_conns = 1024;
     int cli_buf_max_sz = 4096; // 4KB
     int server_mode = SRV_MODE_EPOLL;
+    int log_level = LOG_LEVEL_DEBUG;
 
-    char const * const shrt_opts = "h46a:p:c:b:m:";
+    char const * const shrt_opts = "h46a:p:c:b:m:l:";
     const struct option long_opts[] = 
     {
         {"help", no_argument, NULL, 'h'},
@@ -39,7 +40,8 @@ int main(int argc, char** argv) {
         {"port", optional_argument, NULL, 'p'},
         {"conn", optional_argument, NULL, 'c'},
         {"bsiz", optional_argument, NULL, 'b'},
-        {"mode", optional_argument, NULL, 'm'}
+        {"mode", optional_argument, NULL, 'm'},
+        {"log", optional_argument, NULL, 'l'}
     };
     #define HELP_ARGS() \
         do { \
@@ -50,6 +52,7 @@ int main(int argc, char** argv) {
             fprintf(stdout, "Option: [-c] | [--conn], max client connections, (default:1024)\n"); \
             fprintf(stdout, "Option: [-b] | [--bsiz], client max buffer size byte, (default:4096)\n"); \
             fprintf(stdout, "Option: [-m] | [--mode], blocking:0, select:1, epoll:2, (default:2)\n"); \
+            fprintf(stdout, "Option: [-l] | [--log], debug:0, info:1, error:2, (default:0)\n"); \
         } while(0)
     
     int optcase = 0;
@@ -85,6 +88,10 @@ int main(int argc, char** argv) {
             server_mode = strtol(optarg, NULL, 10);
             break;
 
+            case 'l':
+            log_level = strtol(optarg, NULL, 10);
+            break;
+
             case 'h':
             HELP_ARGS();
             return 0;
@@ -96,19 +103,19 @@ int main(int argc, char** argv) {
     }
 
     if (strlen(skt_ipv4_addr) == 0) {
-        fprintf(stderr, "[ERROR] bad address:%s with adfamily:%d\n", skt_ipv4_addr, domain_safamily);
+        ERRF("bad address:%s(len=%ld) with adfamily:%d", skt_ipv4_addr, strlen(skt_ipv4_addr), domain_safamily);
         return 1;
     }
     if (skt_ipv4_port<=0 || skt_ipv4_port>65535) {
-        fprintf(stderr, "[ERROR] bad port:%d\n", skt_ipv4_port);
+        ERRF("bad port:%d", skt_ipv4_port);
         return 1;
     }
     if (skt_max_conns<=0) {
-        fprintf(stderr, "[ERROR] bad conn:%d\n", skt_max_conns);
+        ERRF("bad conn:%d", skt_max_conns);
         return 1;
     }
     if (cli_buf_max_sz<=0) {
-        fprintf(stderr, "[ERROR] bad bsiz:%d\n", cli_buf_max_sz);
+        ERRF("bad bsiz:%d", cli_buf_max_sz);
         return 1;
     }
     server_accept_f accf = NULL;
@@ -126,7 +133,7 @@ int main(int argc, char** argv) {
             break;
         }
         default: {
-            fprintf(stderr, "[ERROR] server_mode:%d is not supportted\n", server_mode);
+            ERRF("server_mode:%d is not supportted", server_mode);
             return 1;
         }
     }
@@ -134,10 +141,9 @@ int main(int argc, char** argv) {
     // Create an `IPv4` socket
     int skt_fd = socket(domain_safamily, SOCK_STREAM, IPPROTO_TCP);
     if (skt_fd == -1) {
-        ERRF(Creating TCP Socket);
-        return 1;
+        FATAL("Creating TCP Socket");
     }
-    fprintf(stdout, "[DEBUG] Create Socket success, [server_fd:%d]\n", skt_fd);
+    DEBUGF("Create Socket success, [server_fd:%d]", skt_fd);
     glb_skt_fd = skt_fd;
 
     // Assign socket an `IPv4:Port` Address
@@ -145,26 +151,23 @@ int main(int argc, char** argv) {
     sktaddrin_set(svr_addr, domain_safamily, skt_ipv4_port, skt_ipv4_addr);
     int bind_err = bind(skt_fd, (struct sockaddr*)&svr_addr, sizeof(svr_addr));
     if (bind_err == -1) {
-        ERRF(Binding TCP Socket Address);
-        return 1;
+        FATAL("Binding TCP Socket Address");
     }
-    fprintf(stdout, "[DEBUG] Assign Socket Address success\n");
+    DEBUGF("Assign Socket Address success");
 
     // Listen to conns
     int lis_err = listen(skt_fd, skt_max_conns);
     if (bind_err == -1) {
-        ERRF(Listening TCP Socket);
-        return 1;
+        FATAL("Listening TCP Socket");
     }
-    fprintf(stdout, "[DEBUG] Listening Socket Conns in: %s:%d\n", skt_ipv4_addr, skt_ipv4_port);
+    DEBUGF("Listening Socket Conns in: %s:%d", skt_ipv4_addr, skt_ipv4_port);
 
     accf(skt_fd, skt_max_conns, cli_buf_max_sz);
 
     if (close(skt_fd) == -1){
-        ERRF(Closing TCP Socket);
-        return 1;
+        FATAL("Closing TCP Socket");
     } else {
-        fprintf(stdout, "[INFO ] server closed normalized, exit\n");
+        INFOF("server closed normalized, exit");
         return 0;
     }
 }

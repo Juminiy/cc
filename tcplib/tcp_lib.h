@@ -35,10 +35,21 @@ int accept_clients_by_epoll(
     int buf_max_sz
 );
 
-#define TCP_CLIENT_EXIT_STR "!quit"
-#define TCP_CLIENT_EXIT 111
-#define TCP_CLIENT_SEND 000
-#define TCP_CLIENT_ERR  010
+// Server Code
+#define TCP_SRV_RD_OK  (1<<0)
+#define TCP_SRV_RD_ERR (1<<1)
+#define TCP_SRV_WR_OK  (1<<2)
+#define TCP_SRV_WR_ERR (1<<3)
+
+// Client Code
+#define TCP_CLI_RD_OK  (1<<4)
+#define TCP_CLI_RD_ERR (1<<5)
+#define TCP_CLI_WR_OK  (1<<6)
+#define TCP_CLI_WR_ERR (1<<7)
+#define TCP_CLI_EOF    (1<<8)
+#define TCP_CLI_EXIT   (1<<9)
+
+#define TCP_CLI_EXIT_MSG "(!q)"
 
 #define SRV_MODE_BLOCKING 0
 #define SRV_MODE_SELECT 1

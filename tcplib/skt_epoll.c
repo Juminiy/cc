@@ -18,7 +18,7 @@ int accept_clients_by_epoll(
 
     int epoll_fd = epoll_create1(0); // EPOLL_CLOEXEC
     if (epoll_fd == -1) {
-        fprintf(stderr, "[ERROR] epoll_create1 create epoll_fd\n");
+        ERRF("epoll_create1 create epoll_fd");
         return 1;
     }
 
@@ -28,7 +28,7 @@ int accept_clients_by_epoll(
     srv_ev.data.fd = srv_skt_fd;
 
     if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, srv_skt_fd, &srv_ev) == -1) {
-        fprintf(stderr, "[ERROR] epoll add server_fd:%d into interest\n", srv_skt_fd);
+        ERRF("epoll add server_fd:%d into interest", srv_skt_fd);
         return 1;
     }
 
@@ -37,7 +37,7 @@ int accept_clients_by_epoll(
     for(;;) {
         int fd_cnt = epoll_wait(epoll_fd, tot_evs, tot_sz, -1);
         if (fd_cnt == -1){
-            fprintf(stderr, "[ERROR] epoll wait all events\n");
+            ERRF("epoll wait all events");
             return 1;
         }
 
@@ -51,14 +51,14 @@ int accept_clients_by_epoll(
                 cli_ev.events = EPOLLIN | EPOLLET;
                 cli_ev.data.fd = cli_fd;
                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, cli_fd, &cli_ev) == -1) {
-                    fprintf(stderr, "[ERROR] epoll add client_fd:%d into interest\n", cur_fd);
+                    ERRF("epoll add client_fd:%d into interest", cur_fd);
                     return 1;
                 }
             } else {
                 int rd_res = read_client(cur_fd, cli_buf, buf_max_sz);
-                if (rd_res == TCP_CLIENT_EXIT || rd_res == TCP_CLIENT_ERR) {
+                if (rd_res == TCP_SRV_RD_ERR || rd_res == TCP_CLI_EXIT) {
                     if(epoll_ctl(epoll_fd, EPOLL_CTL_DEL, cur_fd, NULL)==-1) {
-                        fprintf(stderr, "[ERROR] epoll delete client_fd:%d from interest\n", cur_fd);
+                        ERRF("epoll delete client_fd:%d from interest", cur_fd);
                     }
                     close(cur_fd);
                 }

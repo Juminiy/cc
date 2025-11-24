@@ -33,6 +33,8 @@ args_test.d: test/args_test.c
 str_test.d: test/str_test.c
 klist_test.d: test/klist_test.c
 select_test.d: test/select_test.c
+logf_test.d: test/logf_test.c
+uthash_test.d: test/uthash_test.c
 
 fdset_test.o: test/fdset_test.c
 

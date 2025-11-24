@@ -14,7 +14,7 @@
 
 int glb_skt_fd = -1;
 void __attribute__((destructor)) __inexit() {
-    fprintf(stdout, "[INFO ] clean socket\n");
+    INFO("clean socket");
     if (glb_skt_fd != -1) {
         close(glb_skt_fd);
     }
@@ -82,53 +82,51 @@ int main(int argc, char** argv) {
     }
 
     if (strlen(srv_addr) == 0) {
-        fprintf(stderr, "[ERROR] bad address:%s with adfamily:%d\n", srv_addr, addr_family);
+        ERRF("bad address:%s(len=%ld) with adfamily:%d", srv_addr, strlen(srv_addr), addr_family);
         return 1;
     }
     if (srv_port<=0 || srv_port>65535) {
-        fprintf(stderr, "[ERROR] bad port:%d\n", srv_port);
+        ERRF("bad port:%d", srv_port);
         return 1;
     }
     if (cli_send_max_sz<=0) {
-        fprintf(stderr, "[ERROR] bad bsiz:%d\n", cli_send_max_sz);
+        ERRF("bad bsiz:%d", cli_send_max_sz);
         return 1;
     }
     
     int skt_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (skt_fd == -1){
-        ERRF(Create Socket Error);
-        return 1;
+        FATAL("Create Socket");
     }
-    fprintf(stdout, "[DEBUG] Create Socket success, [client_fd:%d]\n", skt_fd);
+    DEBUGF("Create Socket success, [client_fd:%d]", skt_fd);
     glb_skt_fd = skt_fd;
 
     struct sockaddr_in skt_addr;
     sktaddrin_set(skt_addr, AF_INET, srv_port, srv_addr);
     int conn_err = connect(skt_fd, (struct sockaddr*) &skt_addr, sizeof(skt_addr));
     if (conn_err == -1) {
-        fprintf(stderr, "[ERROR] Connect to host %s:%d\n", srv_addr, srv_port);
+        ERRF("Connect to host %s:%d", srv_addr, srv_port);
         return 1;
     }
-    fprintf(stdout, "[INFO ] Connect to host %s:%d success\n", srv_addr, srv_port);
+    INFOF("Connect to host %s:%d success", srv_addr, srv_port);
 
     char *wrbuf = (char*)malloc(cli_send_max_sz);
     for (;;) {
-        fprintf(stdout, "[INFO ] > ");
+        fprintf(stdout, "[INPUT] > ");
         int cinsz = fscanf(stdin, "%s", wrbuf);
         if (cinsz == -1) {
-            ERRF(CIN Scan Bytes);
-            return 1;
+            FATAL("CIN Scan Bytes");
         }
         ssize_t wr_sz = send(skt_fd, wrbuf, cli_send_max_sz, 0);
         if (wr_sz == 0){
-            fprintf(stdout, "[INFO ] server disconnected\n");
+            INFOF("server disconnected");
             break;
         }
         if (wr_sz == -1) {
-            ERRF(Client Write buffer);
+            FATAL("Client Write");
             break;
-        } else if (strcmp(wrbuf, TCP_CLIENT_EXIT_STR) == 0) {
-            fprintf(stdout, "[INFO ] client disconnected\n");
+        } else if (strcmp(wrbuf, TCP_CLI_EXIT_MSG) == 0) {
+            INFOF("client disconnected");
             break;
         }
         sleep(1);

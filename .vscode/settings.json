@@ -29,6 +29,11 @@
         "file.h": "c",
         "features.h": "c",
         "epoll.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "concepts": "c",
+        "cstdio": "c",
+        "type_traits": "c",
+        "new": "c",
+        "typeinfo": "c"
     }
 }
