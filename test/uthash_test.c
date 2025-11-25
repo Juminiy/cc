@@ -1,3 +1,4 @@
+// the uthash library BUGGY, will not use it anymore. 
 #include "../thirdparty/uthash/uthash.h"
 
 #include <stdio.h>
@@ -28,7 +29,10 @@ void del_user(t_user *_users, t_user *_user) {
 int main() {
 
     t_user *users=(t_user*)malloc(sizeof(t_user)*4);
-
+    if(users==NULL){
+        fprintf(stderr, "malloc NULL\n");
+        exit(EXIT_FAILURE);
+    }
 
     printf("not in get\n");
 

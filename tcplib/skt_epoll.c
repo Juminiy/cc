@@ -7,6 +7,7 @@
 
 
 #include "tcp_lib.h"
+#include "skt_fdset.h"
 
 int accept_clients_by_epoll(
     int srv_skt_fd,
@@ -34,6 +35,7 @@ int accept_clients_by_epoll(
 
     int tot_sz = cli_max_sz + 1;
     struct epoll_event tot_evs[tot_sz];
+    optfdset *cli_fds = create_optfdset(cli_max_sz);
     for(;;) {
         int fd_cnt = epoll_wait(epoll_fd, tot_evs, tot_sz, -1);
         if (fd_cnt == -1){
@@ -45,8 +47,12 @@ int accept_clients_by_epoll(
             int cur_fd = tot_evs[idx].data.fd;
             if(cur_fd==srv_skt_fd) {
                 int cli_fd = accept_client(srv_skt_fd);
-                fd_nonblocking(cli_fd);
+                if(optfdset_add(cli_fds, cli_fd)==FD_SET_FULL) {
+                    close(cli_fd);
+                    continue;
+                }
 
+                fd_nonblocking(cli_fd);
                 struct epoll_event cli_ev;
                 cli_ev.events = EPOLLIN | EPOLLET;
                 cli_ev.data.fd = cli_fd;
@@ -60,7 +66,17 @@ int accept_clients_by_epoll(
                     if(epoll_ctl(epoll_fd, EPOLL_CTL_DEL, cur_fd, NULL)==-1) {
                         ERRF("epoll delete client_fd:%d from interest", cur_fd);
                     }
+                    optfdset_del(cli_fds, cur_fd);
                     close(cur_fd);
+                    continue;
+                }
+                char buf_dest[25+strlen(cli_buf)];
+                snprintf(buf_dest, 25+strlen(cli_buf), "[client_fd:%d] [msg:%s]", cur_fd, cli_buf);
+                for(int cli_idx=0;cli_idx<cli_fds->cap;cli_idx++){
+                    int _fd = cli_fds->arr[cli_idx];
+                    if(optfdset_valid(_fd) && _fd!=cur_fd){
+                        write_client(_fd, buf_dest, strlen(buf_dest));
+                    }
                 }
             }
         }

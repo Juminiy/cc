@@ -12,11 +12,58 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#include <pthread.h>
+
 int glb_skt_fd = -1;
 void __attribute__((destructor)) __inexit() {
     INFO("clean socket");
     if (glb_skt_fd != -1) {
         close(glb_skt_fd);
+    }
+}
+
+typedef struct {
+    int skt_fd;
+    char *buf;
+    int buf_sz;
+} io_srv;
+
+void* read_server(void *arg) {
+    io_srv *rd_srv = arg;
+    for (;;) {
+        ssize_t rd_sz = read(rd_srv->skt_fd, rd_srv->buf, rd_srv->buf_sz);
+        if (rd_sz==-1) {
+            ERRF("read from server error");
+        } else if(rd_sz==0){
+            FATAL("server disconnected");
+        } else {
+            str_trunc(rd_srv->buf, rd_sz);
+            fprintf(stdout, "\r[OUPUT] > %s\n", rd_srv->buf);
+            fprintf(stdout, "\r[INPUT] < ");
+        }
+    }
+    return NULL;
+}
+
+void* write_server(void *arg) {
+    io_srv *wr_srv = arg;
+    for (;;) {
+        fprintf(stdout, "\r[INPUT] < ");
+        int cinsz = fscanf(stdin, "%s", wr_srv->buf);
+        if (cinsz == -1) {
+            FATAL("CIN Scan Bytes");
+        }
+        ssize_t wr_sz = write(wr_srv->skt_fd, wr_srv->buf, wr_srv->buf_sz);
+        if (wr_sz == 0){
+            INFOF("server disconnected");
+            break;
+        } else if (wr_sz == -1) {
+            FATAL("Client Write");
+            break;
+        } else if (strcmp(wr_srv->buf, TCP_CLI_EXIT_MSG) == 0) {
+            INFOF("client disconnected");
+            break;
+        }
     }
 }
 
@@ -110,26 +157,36 @@ int main(int argc, char** argv) {
     }
     INFOF("Connect to host %s:%d success", srv_addr, srv_port);
 
-    char *wrbuf = (char*)malloc(cli_send_max_sz);
-    for (;;) {
-        fprintf(stdout, "[INPUT] > ");
-        int cinsz = fscanf(stdin, "%s", wrbuf);
-        if (cinsz == -1) {
-            FATAL("CIN Scan Bytes");
-        }
-        ssize_t wr_sz = send(skt_fd, wrbuf, cli_send_max_sz, 0);
-        if (wr_sz == 0){
-            INFOF("server disconnected");
-            break;
-        }
-        if (wr_sz == -1) {
-            FATAL("Client Write");
-            break;
-        } else if (strcmp(wrbuf, TCP_CLI_EXIT_MSG) == 0) {
-            INFOF("client disconnected");
-            break;
-        }
-        sleep(1);
+    pthread_attr_t tattr;
+    pthread_t rd_thread_num = 1, wr_thread_num = 2;
+    io_srv rd_srv = {
+        .buf_sz = cli_send_max_sz,
+        .buf = (char*)malloc(cli_send_max_sz),
+        .skt_fd = skt_fd
+    };
+    io_srv wr_srv = {
+        .buf_sz = cli_send_max_sz,
+        .buf = (char*)malloc(cli_send_max_sz),
+        .skt_fd = skt_fd
+    };
+    void *rd_thread_ret=NULL, *wr_thread_ret=NULL;
+    if(pthread_attr_init(&tattr)) {
+        FATAL("threads initing attr");
+    }
+    if(pthread_create(&rd_thread_num, &tattr, read_server, &rd_srv)) {
+        FATAL("read_server thread creating");
+    }
+    if(pthread_create(&wr_thread_num, &tattr, write_server, &wr_srv)) {
+        FATAL("write_server thread creating");
+    }
+    if(pthread_attr_destroy(&tattr)) {
+        FATAL("threads destroying attr");
+    }
+    if(pthread_join(rd_thread_num, &rd_thread_ret)) {
+        FATAL("read_server thread joining");
+    }
+    if(pthread_join(wr_thread_num, &wr_thread_ret)) {
+        FATAL("write_server thread joining");
     }
 
     close(skt_fd);

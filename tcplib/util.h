@@ -36,4 +36,6 @@
 #define LOG_LEVEL_WARN  2
 #define LOG_LEVEL_ERROR 3
 
+void str_trunc(char *_str, int _len);
+
 #endif

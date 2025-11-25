@@ -3,10 +3,10 @@
 
 #include <stdbool.h>
 
-#define OPT_OK 0
+#define FD_OPT_OK 0
 #define FD_INVALID -1
-#define BAD_INDEX -2
-#define SET_FULL -3
+#define FD_BAD_INDEX -2
+#define FD_SET_FULL -3
 
 // add, delete, foreach, ensured input data unique
 // do not permit enlarge

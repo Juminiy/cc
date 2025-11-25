@@ -22,7 +22,6 @@ typedef struct {
 
 int max_room_sz = 0;
 
-
 // 
 int create_chat_room(
     int max_fd_sz,

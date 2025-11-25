@@ -14,7 +14,7 @@ all: tcp_srv.d tcp_cli.d
 tcp_srv.d: tcp_srv.o tcp_lib.o skt_select.o skt_fdset.o skt_epoll.o
 	$(CC) $(cplargs) -o $@ $^
 
-tcp_cli.d: tcp_cli.o
+tcp_cli.d: tcp_cli.o util.o
 	$(CC) $(cplargs) -o $@ $^
 
 tcp_srv.o: tcpsrv/tcp_srv.c
@@ -24,6 +24,7 @@ skt_epoll.o: tcplib/skt_epoll.c
 skt_fdset.o: tcplib/skt_fdset.c
 tcp_lib.o: tcplib/tcp_lib.c
 net_util.o: tcplib/net_util.c
+util.o: tcplib/util.c
 
 test: 
 
@@ -34,7 +35,7 @@ str_test.d: test/str_test.c
 klist_test.d: test/klist_test.c
 select_test.d: test/select_test.c
 logf_test.d: test/logf_test.c
-uthash_test.d: test/uthash_test.c
+mt_test.d: test/mt_test.c
 
 fdset_test.o: test/fdset_test.c
 

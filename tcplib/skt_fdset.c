@@ -21,7 +21,7 @@ optfdset* create_optfdset(int _sz) {
 int delete_optfdset(optfdset *_fdset) {
     free(_fdset->arr);
     free(_fdset);
-    return OPT_OK;
+    return FD_OPT_OK;
 }
 
 int optfdset_add(optfdset *_fdset, int _fd) {
@@ -29,17 +29,17 @@ int optfdset_add(optfdset *_fdset, int _fd) {
         return FD_INVALID;
     }
     int exist_idx = optfdset_index(_fdset, _fd);
-    if (exist_idx!=BAD_INDEX){
+    if (exist_idx!=FD_BAD_INDEX){
         return exist_idx;
     }
     int empty_idx = optfdset_index(_fdset, FD_INVALID);
-    if (empty_idx!=BAD_INDEX){
+    if (empty_idx!=FD_BAD_INDEX){
         _fdset->siz++;
         _fdset->arr[empty_idx] = _fd;
         optfdset_minmax_set(_fdset, _fd);
         return empty_idx;
     }
-    return SET_FULL;
+    return FD_SET_FULL;
 }
 
 int optfdset_del(optfdset *_fdset, int _fd) {
@@ -47,12 +47,12 @@ int optfdset_del(optfdset *_fdset, int _fd) {
         return FD_INVALID;
     }
     int exist_idx = optfdset_index(_fdset, _fd);
-    if (exist_idx!=BAD_INDEX) {
+    if (exist_idx!=FD_BAD_INDEX) {
         _fdset->siz--;
         _fdset->arr[exist_idx] = FD_INVALID;
         optfdset_minmax_reset(_fdset);
     }
-    return OPT_OK;
+    return FD_OPT_OK;
 }
 
 int optfdset_index(optfdset *_fdset, int _fd) {
@@ -61,7 +61,7 @@ int optfdset_index(optfdset *_fdset, int _fd) {
             return idx;
         }
     }
-    return BAD_INDEX;
+    return FD_BAD_INDEX;
 }
 
 bool optfdset_valid(int _fd) {
@@ -79,7 +79,7 @@ int optfdset_minmax_set(optfdset *_fdset, int _fd) {
     } else {
         _fdset->max=MAX(_fdset->max, _fd);
     }
-    return OPT_OK;
+    return FD_OPT_OK;
 }
 
 int optfdset_minmax_reset(optfdset *_fdset) {

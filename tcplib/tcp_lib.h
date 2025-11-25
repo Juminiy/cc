@@ -15,7 +15,8 @@
 
 void fd_nonblocking(int fd);
 int accept_client(int srv_skt_fd);
-int read_client(int cli_skt_fd, char *cli_buf, int buf_max_sz);
+int read_client(int cli_skt_fd, char *buf, int buf_sz);
+int write_client(int cli_skt_fd, char *buf, int buf_sz);
 
 typedef int(*server_accept_f)(int, int, int);
 

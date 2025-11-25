@@ -45,7 +45,7 @@ int accept_clients_by_select(
                     if (curfd == srv_skt_fd) { // server socket accept read 
                         int cli_skt_fd = accept_client(srv_skt_fd);
                         int add_ret = optfdset_add(fdlis, cli_skt_fd);
-                        if (add_ret == SET_FULL) {
+                        if (add_ret == FD_SET_FULL) {
                             close(cli_skt_fd);
                             WARNF("Client[client_fd:%d] connect exceed cli_max_sz:%d, rejected", cli_skt_fd, cli_max_sz);
                         } else {
@@ -57,7 +57,7 @@ int accept_clients_by_select(
                         if (rd_res == TCP_SRV_RD_ERR || rd_res == TCP_CLI_EXIT) {
                             int del_cli_res = optfdset_del(fdlis, curfd);
                             close(curfd);
-                            if (del_cli_res != OPT_OK) {
+                            if (del_cli_res != FD_OPT_OK) {
                                 ERRF("delete client Client[client_fd:%d]", curfd);
                             }
                         }
