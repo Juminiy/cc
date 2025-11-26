@@ -39,6 +39,16 @@
         "sortedmap.h": "c",
         "smap.h": "c",
         "pthread.h": "c",
-        "if.h": "c"
+        "if.h": "c",
+        "eventfd.h": "c",
+        "io_uring.h": "c",
+        "mman.h": "c",
+        "syscall.h": "c",
+        "unistd_32.h": "c",
+        "unistd_x32.h": "c",
+        "unistd_64.h": "c",
+        "liburing.h": "c",
+        "uio.h": "c",
+        "net_util.h": "c"
     }
 }

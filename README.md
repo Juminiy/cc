@@ -7,11 +7,12 @@
    3. NonBlocking: by linux-epoll
    4. IPv4
    5. MaxClientSize
-   6. Read from clients
+   6. Read from clients, Write to clients
 
 2. TCP Client
-   1. Write to server
+   1. Write to server, Read from server
    2. IPv4
+   3. Client connect to clients by server dispatching
 
 3. Features Append:
    1. server read/write, client read/write both in both sides.

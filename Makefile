@@ -9,6 +9,9 @@ vpath %.o
 %.d: %.c
 	$(CC) $(cplargs) -o $@ $^
 
+%.d: %.o
+	$(CC) $(cplargs) -o $@ $^
+
 all: tcp_srv.d tcp_cli.d
 
 tcp_srv.d: tcp_srv.o tcp_lib.o skt_select.o skt_fdset.o skt_epoll.o
@@ -28,7 +31,7 @@ util.o: tcplib/util.c
 
 test: 
 
-fdset_test.d: fdset_test.o skt_fdset.o
+fdset_test.d: test/fdset_test.c skt_fdset.o
 poll_test.d: test/poll_test.c
 args_test.d: test/args_test.c
 str_test.d: test/str_test.c
@@ -36,8 +39,11 @@ klist_test.d: test/klist_test.c
 select_test.d: test/select_test.c
 logf_test.d: test/logf_test.c
 mt_test.d: test/mt_test.c
+os_test.d: test/os_test.c
+net_test.d: test/net_test.c net_util.o
 
 fdset_test.o: test/fdset_test.c
+net_test.o: test/net_test.c
 
 clean:
 	rm -rf *.o *.a *.so *.out
