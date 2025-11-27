@@ -30,9 +30,13 @@ typedef struct elem_t {
     elem_uni uni; // 8B
 } elem_t;
 
-#define setup_elem_t(elem, elem_tag, uni_field, elem_uni) \
-    do { elem.tag = elem_tag; elem.uni.uni_field = elem_uni; } while(0)
+#define setup_elem_t(elem, elem_tag, uni_field, elem_val) \
+    do { elem.tag = elem_tag; elem.uni.uni_field = elem_val; } while(0)
 
-typedef int(*elem_t_cmp)(elem_t, elem_t);
+// func must return `val`:
+// _e0 = _e1: val===0
+// _e0 < _e1: any val<0
+// _e0 > _e1: any val>0
+typedef int(*elem_t_cmp)(elem_t _e0, elem_t _e1);
 
 #endif

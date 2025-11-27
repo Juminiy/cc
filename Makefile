@@ -29,6 +29,7 @@ tcp_lib.o: tcplib/tcp_lib.c
 net_util.o: tcplib/net_util.c
 util.o: tcplib/util.c
 ctr_blist.o: ctrlib/ctr_blist.c
+ctr_rbtree.o: ctrlib/ctr_rbtree.c
 
 test: 
 
@@ -43,6 +44,7 @@ mt_test.d: test/mt_test.c
 os_test.d: test/os_test.c
 net_test.d: test/net_test.c net_util.o ctr_blist.o
 blist_test.d: test/blist_test.c ctr_blist.o
+rbtree_test.d: test/rbtree_test.c ctr_rbtree.o
 
 clean:
 	rm -rf *.o *.a *.so *.out
