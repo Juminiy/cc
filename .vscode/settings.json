@@ -49,6 +49,16 @@
         "unistd_64.h": "c",
         "liburing.h": "c",
         "uio.h": "c",
-        "net_util.h": "c"
+        "net_util.h": "c",
+        "blist.h": "c",
+        "atomic": "cpp",
+        "chrono": "cpp",
+        "cstdint": "cpp",
+        "io_context": "cpp",
+        "random": "cpp",
+        "compare": "cpp",
+        "ctr_elemt.h": "c",
+        "ctr_blist.h": "c",
+        "stddef.h": "c"
     }
 }

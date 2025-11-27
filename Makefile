@@ -1,6 +1,6 @@
 cplargs=-Wunused-result -O2
 
-VPATH = tcpcli:tcplib:tcpsrv:test
+VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test
 vpath %.o
 
 %.o: %.c
@@ -28,6 +28,7 @@ skt_fdset.o: tcplib/skt_fdset.c
 tcp_lib.o: tcplib/tcp_lib.c
 net_util.o: tcplib/net_util.c
 util.o: tcplib/util.c
+ctr_blist.o: ctrlib/ctr_blist.c
 
 test: 
 
@@ -40,10 +41,8 @@ select_test.d: test/select_test.c
 logf_test.d: test/logf_test.c
 mt_test.d: test/mt_test.c
 os_test.d: test/os_test.c
-net_test.d: test/net_test.c net_util.o
-
-fdset_test.o: test/fdset_test.c
-net_test.o: test/net_test.c
+net_test.d: test/net_test.c net_util.o ctr_blist.o
+blist_test.d: test/blist_test.c ctr_blist.o
 
 clean:
 	rm -rf *.o *.a *.so *.out
