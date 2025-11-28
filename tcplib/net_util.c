@@ -15,7 +15,7 @@
         strcpy(intfipaddr->_ip, inet_ntoa(sa_in->sin_addr)); \
         intfipaddr->_name = intf->ifa_name; \
         elem_t elem_addr; \
-        setup_elem_t(elem_addr, 0, ptr, intfipaddr); \
+        setup_elem_ptr(elem_addr, intfipaddr); \
         bListAddTail(addr_blist, elem_addr); \
     } while(0)
 

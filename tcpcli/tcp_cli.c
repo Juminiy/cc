@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 
 #include "../tcplib/tcp_lib.h"
+#include "../tcplib/net_util.h"
 
 #include <time.h>
 #include <unistd.h>
@@ -74,7 +75,7 @@ int main(int argc, char** argv) {
     int srv_port = 3054;
     int cli_send_max_sz = 4096; // 4KB
 
-    const char *shrt_opts = "h46a:p:b:";
+    const char *shrt_opts = "h46a:p:b:s";
     const struct option long_opts[] = 
     {
         {"help", no_argument, NULL, 'h'},
@@ -82,7 +83,8 @@ int main(int argc, char** argv) {
         {"ipv6", no_argument, NULL, '6'},
         {"addr", required_argument, NULL, 'a'},
         {"port", optional_argument, NULL, 'p'},
-        {"bsiz", optional_argument, NULL, 'b'}
+        {"bsiz", optional_argument, NULL, 'b'},
+        {"show-intf", no_argument, NULL, 's'}
     };
     #define HELP_ARGS() \
         do { \
@@ -91,6 +93,7 @@ int main(int argc, char** argv) {
             fprintf(stdout, "Option: [-a] | [--addr], bind address\n"); \
             fprintf(stdout, "Option: [-p] | [--port], bind port, (default:3054)\n"); \
             fprintf(stdout, "Option: [-b] | [--bsiz], client max buffer size byte, (default:4096)\n"); \
+            fprintf(stdout, "Option: [-s] | [--show-intf], show net interface and ip\n"); \
         } while(0)
 
     int optcase = 0;
@@ -117,6 +120,10 @@ int main(int argc, char** argv) {
             case 'b':
             cli_send_max_sz = strtol(optarg, NULL, 10);
             break;
+
+            case 's':
+            SHOW_INTFIP(INFOF);
+            return 0;
 
             case 'h':
             HELP_ARGS();

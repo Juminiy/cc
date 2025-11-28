@@ -30,8 +30,26 @@ typedef struct elem_t {
     elem_uni uni; // 8B
 } elem_t;
 
+#define ELEM_T_INVALID 0
+#define ELEM_T_VALID   1
+#define valid_elem_t(elem) (elem.tag!=ELEM_T_INVALID)
+
 #define setup_elem_t(elem, elem_tag, uni_field, elem_val) \
     do { elem.tag = elem_tag; elem.uni.uni_field = elem_val; } while(0)
+
+#define setup_elem_u64(_elem, _u64) \
+    setup_elem_t(_elem, ELEM_T_VALID, u64, _u64)
+#define setup_elem_i64(_elem, _i64) \
+    setup_elem_t(_elem, ELEM_T_VALID, i64, _i64)
+#define setup_elem_f64(_elem, _f64) \
+    setup_elem_t(_elem, ELEM_T_VALID, f64, _f64)
+#define setup_elem_ptr(_elem, _ptr) \
+    setup_elem_t(_elem, ELEM_T_VALID, ptr, _ptr)
+
+#define get_elem_u64(_elem) (_elem.uni.u64)
+#define get_elem_i64(_elem) (_elem.uni.i64)
+#define get_elem_f64(_elem) (_elem.uni.f64)
+#define get_elem_ptr(_elem) (_elem.uni.ptr)
 
 // func must return `val`:
 // _e0 = _e1: val===0

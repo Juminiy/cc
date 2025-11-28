@@ -39,17 +39,17 @@ void freeBList(blist *_bl) {
     free(_bl);
 }
 
-blist *bListLinkHead(blist *_bl, bnode *_bn) {
+bnode *bListLinkHead(blist *_bl, bnode *_bn) {
     __link_bnode(_bn, _bl->_head);
     _bl->_head = _bn;
     if(_bl->_size==0) {
         _bl->_tail = _bn;
     }
     _bl->_size++;
-    return _bl;
+    return _bn;
 }
 
-blist *bListAddHead(blist *_bl, elem_t _dt) {
+bnode *bListAddHead(blist *_bl, elem_t _dt) {
     return bListLinkHead(_bl, makeBNode(NULL,_dt,NULL));
 }
 
@@ -66,17 +66,17 @@ bnode *bListDelHead(blist *_bl) {
     return _bn;
 }
 
-blist *bListLinkTail(blist *_bl, bnode *_bn) {
+bnode *bListLinkTail(blist *_bl, bnode *_bn) {
     __link_bnode(_bl->_tail, _bn);
     _bl->_tail = _bn;
     if(_bl->_size==0) {
         _bl->_head = _bn;
     }
     _bl->_size++;
-    return _bl;
+    return _bn;
 }
 
-blist *bListAddTail(blist *_bl, elem_t _dt) {
+bnode *bListAddTail(blist *_bl, elem_t _dt) {
     return bListLinkTail(_bl, makeBNode(NULL,_dt,NULL));
 }
 

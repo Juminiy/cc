@@ -11,6 +11,7 @@
 #include <getopt.h>
 
 #include "../tcplib/tcp_lib.h"
+#include "../tcplib/net_util.h"
 
 int glb_skt_fd = -1;
 void __attribute__((destructor)) __inexit() {
@@ -30,7 +31,7 @@ int main(int argc, char** argv) {
     int server_mode = SRV_MODE_EPOLL;
     int log_level = LOG_LEVEL_DEBUG;
 
-    char const * const shrt_opts = "h46a:p:c:b:m:l:";
+    char const * const shrt_opts = "h46a:p:c:b:m:l:s";
     const struct option long_opts[] = 
     {
         {"help", no_argument, NULL, 'h'},
@@ -41,7 +42,8 @@ int main(int argc, char** argv) {
         {"conn", optional_argument, NULL, 'c'},
         {"bsiz", optional_argument, NULL, 'b'},
         {"mode", optional_argument, NULL, 'm'},
-        {"log", optional_argument, NULL, 'l'}
+        {"log", optional_argument, NULL, 'l'},
+        {"show-intf", no_argument, NULL, 's'}
     };
     #define HELP_ARGS() \
         do { \
@@ -53,6 +55,7 @@ int main(int argc, char** argv) {
             fprintf(stdout, "Option: [-b] | [--bsiz], client max buffer size byte, (default:4096)\n"); \
             fprintf(stdout, "Option: [-m] | [--mode], blocking:0, select:1, epoll:2, (default:2)\n"); \
             fprintf(stdout, "Option: [-l] | [--log], debug:0, info:1, error:2, (default:0)\n"); \
+            fprintf(stdout, "Option: [-s] | [--show-intf], show net interface and ip\n"); \
         } while(0)
     
     int optcase = 0;
@@ -91,6 +94,10 @@ int main(int argc, char** argv) {
             case 'l':
             log_level = strtol(optarg, NULL, 10);
             break;
+
+            case 's':
+            SHOW_INTFIP(INFOF);
+            return 0;
 
             case 'h':
             HELP_ARGS();

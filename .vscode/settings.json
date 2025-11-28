@@ -59,6 +59,9 @@
         "compare": "cpp",
         "ctr_elemt.h": "c",
         "ctr_blist.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "ctr_bqueue.h": "c",
+        "ctr_bstack.h": "c",
+        "ctr_rbtree.h": "c"
     }
 }
