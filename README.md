@@ -19,3 +19,6 @@
    2. client-client connects in chat-room mode dispatched by server.
    3. IPv6 Nerwork.
    4. server give the avaliable ipv4 or ipv6 network addresses.
+
+## Debug
+1. `gdb ./rbtree_test.d -x rbtree_test.gdbinit`

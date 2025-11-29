@@ -42,7 +42,8 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 	}
 	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
 	if(cmp_res==0) {
-		_tr->_elem_set(_rt->_data, _nd->_data);
+		// _tr->_elem_set(_rt->_data, _nd->_data); 
+		_rt->_data = _nd->_data; // set new to old
 	} else if (cmp_res < 0) {
 		rb_node *rres = rbNodeInsertNode(_rt->_right, _nd, _tr);
 		__link_right(_rt, rres);
@@ -80,7 +81,8 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		rb_node *lres = rbNodeDeleteNode(_rt->_left, _nd, _tr);
 		__link_left(_rt, lres);
 	} else {
-		_tr->_elem_set(_rt->_data, _nd->_data); // copy value to _nd
+		// _tr->_elem_set(_nd->_data, _rt->_data); 
+		_nd->_data = _rt->_data; // set old to new
 
 		rb_node *rpl = NULL;
 		if (__is_leaf(_rt)) {
@@ -90,21 +92,19 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		} else if(_rt->_right&&_rt->_left==NULL) {
 			rpl = _rt->_right;
 		} else {
-			rpl = rbNodeMaxNode(_rt->_left, _tr); // must be leaf
-			__unlink_parent(rpl);
-			__link_right(rpl, _rt->_right);
+			rpl = rbNodeMaxNode(_rt->_left, _tr); // may be leaf, must child<=1
 			if(rpl != _rt->_left){
 				__link_left(rpl, _rt->_left);
 			}
+			__link_right(rpl, _rt->_right);
+			__unlink_parent(rpl);
 		}
 		
 		rb_node *rt_parent = _rt->_parent;
-		if (rt_parent) {
-			if(rt_parent->_left == _rt) {
-				__link_left(rt_parent, rpl);
-			} else {
-				__link_right(rt_parent, rpl);
-			}
+		if(__is_left(_rt)){
+			__link_left(rt_parent, rpl);
+		} else if(__is_right(_rt)){
+			__link_right(rt_parent, rpl);
 		}
 		__unlink_parent(_rt);
 		return rpl;
@@ -166,6 +166,9 @@ rb_node* rbTreeInsertData(rb_tree* _tr, elem_t _dt) {
 	return rbTreeInsertNode(_tr, makeRBNode(NULL, NULL, _dt));
 }
 
+/*
+ * @return @param <_nd>: an inserted new node
+*/
 rb_node* rbTreeInsertNode(rb_tree* _tr, rb_node *_nd) {
 	_tr->_root = rbNodeInsertNode(_tr->_root, _nd, _tr);
 	return _nd;
@@ -175,6 +178,9 @@ rb_node* rbTreeDeleteData(rb_tree* _tr, elem_t _dt) {
 	return rbTreeDeleteNode(_tr, makeRBNode(NULL, NULL, _dt));
 }
 
+/*
+ * @return @param <_nd>: an deleted node
+*/
 rb_node* rbTreeDeleteNode(rb_tree* _tr, rb_node *_nd) {
 	_tr->_root = rbNodeDeleteNode(_tr->_root, _nd, _tr);
 	return _nd;
@@ -190,7 +196,7 @@ rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd) {
 
 blist* rbTreeMidTrav(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // <rb_node*>
-	blist *bl = makeBList();			// list<elem_t>
+	blist *bl = makeBList();			// list<rb_node*>
 	bstack *bstk = makeBStack();		// stack<rb_node*>
 	rb_node *nd = _tr->_root;
 

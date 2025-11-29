@@ -16,11 +16,13 @@ typedef struct rb_node {
 typedef struct rb_tree {
     rb_node *_root;
     size_t   _size;
-    elem_t_cmp _elem_cmp; // +required
-    void (*_elem_set)(elem_t _old, elem_t _new);
+    elem_t_cmp _elem_cmp; 						 // +required, compare _data
+    // void (*_elem_set)(elem_t _old, elem_t _new); // +optional, set _old to _new 
 } rb_tree;
 
-#define rbTreeSetElemSet(_tr, _f) ((_tr)->_elem_set = (_f))
+// #define rbTreeSetElemSet(_tr, _f) ((_tr)->_elem_set = (_f))
+
+// please use the MACRO carefully, because the `link` and `unlink` operation is bidirectional
 
 #define __link_left(nd, left) \
 	do { if(nd) {nd->_left=left;} if(left) {left->_parent=nd;} } while(0)
@@ -45,6 +47,7 @@ typedef struct rb_tree {
 #define __is_leaf(nd) (nd->_left==NULL&&nd->_right==NULL)
 #define __is_root(nd) (nd->_parent==NULL)
 #define __is_left(nd) (nd->_parent&&nd->_parent->_left==nd)
+#define __is_right(nd) (nd->_parent&&nd->_parent->_right==nd) 
 
 rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data);
 void freeRBNode(rb_node* _nd);
@@ -68,6 +71,7 @@ rb_node* rbTreeGetData(rb_tree* _tr, elem_t _dt);
 rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd);
 
 // traverse
+typedef blist*(*rbTreeTrav)(rb_tree*);
 blist* rbTreeMidTrav(rb_tree* _tr);
 blist* rbTreeLelTrav(rb_tree* _tr);
 

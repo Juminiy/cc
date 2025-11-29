@@ -62,6 +62,7 @@
         "stddef.h": "c",
         "ctr_bqueue.h": "c",
         "ctr_bstack.h": "c",
-        "ctr_rbtree.h": "c"
+        "ctr_rbtree.h": "c",
+        "ctr_map.h": "c"
     }
 }
