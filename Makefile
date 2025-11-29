@@ -51,7 +51,8 @@ os_test.d: test/os_test.c
 net_test.d: test/net_test.c net_util.o ctr_blist.o
 blist_test.d: test/blist_test.c ctr_blist.o
 bdeque_test.d: test/bdeque_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o
-rbtree_test.d: test/rbtree_test.c ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o 
+bstree_test.d: test/bstree_test.c ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o 
+rbtree_test.d: test/rbtree_test.c ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_rbtree.o
 map_test.d: test/map_test.c ctr_map.o ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o 
 
 clean:

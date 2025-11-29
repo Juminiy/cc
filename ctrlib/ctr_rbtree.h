@@ -4,8 +4,12 @@
 #include "ctr_elemt.h"
 #include "ctr_blist.h"
 
-#define RB_NODE_BLK 1
-#define RB_NODE_RED 0
+#define RB_NODE_BLK 0
+#define RB_NODE_RED 1
+
+#define RB_NODE_DIR_NONE -1
+#define RB_NODE_DIR_LEFT 0
+#define RB_NODE_DIR_RIGHT 1
 
 typedef struct rb_node {
     struct rb_node *_left, *_right, *_parent;
@@ -48,6 +52,7 @@ typedef struct rb_tree {
 #define __is_root(nd) (nd->_parent==NULL)
 #define __is_left(nd) (nd->_parent&&nd->_parent->_left==nd)
 #define __is_right(nd) (nd->_parent&&nd->_parent->_right==nd) 
+#define __node_dir(nd) (__is_left(nd)?RB_NODE_DIR_LEFT:(__is_right(nd)?RB_NODE_DIR_RIGHT:RB_NODE_DIR_NONE))
 
 rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data);
 void freeRBNode(rb_node* _nd);
@@ -58,9 +63,9 @@ void freeRBTree(rb_tree* _tr);
 // bsnode: binary tree node
 rb_node* rbNodeMinNode(rb_node* _rt, rb_tree *_tr);
 rb_node* rbNodeMaxNode(rb_node* _rt, rb_tree *_tr);
-rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr);
-rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr);
-rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr);
+rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr);
+rb_node* bsNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr);
+rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr);
 
 // bstree: binary search tree
 rb_node* rbTreeInsertData(rb_tree* _tr, elem_t _dt);
@@ -74,5 +79,15 @@ rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd);
 typedef blist*(*rbTreeTrav)(rb_tree*);
 blist* rbTreeMidTrav(rb_tree* _tr);
 blist* rbTreeLelTrav(rb_tree* _tr);
+
+// avltree: balance tree
+rb_node* rotate_right(rb_node* _nd);
+rb_node* rotate_left(rb_node *_nd);
+
+// rbtree: red black tree
+rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr);
+rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr);
+rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr);
+
 
 #endif

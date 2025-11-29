@@ -36,7 +36,7 @@ rb_node* rbNodeMaxNode(rb_node* _rt, rb_tree *_tr) {
 	return _cur;
 }
 
-rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
+rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 	if(!_rt) {
 		return _nd;
 	}
@@ -45,16 +45,16 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 		// _tr->_elem_set(_rt->_data, _nd->_data); 
 		_rt->_data = _nd->_data; // set new to old
 	} else if (cmp_res < 0) {
-		rb_node *rres = rbNodeInsertNode(_rt->_right, _nd, _tr);
+		rb_node *rres = bsNodeInsertNode(_rt->_right, _nd, _tr);
 		__link_right(_rt, rres);
 	} else {
-		rb_node *lres = rbNodeInsertNode(_rt->_left, _nd, _tr);
+		rb_node *lres = bsNodeInsertNode(_rt->_left, _nd, _tr);
 		__link_left(_rt, lres);
 	}
 	return _rt;
 }
 
-rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
+rb_node* bsNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	if(_rt == NULL) {
 		return NULL;
 	}
@@ -62,23 +62,23 @@ rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	if(cmp_res==0) {
 		return _rt;
 	} else if (cmp_res < 0) {
-		return rbNodeGetNode(_rt->_right, _nd, _tr);
+		return bsNodeGetNode(_rt->_right, _nd, _tr);
 	} else {
-		return rbNodeGetNode(_rt->_left, _nd, _tr);
+		return bsNodeGetNode(_rt->_left, _nd, _tr);
 	}
 }
 
-rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
+rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	if(_rt==NULL) {
 		return NULL;
 	}
 	
 	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
 	if (cmp_res < 0) {
-		rb_node *rres = rbNodeDeleteNode(_rt->_right, _nd, _tr);
+		rb_node *rres = bsNodeDeleteNode(_rt->_right, _nd, _tr);
 		__link_right(_rt, rres);
 	} else if (cmp_res > 0) {
-		rb_node *lres = rbNodeDeleteNode(_rt->_left, _nd, _tr);
+		rb_node *lres = bsNodeDeleteNode(_rt->_left, _nd, _tr);
 		__link_left(_rt, lres);
 	} else {
 		// _tr->_elem_set(_nd->_data, _rt->_data); 
