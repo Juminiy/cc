@@ -4,8 +4,8 @@
 #include "ctr_elemt.h"
 #include "ctr_blist.h"
 
-#define RB_NODE_BLK 0
-#define RB_NODE_RED 1
+#define RB_NODE_CLR_BLK 0
+#define RB_NODE_CLR_RED 1
 
 #define RB_NODE_DIR_NONE -1
 #define RB_NODE_DIR_LEFT 0
@@ -15,6 +15,7 @@ typedef struct rb_node {
     struct rb_node *_left, *_right, *_parent;
     int _color;
     elem_t _data;
+	size_t _size;
 } rb_node;
 
 typedef struct rb_tree {
@@ -53,6 +54,9 @@ typedef struct rb_tree {
 #define __is_left(nd) (nd->_parent&&nd->_parent->_left==nd)
 #define __is_right(nd) (nd->_parent&&nd->_parent->_right==nd) 
 #define __node_dir(nd) (__is_left(nd)?RB_NODE_DIR_LEFT:(__is_right(nd)?RB_NODE_DIR_RIGHT:RB_NODE_DIR_NONE))
+#define __is_red(nd) (nd&&nd->_color==RB_NODE_CLR_RED)
+#define __is_black(nd) (!nd||(nd&&nd->_color==RB_NODE_CLR_BLK))
+#define __node_size(nd) (nd?nd->_size:0)
 
 rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data);
 void freeRBNode(rb_node* _nd);

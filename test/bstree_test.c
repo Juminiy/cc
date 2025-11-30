@@ -79,6 +79,7 @@ void test_trav(int *arr, int sz, int delval, rbTreeTrav travfn) {
 
 	printf("befor delete[%2d]: ", delval);
 	for (int i=0;i<sz;i++){
+		printf("insert elem: %d\n", arr[i]);
 		setup_elem_i64(elem_val, arr[i]); 
 		rbTreeInsertData(rb, elem_val);
 	}
@@ -114,8 +115,8 @@ void test_del_trav() {
 	test_trav(arr3,7,5,NULL); // lr root
 
 	int arr4[10]={1,2,3,4,5,6,7,8,9,10};
-	for(int i=1;i<=10;i++){
-		test_trav(arr4, 10, i,NULL);
+	for(int i=0;i<10;i++){
+		test_trav(arr4, 10, arr4[i], NULL);
 	}
 }
 
@@ -194,9 +195,16 @@ void test_ssmap() {
 	freeRBTree(rb);
 }
 
-int main() {
+void test_del_trav_bug() {
+	int arr4[10]={1,2,3,4,5,6,7,8,9,10};
+	for(int i=0;i<10;i++){
+		test_trav(arr4, 10, arr4[i], NULL);
+	}
+}
 
-	test_ssmap();
+int main() {	
+
+	test_del_trav_bug();
 
 	return 0;
 }

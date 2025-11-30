@@ -10,7 +10,8 @@ rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 	__link_left(nd, _left);
 	__link_right(nd, _right);
 	nd->_data = _data;
-	nd->_color = RB_NODE_RED;
+	nd->_color = RB_NODE_CLR_RED;
+	nd->_size = 1;
 	return nd;
 }
 
