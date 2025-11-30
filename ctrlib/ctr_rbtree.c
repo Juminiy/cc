@@ -162,7 +162,7 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 
 		rb_node *_c=__child_(_s, n_dir), *_d=__child_(_s, !n_dir);
 		if(!__is_red(_c) && !__is_red(_d)){
-			_s->_color == RB_NODE_CLR_RED;
+			_s->_color = RB_NODE_CLR_RED;
 			_nd = _p;
 			goto __endup_tag;
 		}

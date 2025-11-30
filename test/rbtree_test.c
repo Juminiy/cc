@@ -11,7 +11,7 @@ void print_blist(blist *bl) {
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
 		rb_node *rbn = bNodeData(bn).ptr;
-		printf("%2ld(size=%2ld) ", get_elem_i64(rbn->_data), rbn->_size);
+		printf("%2lld(size=%2ld) ", get_elem_i64(rbn->_data), rbn->_size);
 	}
     printf("]\n");
 	freeBIter(bi);
