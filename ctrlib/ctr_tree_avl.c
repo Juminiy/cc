@@ -130,17 +130,17 @@ rb_node* avlNodeInsertNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		int cur_bf = __node_bf(_cur);
 		if(cur_bf==2) {				// right-heavy
 			int right_bf = __node_bf(_cur->_right);
-			if(right_bf>0){
+			if(right_bf>=0){
 				_cur = rotate_ll(_cur);
-			} else if(right_bf<=0){
+			} else if(right_bf<0){
 				_cur = rotate_rl(_cur);
 			}
 
 		} else if(cur_bf==-2){		// left-heavy
 			int left_bf = __node_bf(_cur->_left);
-			if(left_bf<0){
+			if(left_bf<=0){
 				_cur = rotate_rr(_cur);
-			} else if(left_bf>=0){
+			} else if(left_bf>0){
 				_cur = rotate_lr(_cur);
 			}
 		}
