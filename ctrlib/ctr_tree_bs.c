@@ -21,8 +21,8 @@ rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 }
 
 void freeRBNode(rb_node* _nd) {
-	__unlink_left(_nd);
-	__unlink_right(_nd);
+	// __unlink_left(_nd);
+	// __unlink_right(_nd);
 	free(_nd);
 }
 
@@ -41,6 +41,31 @@ rb_node* bsNodeMaxNode(rb_node* _rt, rb_tree *_tr) {
 	}
 	return _cur;
 }
+
+// Predecessor
+rb_node* bsNodePreNode(rb_node* _rt, rb_tree *_tr) { 
+	if(_rt->_left){
+		return bsNodeMaxNode(_rt->_left, _tr);
+	}
+	rb_node *_p = _rt->_parent;
+	while(_p&&_p->_left==_rt){
+		_rt = _p, _p = _p->_parent;
+	}
+	return _p;
+}
+
+// Successor
+rb_node* bsNodeNextNode(rb_node* _rt, rb_tree *_tr) {
+	if(_rt->_right){
+		return bsNodeMinNode(_rt->_right, _tr);
+	}
+	rb_node *_p = _rt->_parent;
+	while(_p&&_p->_right==_rt){
+		_rt = _p, _p = _p->_parent;
+	}
+	return _p;
+}
+
 
 rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 	if(!_rt) {
@@ -81,7 +106,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	if(_rt==NULL) {
 		return NULL;
 	}
-	
+
 	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
 	if (cmp_res < 0) {
 		rb_node *rres = bsNodeDeleteNode(_rt->_right, _nd, _tr);
@@ -93,31 +118,20 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		// _tr->_elem_set(_nd->_data, _rt->_data); 
 		_nd->_data = _rt->_data; // set old to new
 
-		rb_node *rpl = NULL;
-		if (__is_leaf(_rt)) {
-			// do nothing
-		} else if(_rt->_left&&_rt->_right==NULL) {
-			rpl = _rt->_left;
-		} else if(_rt->_right&&_rt->_left==NULL) {
-			rpl = _rt->_right;
+		if(_rt->_right==NULL) {
+			rb_node *_tmp=_rt->_left;
+			freeRBNode(_rt);
+			return _tmp;
+		} else if(_rt->_left==NULL) {
+			rb_node *_tmp=_rt->_right;
+			freeRBNode(_rt);
+			return _tmp;
 		} else {
-			rpl = bsNodeMaxNode(_rt->_left, _tr); // may be leaf, must child<=1
-			if(rpl != _rt->_left){
-				__link_left(rpl, _rt->_left);
-			}
-			__link_right(rpl, _rt->_right);
-			__unlink_parent(rpl);
+			rb_node *rpl = bsNodeMaxNode(_rt->_left, _tr); // may be leaf, must child<=1
+			_rt->_data = rpl->_data;
+			rb_node *lres = bsNodeDeleteNode(_rt->_left, rpl, _tr);
+			__link_left(_rt, lres);
 		}
-		
-		rb_node *rt_parent = _rt->_parent;
-		if(__is_left(_rt)){
-			__link_left(rt_parent, rpl);
-		} else if(__is_right(_rt)){
-			__link_right(rt_parent, rpl);
-		}
-		__unlink_parent(_rt);
-		freeRBNode(_rt);
-		return rpl;
 	}
 	return _rt;
 }
@@ -194,6 +208,7 @@ rb_node* rbTreeInsertNode(rb_tree* _tr, rb_node *_nd) {
 
 		case TREE_NODE_TYPE_RB:
 		_tr->_root = rbNodeInsertNode(_tr->_root, _nd, _tr);
+		_tr->_root->_color = RB_NODE_CLR_BLK; // set root BLACK
 		break;
 
 		default: // TREE_NODE_TYPE_BS, or other

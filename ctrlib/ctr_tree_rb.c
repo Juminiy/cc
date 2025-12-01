@@ -62,31 +62,19 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 
 	// node _sizeAdd
 	for(rb_node *_curnd=_cur_parent;_curnd;_curnd=_curnd->_parent){
-		_curnd->_size++;
+		__update_size_height(_curnd); 
+		// _curnd->_size++; // if height is not used, optimized to this line
 	}
 
 	// rotate & _colorChange
 	rbNodeInsertAdjust(_nd);
 
-	_rt->_color = RB_NODE_CLR_BLK; // set root BLACK
 	return _rt;
 }
 
 // @return if found: node, else: NULL
 rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	return avlNodeGetNode(_rt, _nd, _tr);
-}
-
-rb_node* rbNodeNext(rb_node *_nd, rb_tree *_tr) {
-	if(!_nd||_nd==_tr->_root){
-		return NULL;
-	} else if(_nd->_right){
-		return bsNodeMinNode(_nd->_right, _tr);
-	}
-	while(_nd&&_nd->_parent&&__node_dir(_nd)==RB_NODE_DIR_RIGHT){
-		_nd = _nd->_parent;
-	}
-	return _nd ? _nd->_parent : NULL;
 }
 
 void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
@@ -151,7 +139,7 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		__swap_(elem_t, _suc->_data, _nd->_data);
 		_res = _nd, _nd = _suc;
 	} else {
-		_res = rbNodeNext(_nd, _tr);
+		_res = bsNodeNextNode(_nd, _tr);
 	}
 
 	int n_dir=__node_dir(_nd);

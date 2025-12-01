@@ -1,15 +1,18 @@
 optargs=-Wunused-result -O2
-debugargs=-g -std=c99 -lm
+debugargs=-g -lm
 cplargs=$(debugargs)
 
 VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test
 vpath %.o
 
 %.o: %.c
-	$(CC) -c -o $@ $< $(cplargs)
+	$(CC) -std=c99 -c -o $@ $< $(cplargs)
 
 %.d: %.c
-	$(CC) -o $@ $^ $(cplargs)
+	$(CC) -std=c99 -o $@ $^ $(cplargs)
+
+%.d: %.cpp
+	g++ -std=c++11 -o $@ $^
 
 %.d: %.o
 	$(CC) $(cplargs) -o $@ $^
@@ -52,8 +55,9 @@ bdeque_test.d: test/bdeque_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o
 bstree_test.d: test/bstree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
 rbtree_test.d: test/rbtree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
 avltree_test.d: test/avltree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
-map_test.d: test/map_test.c ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o 
+map_test.d: test/map_test.c ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o
+cppmap_test.d: test/cppmap_test.cpp
 
 clean:
-	rm -rf *.o *.a *.so *.out
+	rm -rf *.o *.a *.so *.out *.dSYM
 	rm -rf *.d

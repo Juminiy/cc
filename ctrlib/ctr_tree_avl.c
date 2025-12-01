@@ -1,18 +1,5 @@
 #include "ctr_rbtree.h"
 
-#define __update_size_height(_nd) \
-	do { \
-		_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+1; \
-		_nd->_height=__max_(__node_height(_nd->_left),__node_height(_nd->_right))+1; \
-	} while(0)
-
-size_t __max_(size_t _a, size_t _b){
-	return _a > _b ? _a : _b;
-}
-size_t __min_(size_t _a, size_t _b){
-	return _a < _b ? _a : _b;
-}
-
 //		A				B	
 //   B		Ar	->  Bl	   A
 // Bl Br		  C		 Br	 Ar
@@ -181,4 +168,5 @@ rb_node* avlNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 
 rb_node* avlNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 
+	return _rt;
 }

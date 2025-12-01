@@ -79,7 +79,7 @@ void test_trav(int *arr, int sz, int delval, rbTreeTrav travfn) {
 
 	printf("befor delete[%2d]: ", delval);
 	for (int i=0;i<sz;i++){
-		printf("insert elem: %d\n", arr[i]);
+		// printf("insert elem: %d\n", arr[i]);
 		setup_elem_i64(elem_val, arr[i]); 
 		rbTreeInsertData(rb, elem_val);
 	}
@@ -202,9 +202,64 @@ void test_del_trav_bug() {
 	}
 }
 
-int main() {	
+#include <time.h>
+#include <stdlib.h>
+#include <math.h>
 
-	test_del_trav_bug();
+void check_order(blist *bl){
+    biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
+    int64_t prev_val = -1;
+    for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
+		rb_node *rbn = bNodeData(bn).ptr;   
+        int64_t _cur_i64 = get_elem_i64(rbn->_data);
+        if(_cur_i64<prev_val){
+            printf("[ERROR]: %ld < %ld\n", _cur_i64, prev_val);
+            break;
+        }
+        prev_val=_cur_i64;
+	}
+}
+
+void test_bstree_delete(int tot_sz) {
+	srand(time(NULL));
+	elem_t elem_val; 
+	rb_tree *rb = makeRBTree(elem_int_cmp);
+	setTreeNodeType(rb, TREE_NODE_TYPE_BS);
+	int arr[tot_sz+1];
+	for (int i=0;i<tot_sz;i++){
+		arr[i]=rand();
+		setup_elem_i64(elem_val, arr[i]); rbTreeInsertData(rb, elem_val);
+	}
+
+	printf("insert: %d, tree_size: %ld, tree_height: %ld, log_2(%d)=%.2f\n", 
+        tot_sz, __tree_size(rb), __tree_height(rb), tot_sz, log2(tot_sz*1.0));
+
+	for (int i=0;i<tot_sz;i++){
+		setup_elem_i64(elem_val, arr[i]); rbTreeDeleteData(rb, elem_val);
+		check_order(rbTreeMidTrav(rb));
+	}
+	
+}
+
+void test_del_trav_mem_bug() {
+	int arr[10]={5,3,8,2,4,9};
+	test_trav(arr,6,2,NULL); // leaf
+	test_trav(arr,6,4,NULL); // leaf
+	test_trav(arr,6,9,NULL); // leaf
+}
+
+int main(int argc, char **argv) {	
+
+	// test_del_trav_bug();
+	int tot_sz = 100;
+	if(argc>=2){
+		tot_sz = strtol(argv[1], NULL, 10);
+	}
+	test_bstree_delete(tot_sz);
+
+	// test_del_trav_mem_bug();
+
+	// test_del_trav();
 
 	return 0;
 }

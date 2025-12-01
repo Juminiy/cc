@@ -44,6 +44,7 @@ typedef struct rb_tree {
 #define __link_right(nd, right) \
 	do { if(nd) {nd->_right=right;} if(right) {right->_parent=nd;} } while(0)
 
+// __unlink is the BUGGY maker, do not use it!
 #define __unlink_left(nd) \
 	do { if(nd && nd->_left) {nd->_left->_parent=NULL;nd->_left=NULL;} } while(0) 
 
@@ -70,6 +71,20 @@ typedef struct rb_tree {
 #define __node_bf(nd) (__node_height(nd->_right)-__node_height(nd->_left))
 #define __tree_size(tr) (tr&&tr->_root?tr->_root->_size:0)
 #define __tree_height(tr) (tr?__node_height(tr->_root):0)
+#define __update_size_height(_nd) \
+	do { \
+		_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+1; \
+		_nd->_height=__max_(__node_height(_nd->_left),__node_height(_nd->_right))+1; \
+	} while(0)
+
+static inline size_t __max_(size_t _a, size_t _b){
+	return _a > _b ? _a : _b;
+}
+
+static inline size_t __min_(size_t _a, size_t _b){
+	return _a < _b ? _a : _b;
+}
+
 
 // tree: bst,rbtree,avltree
 rb_tree* makeRBTree(elem_t_cmp _elem_cmp);
@@ -90,6 +105,8 @@ void freeRBNode(rb_node* _nd);
 // bsnode: binary search tree node
 rb_node* bsNodeMinNode(rb_node* _rt, rb_tree *_tr);
 rb_node* bsNodeMaxNode(rb_node* _rt, rb_tree *_tr);
+rb_node* bsNodePreNode(rb_node* _rt, rb_tree *_tr);
+rb_node* bsNodeNextNode(rb_node* _rt, rb_tree *_tr);
 
 typedef rb_node*(*rbNodeOpt)(rb_node*, rb_node*, rb_tree*);
 rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr);

@@ -11,7 +11,7 @@ void print_blist(blist *bl) {
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
 		rb_node *rbn = bNodeData(bn).ptr;
-		printf("%2ld(size=%2ld) ", get_elem_i64(rbn->_data), rbn->_size);
+		printf("%2ld ", get_elem_i64(rbn->_data), rbn->_size);
 	}
     printf("]\n");
 	freeBIter(bi);
@@ -41,6 +41,8 @@ void test_rb_node() {
 	for(int i=0;i<14;i++){
 		setup_elem_i64(_em, arr[i]); rbTreeInsertData(tr, _em);
 	}
+	
+	printf("rbtree: size=%zu, height:%zu\n", __tree_size(tr), __tree_height(tr));
 	print_blist(rbTreeMidTrav(tr));
 	print_blist(rbTreeLelTrav(tr));
 
