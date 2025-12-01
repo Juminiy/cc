@@ -5,6 +5,10 @@
 
 #include <stdlib.h>
 
+/*==============================================================================
+ * MARK: - Tree Node (Implementation)
+ *============================================================================*/
+
 rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 	rb_node *nd = (rb_node*)malloc(sizeof(rb_node));
 	__link_left(nd, _left);
@@ -12,6 +16,7 @@ rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 	nd->_data = _data;
 	nd->_color = RB_NODE_CLR_RED;
 	nd->_size = 1;
+	nd->_height = 1;
 	return nd;
 }
 
@@ -21,7 +26,7 @@ void freeRBNode(rb_node* _nd) {
 	free(_nd);
 }
 
-rb_node* rbNodeMinNode(rb_node* _rt, rb_tree *_tr) {
+rb_node* bsNodeMinNode(rb_node* _rt, rb_tree *_tr) {
 	rb_node *_cur = _rt;
 	while(_cur && _cur->_left) {
 		_cur = _cur->_left;
@@ -29,7 +34,7 @@ rb_node* rbNodeMinNode(rb_node* _rt, rb_tree *_tr) {
 	return _cur;
 }
 
-rb_node* rbNodeMaxNode(rb_node* _rt, rb_tree *_tr) {
+rb_node* bsNodeMaxNode(rb_node* _rt, rb_tree *_tr) {
 	rb_node *_cur = _rt;
 	while(_cur && _cur->_right) {
 		_cur = _cur->_right;
@@ -55,13 +60,15 @@ rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 	return _rt;
 }
 
+// @return @param<_nd>: copy data to _nd and return _nd
 rb_node* bsNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	if(_rt == NULL) {
 		return NULL;
 	}
 	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
 	if(cmp_res==0) {
-		return _rt;
+		_nd->_data = _rt->_data;
+		return _nd;
 	} else if (cmp_res < 0) {
 		return bsNodeGetNode(_rt->_right, _nd, _tr);
 	} else {
@@ -69,6 +76,7 @@ rb_node* bsNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	}
 }
 
+// @return @param<_rt>: copy data to _nd and return _rt
 rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	if(_rt==NULL) {
 		return NULL;
@@ -93,7 +101,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		} else if(_rt->_right&&_rt->_left==NULL) {
 			rpl = _rt->_right;
 		} else {
-			rpl = rbNodeMaxNode(_rt->_left, _tr); // may be leaf, must child<=1
+			rpl = bsNodeMaxNode(_rt->_left, _tr); // may be leaf, must child<=1
 			if(rpl != _rt->_left){
 				__link_left(rpl, _rt->_left);
 			}
@@ -108,6 +116,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 			__link_right(rt_parent, rpl);
 		}
 		__unlink_parent(_rt);
+		freeRBNode(_rt);
 		return rpl;
 	}
 	return _rt;
@@ -118,7 +127,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 // rb_node *rpl_nd = NULL;
 // if(del_nd->_left) {
 // 	__unlink_left(del_nd);
-// 	rpl_nd = rbNodeMaxNode(del_nd->_left, _tr); // must be a leaf
+// 	rpl_nd = bsNodeMaxNode(del_nd->_left, _tr); // must be a leaf
 // 	if(rpl_nd) {
 // 		__unlink_parent(rpl_nd);
 // 		__link_right(del_nd->_parent, rpl_nd);
@@ -130,7 +139,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 // if(del_nd->_right) {
 // 	__unlink_right(del_nd);
 // 	if(rpl_nd==NULL) {
-// 		rpl_nd = rbNodeMinNode(del_nd->_right, _tr); // must be a leaf
+// 		rpl_nd = bsNodeMinNode(del_nd->_right, _tr); // must be a leaf
 // 		if(rpl_nd) {
 // 			__unlink_parent(rpl_nd);
 // 			__link_right(del_nd->_parent, rpl_nd);
@@ -141,11 +150,16 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 // 	}
 // }
 
+/*==============================================================================
+ * MARK: - Tree (Implementation)
+ *============================================================================*/
+
 rb_tree* makeRBTree(elem_t_cmp _elem_cmp) {
 	rb_tree *_tr = (rb_tree*)malloc(sizeof(rb_tree));
 	_tr->_root = NULL;
 	_tr->_size = 0;
 	_tr->_elem_cmp = _elem_cmp;
+	_tr->_tree_node_type = TREE_NODE_TYPE_BS;
 	return _tr;
 }
 
@@ -164,36 +178,94 @@ void freeRBTree(rb_tree* _tr) {
 }
 
 rb_node* rbTreeInsertData(rb_tree* _tr, elem_t _dt) {
-	return rbTreeInsertNode(_tr, makeRBNode(NULL, NULL, _dt));
+	rb_node *_nd = makeRBNode(NULL, NULL, _dt);
+	// todo: if replace only, should be freed 
+	return rbTreeInsertNode(_tr, _nd);
 }
 
 /*
- * @return @param <_nd>: an inserted new node
+ * @return @param<_nd>: an inserted node
 */
 rb_node* rbTreeInsertNode(rb_tree* _tr, rb_node *_nd) {
-	_tr->_root = rbNodeInsertNode(_tr->_root, _nd, _tr);
+	switch (_tr->_tree_node_type) {
+		case TREE_NODE_TYPE_AVL:
+		_tr->_root = avlNodeInsertNode(_tr->_root, _nd, _tr);
+		break;
+
+		case TREE_NODE_TYPE_RB:
+		_tr->_root = rbNodeInsertNode(_tr->_root, _nd, _tr);
+		break;
+
+		default: // TREE_NODE_TYPE_BS, or other
+		_tr->_root = bsNodeInsertNode(_tr->_root, _nd, _tr);
+		break;
+	}
 	return _nd;
 }
 
 rb_node* rbTreeDeleteData(rb_tree* _tr, elem_t _dt) {
-	return rbTreeDeleteNode(_tr, makeRBNode(NULL, NULL, _dt));
+	rb_node *_nd = makeRBNode(NULL, NULL, _dt);
+	return rbTreeDeleteNode(_tr, _nd);
 }
 
 /*
- * @return @param <_nd>: an deleted node
+ * @return @param<_nd>: an deleted node
+ * 1. delete node(cmp=0) from tree
+ * 2. copy _data to _nd
+ * 3. return _nd
 */
 rb_node* rbTreeDeleteNode(rb_tree* _tr, rb_node *_nd) {
-	_tr->_root = rbNodeDeleteNode(_tr->_root, _nd, _tr);
+	switch (_tr->_tree_node_type) {
+		case TREE_NODE_TYPE_AVL:
+		_tr->_root = avlNodeDeleteNode(_tr->_root, _nd, _tr);
+		break;
+
+		case TREE_NODE_TYPE_RB:
+		_tr->_root = rbNodeDeleteNode(_tr->_root, _nd, _tr);
+		break;
+
+		default: // TREE_NODE_TYPE_BS, or other
+		_tr->_root = bsNodeDeleteNode(_tr->_root, _nd, _tr);
+		break;
+	}
 	return _nd;
 }
 
 rb_node* rbTreeGetData(rb_tree* _tr, elem_t _dt) {
-	return rbTreeGetNode(_tr, makeRBNode(NULL, NULL, _dt));
+	rb_node *_nd = makeRBNode(NULL, NULL, _dt);
+	rb_node *_found = rbTreeGetNode(_tr, _nd);
+	if(!_found){
+		free(_nd);
+	}
+	return _found;
 }
 
+/*
+ * @return @param<_nd> 
+ * 1. copy node in tree _data to _nd
+ * 2. will not return node in tree, only return _nd
+*/
 rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd) {
-	return rbNodeGetNode(_tr->_root, _nd, _tr);
+	switch (_tr->_tree_node_type) {
+		case TREE_NODE_TYPE_AVL:
+		_nd = avlNodeGetNode(_tr->_root, _nd, _tr);
+		break;
+
+		case TREE_NODE_TYPE_RB:
+		_nd = rbNodeGetNode(_tr->_root, _nd, _tr);
+		break;
+
+		default: // TREE_NODE_TYPE_BS, or other
+		_nd = bsNodeGetNode(_tr->_root, _nd, _tr);
+		break;
+	}
+	return _nd;
 }
+
+
+/*==============================================================================
+ * MARK: - Tree Traversal (Implementation)
+ *============================================================================*/
 
 blist* rbTreeMidTrav(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // <rb_node*>

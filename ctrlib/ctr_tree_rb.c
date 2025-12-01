@@ -7,43 +7,9 @@
 		else if((_dir)==RB_NODE_DIR_RIGHT) rotate_right(_nd); \
 	} while(0)
 
-rb_node* rotate_right(rb_node *_nd) {
-	rb_node *_pa=_nd->_parent; 
-	bool _is_lf=__is_left(_nd), _is_right=__is_right(_nd);
-	rb_node *_lf=_nd->_left;
-	rb_node *_lf_right=_lf?_lf->_right:NULL;
-	__link_right(_lf, _nd);
-	__link_left(_nd, _lf_right);
-	if(_is_lf){
-		__link_left(_pa, _lf);
-	} else if(_is_right) {
-		__link_right(_pa, _lf);
-	}
-	_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+1;
-	_lf->_size=__node_size(_lf->_left)+__node_size(_lf->_right)+1;
-	return _lf;
-}
-
-rb_node* rotate_left(rb_node *_nd) {
-	rb_node *_pa=_nd->_parent;
-	bool _is_lf=__is_left(_nd), _is_right=__is_right(_nd);
-	rb_node *_ri=_nd->_right;
-	rb_node *_ri_left=_ri?_ri->_left:NULL;
-	__link_left(_ri, _nd);
-	__link_right(_nd, _ri_left);
-	if(_is_lf){
-		__link_left(_pa, _ri);
-	} else if(_is_right) {
-		__link_right(_pa, _ri);
-	}
-	_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+1;
-	_ri->_size=__node_size(_ri->_left)+__node_size(_ri->_right)+1;
-	return _ri;
-}
-
-void rbNodeInsertAdjust(rb_node *_p, rb_node *_nd, int _dir) {
+void rbNodeInsertAdjust(rb_node *_nd) {
 	
-	for(_p = _nd->_parent;__is_red(_p);_p = _nd->_parent){
+	for(rb_node *_p = _nd->_parent;__is_red(_p);_p = _nd->_parent){
 		int p_dir = __node_dir(_p);
 		rb_node *_g=_p->_parent; 
 		rb_node *_u=__child_(_g, !p_dir);
@@ -75,7 +41,7 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
 		if(cmp_res==0){ // find update
 			_cur->_data = _nd->_data;
-			break;
+			return _rt;
 		} else if(cmp_res<0){
 			_cur = _cur->_right;
 			_dir = RB_NODE_DIR_RIGHT;
@@ -84,15 +50,13 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 			_dir = RB_NODE_DIR_LEFT;
 		}
 	}
-	if(_cur) {
-		return _rt;
-	} else {
+	if(!_cur){
 		if(_dir==RB_NODE_DIR_LEFT){
 			__link_left(_cur_parent, _nd);
 		} else if(_dir==RB_NODE_DIR_RIGHT){
 			__link_right(_cur_parent, _nd);
 		} else { // _cur_parent == NULL
-			_rt = _nd;
+			return _nd;
 		}
 	}
 
@@ -102,7 +66,7 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 	}
 
 	// rotate & _colorChange
-	rbNodeInsertAdjust(_cur_parent, _nd, _dir);
+	rbNodeInsertAdjust(_nd);
 
 	_rt->_color = RB_NODE_CLR_BLK; // set root BLACK
 	return _rt;
@@ -110,25 +74,14 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 
 // @return if found: node, else: NULL
 rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	rb_node *_cur = _rt;
-	while(_cur) {
-		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
-		if(cmp_res==0){
-			return _cur;
-		} else if(cmp_res<0){
-			_cur = _cur->_right;
-		} else {
-			_cur = _cur->_left;
-		}
-	}
-	return NULL;
+	return avlNodeGetNode(_rt, _nd, _tr);
 }
 
 rb_node* rbNodeNext(rb_node *_nd, rb_tree *_tr) {
 	if(!_nd||_nd==_tr->_root){
 		return NULL;
 	} else if(_nd->_right){
-		return rbNodeMinNode(_nd->_right, _tr);
+		return bsNodeMinNode(_nd->_right, _tr);
 	}
 	while(_nd&&_nd->_parent&&__node_dir(_nd)==RB_NODE_DIR_RIGHT){
 		_nd = _nd->_parent;
@@ -183,7 +136,7 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 	_nd->_color = RB_NODE_CLR_BLK;
 }
 
-// @return @param _rt: _tr->_root itself
+// @return @param<_rt>: _tr->_root itself
 rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	rb_node *del_nd = rbNodeGetNode(_rt, _nd, _tr);
 	if(del_nd==NULL){
@@ -194,7 +147,7 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	_nd = del_nd;
 	rb_node *_res=NULL;
 	if(_nd->_left&&_nd->_right){
-		rb_node *_suc = rbNodeMinNode(_nd->_right,_tr);
+		rb_node *_suc = bsNodeMinNode(_nd->_right,_tr);
 		__swap_(elem_t, _suc->_data, _nd->_data);
 		_res = _nd, _nd = _suc;
 	} else {
@@ -221,5 +174,6 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 	
 	rbNodeDeleteAdjust(_nd, _tr);
 
+	freeRBNode(del_nd);
 	return _rt;
 }

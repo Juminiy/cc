@@ -1,15 +1,15 @@
 optargs=-Wunused-result -O2
-debugargs=-g
+debugargs=-g -std=c99 -lm
 cplargs=$(debugargs)
 
 VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test
 vpath %.o
 
 %.o: %.c
-	$(CC) -c $(cplargs) -o $@ $<
+	$(CC) -c -o $@ $< $(cplargs)
 
 %.d: %.c
-	$(CC) $(cplargs) -o $@ $^
+	$(CC) -o $@ $^ $(cplargs)
 
 %.d: %.o
 	$(CC) $(cplargs) -o $@ $^
@@ -17,10 +17,7 @@ vpath %.o
 all: tcp_srv.d tcp_cli.d
 
 tcp_srv.d: tcp_srv.o tcp_lib.o skt_select.o skt_fdset.o skt_epoll.o net_util.o ctr_blist.o
-	$(CC) $(cplargs) -o $@ $^
-
 tcp_cli.d: tcp_cli.o util.o net_util.o ctr_blist.o
-	$(CC) $(cplargs) -o $@ $^
 
 tcp_srv.o: tcpsrv/tcp_srv.c
 tcp_cli.o: tcpcli/tcp_cli.c
@@ -33,8 +30,9 @@ util.o: tcplib/util.c
 ctr_blist.o: ctrlib/ctr_blist.c
 ctr_bstack.o: ctrlib/ctr_bstack.c
 ctr_bqueue.o: ctrlib/ctr_bqueue.c
-ctr_rbtree.o: ctrlib/ctr_rbtree.c
-ctr_bstree.o: ctrlib/ctr_bstree.c
+ctr_tree_bs.o: ctrlib/ctr_tree_bs.c
+ctr_tree_rb.o: ctrlib/ctr_tree_rb.c
+ctr_tree_avl.o: ctrlib/ctr_tree_avl.c
 ctr_map.o: ctrlib/ctr_map.c
 
 test: 
@@ -51,9 +49,10 @@ os_test.d: test/os_test.c
 net_test.d: test/net_test.c net_util.o ctr_blist.o
 blist_test.d: test/blist_test.c ctr_blist.o
 bdeque_test.d: test/bdeque_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o
-bstree_test.d: test/bstree_test.c ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_rbtree.o
-rbtree_test.d: test/rbtree_test.c ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_rbtree.o
-map_test.d: test/map_test.c ctr_map.o ctr_bstree.o ctr_bstack.o ctr_bqueue.o ctr_blist.o 
+bstree_test.d: test/bstree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
+rbtree_test.d: test/rbtree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
+avltree_test.d: test/avltree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
+map_test.d: test/map_test.c ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o 
 
 clean:
 	rm -rf *.o *.a *.so *.out
