@@ -74,7 +74,7 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 
 // @return if found: node, else: NULL
 rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	return avlNodeGetNode(_rt, _nd, _tr);
+	return bsNodeGetNode(_rt, _nd, _tr);
 }
 
 void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
@@ -126,7 +126,7 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 
 // @return @param<_rt>: _tr->_root itself
 rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	rb_node *del_nd = rbNodeGetNode(_rt, _nd, _tr);
+	rb_node *del_nd = rbTreeGetNodeInTree(_rt, _nd->_data);
 	if(del_nd==NULL){
 		return _rt;
 	}

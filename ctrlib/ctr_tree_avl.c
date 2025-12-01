@@ -132,7 +132,7 @@ rb_node* avlNodeInsertNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 			int right_bf = __node_bf(_cur->_right);
 			if(right_bf>0){
 				_cur = rotate_ll(_cur);
-			} else if(right_bf<0){
+			} else if(right_bf<=0){
 				_cur = rotate_rl(_cur);
 			}
 
@@ -140,7 +140,7 @@ rb_node* avlNodeInsertNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 			int left_bf = __node_bf(_cur->_left);
 			if(left_bf<0){
 				_cur = rotate_rr(_cur);
-			} else if(left_bf>0){
+			} else if(left_bf>=0){
 				_cur = rotate_lr(_cur);
 			}
 		}
@@ -151,19 +151,7 @@ rb_node* avlNodeInsertNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 }
 
 rb_node* avlNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	rb_node *_cur = _rt;
-	while(_cur){
-		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
-		if(cmp_res == 0){
-			_nd->_data = _cur->_data;
-			return _nd;
-		} else if(cmp_res < 0){
-			_cur = _cur->_right;
-		} else {
-			_cur = _cur->_left;
-		}
-	}
-	return NULL;
+	return bsNodeGetNode(_rt, _nd, _tr);
 }
 
 rb_node* avlNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {

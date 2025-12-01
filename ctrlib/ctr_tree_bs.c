@@ -87,18 +87,19 @@ rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 
 // @return @param<_nd>: copy data to _nd and return _nd
 rb_node* bsNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	if(_rt == NULL) {
-		return NULL;
+	rb_node *_cur = _rt;
+	while(_cur){
+		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
+		if(cmp_res == 0){
+			_nd->_data = _cur->_data;
+			return _nd;
+		} else if(cmp_res < 0){
+			_cur = _cur->_right;
+		} else {
+			_cur = _cur->_left;
+		}
 	}
-	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
-	if(cmp_res==0) {
-		_nd->_data = _rt->_data;
-		return _nd;
-	} else if (cmp_res < 0) {
-		return bsNodeGetNode(_rt->_right, _nd, _tr);
-	} else {
-		return bsNodeGetNode(_rt->_left, _nd, _tr);
-	}
+	return NULL;
 }
 
 // @return @param<_rt>: copy data to _nd and return _rt
@@ -275,6 +276,21 @@ rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd) {
 		break;
 	}
 	return _nd;
+}
+
+rb_node* rbTreeGetNodeInTree(rb_tree* _tr, elem_t _dt) {
+	rb_node *_cur = _tr->_root;
+	while(_cur){
+		int cmp_res = _tr->_elem_cmp(_cur->_data, _dt);
+		if(cmp_res == 0){
+			return _cur;
+		} else if(cmp_res < 0){
+			_cur = _cur->_right;
+		} else {
+			_cur = _cur->_left;
+		}
+	}
+	return NULL;
 }
 
 

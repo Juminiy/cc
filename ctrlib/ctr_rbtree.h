@@ -97,6 +97,7 @@ rb_node* rbTreeDeleteData(rb_tree* _tr, elem_t _dt);
 rb_node* rbTreeDeleteNode(rb_tree* _tr, rb_node *_nd);
 rb_node* rbTreeGetData(rb_tree* _tr, elem_t _dt);
 rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd);
+rb_node* rbTreeGetNodeInTree(rb_tree* _tr, elem_t _dt);
 
 // treeNode: (bst,rbtree,avltree)'s node
 rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data);

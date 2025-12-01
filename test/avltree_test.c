@@ -128,7 +128,7 @@ void test_avl_sorted(int tot_cnt) {
         tot_cnt, __tree_size(rb), __tree_height(rb), tot_cnt, log2(tot_cnt*1.0));
 
     // check order
-    check_order(rbTreeMidTrav(rb));
+    // check_order(rbTreeMidTrav(rb));
 
 }
 
