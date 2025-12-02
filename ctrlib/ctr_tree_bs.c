@@ -137,7 +137,8 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 		} else {
 			rb_node *rpl = bsNodeMaxNode(_rt->_left); // may be leaf, must child<=1
 			_rt->_data = rpl->_data;
-			rb_node *lres = bsNodeDeleteNode(_rt->_left, _val, _tr);
+			_node_value rpl_val; init_node_value(rpl_val, rpl->_data);
+			rb_node *lres = bsNodeDeleteNode(_rt->_left, &rpl_val, _tr);
 			__link_left(_rt, lres);
 		}
 	}
@@ -280,11 +281,6 @@ rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val) {
 		break;
 	}
 	return _nd;
-}
-
-rb_node* rbTreeGetNodeInTree(rb_tree* _tr, elem_t _dt) {
-	_node_value _val; init_node_value(_val, _dt);
-	return rbTreeGetNode(_tr, &_val);
 }
 
 /*==============================================================================

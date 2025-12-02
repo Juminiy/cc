@@ -14,13 +14,13 @@ void elem_int_set(elem_t _old, elem_t _new) {
 
 #define test_found(rb, ival) \
 	do { \
-		elem_t elem_val; \
-		setup_elem_t(elem_val, 0, i64, ival); \
-		elem_val = rbTreeGetData(rb, elem_val);\
-		if(valid_elem_t(elem_val)) { \
-			printf("%d Not Found\n", ival); \
-		} else { \
+		elem_t _em; \
+		setup_elem_i64(_em, ival); \
+		_em = rbTreeGetData(rb, _em);\
+		if(valid_elem_t(_em)) { \
 			printf("%d Found\n", ival); \
+		} else { \
+			printf("%d Not Found\n", ival); \
 		} \
 	} while(0)
 
@@ -34,15 +34,15 @@ void test_insert_found() {
 	printf("put data\n");
 
 	elem_t elem_val; 
-	setup_elem_t(elem_val, 0, i64, 5); rbTreeInsertData(rb, elem_val);
-	setup_elem_t(elem_val, 0, i64, 1); rbTreeInsertData(rb, elem_val);
-	setup_elem_t(elem_val, 0, i64, 18); rbTreeInsertData(rb, elem_val);
+	setup_elem_i64(elem_val, 5); rbTreeInsertData(rb, elem_val);
+	setup_elem_i64(elem_val, 1); rbTreeInsertData(rb, elem_val);
+	setup_elem_i64(elem_val, 18); rbTreeInsertData(rb, elem_val);
 
-	test_found(rb, 3);
-	test_found(rb, 5);
-	test_found(rb, 7);
-	test_found(rb, 1);
-	test_found(rb, 18);
+	test_found(rb, 3); // NotFound
+	test_found(rb, 5); // Found
+	test_found(rb, 7); // NotFound
+	test_found(rb, 1); // Found
+	test_found(rb, 18); // Found
 
 	printf("\nafter delete\n");
 
@@ -93,12 +93,12 @@ void test_trav(int *arr, int sz, int delval, rbTreeTrav travfn) {
 	freeRBTree(rb);
 }
 
-void test_link_unlink() {
-	elem_t emval={.tag=0};
-	rb_node * n0 = makeRBNode(NULL,NULL,emval);
-	rb_node * n1 = makeRBNode(NULL,NULL,emval);
-	rb_node * n2 = makeRBNode(NULL,NULL,emval);
-}
+// void test_link_unlink() {
+// 	elem_t emval={.tag=0};
+// 	rb_node * n0 = makeRBNode(NULL,NULL,emval);
+// 	rb_node * n1 = makeRBNode(NULL,NULL,emval);
+// 	rb_node * n2 = makeRBNode(NULL,NULL,emval);
+// }
 
 void test_del_trav() {
 	int arr[10]={5,3,8,2,4,9};
@@ -257,7 +257,7 @@ int main(int argc, char **argv) {
 	test_bstree_delete(tot_sz);
 
 	test_insert_found();
-	test_link_unlink();
+	// test_link_unlink();
 	test_del_trav();
 	test_del_trav2();
 	test_del_trav_bug();

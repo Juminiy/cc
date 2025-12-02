@@ -14,10 +14,12 @@ void print_blist(blist *bl) {
     printf("LIS:blist=[ ");
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
-		rb_node *rbn = bNodeData(bn).ptr;   int64_t _cur_i64 = get_elem_i64(rbn->_data);
-        rb_node *rbn_parent = rbn->_parent; int64_t _par_i64 = rbn_parent?get_elem_i64(rbn_parent->_data):-1;
-		// printf("%2ld(p=%2ld) ", _cur_i64, _par_i64);//(size=%2ld,height=%2ld) rbn->_size, rbn->_height
-        printf("%2ld(ptr=%p) ",_cur_i64,rbn);
+		rb_node *rbn = bNodeData(bn).ptr;   
+        int64_t _cur_i64 = get_elem_i64(rbn->_data);
+        // rb_node *rbn_parent = rbn?rbn->_parent:NULL; 
+        // int64_t _par_i64 = rbn_parent?get_elem_i64(rbn_parent->_data):-1;
+		printf("%2ld ", _cur_i64);//(p=%2ld,size=%2ld,height=%2ld) _par_i64, rbn->_size, rbn->_height,  
+        // printf("%2ld(ptr=%p) ",_cur_i64,rbn);
 	}
     printf("]\n");
 	freeBIter(bi);
@@ -124,14 +126,26 @@ void test_avl_sorted(int tot_cnt) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
     setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    int arr[tot_cnt+1];
     for(int idx=0;idx<tot_cnt;idx++){
-        setup_elem_i64(_em, rand()); rbTreeInsertData(rb, _em);
+        arr[idx] = rand();
+        setup_elem_i64(_em, arr[idx]); rbTreeInsertData(rb, _em);
     }
     printf("insert: %d, tree_size: %ld, tree_height: %ld, log_2(%d)=%.2f\n", 
         tot_cnt, __tree_size(rb), __tree_height(rb), tot_cnt, log2(tot_cnt*1.0));
 
     // check order
     check_order(rbTreeMidTrav(rb));
+    
+
+    for(int idx=0;idx<tot_cnt/2;idx++){
+        setup_elem_i64(_em, arr[idx]); rbTreeDeleteData(rb, _em);
+    }
+    printf("after delete, tree_size: %ld, tree_height: %ld, log_2(%d)=%.2f\n", 
+        __tree_size(rb), __tree_height(rb), tot_cnt/2, log2(tot_cnt*1.0/2.0));
+    // check order
+    check_order(rbTreeMidTrav(rb));
+    
 
     freeRBTree(rb);
 }
@@ -146,12 +160,35 @@ void test_avl_delete(int *arr, size_t arr_sz, int del_val) {
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
     }   
     printf("befor del[%2d]: ", del_val);
-    print_blist(rbTreeLelTrav(rb));
+    print_blist(rbTreeMidTrav(rb));
+    // print_blist(rbTreeLelTrav(rb));
 
     setup_elem_i64(_em, del_val); rbTreeDeleteData(rb, _em);
     printf("after del[%2d]: ", del_val);
-    print_blist(rbTreeLelTrav(rb));
+    print_blist(rbTreeMidTrav(rb));
+    // print_blist(rbTreeLelTrav(rb));
 
+    freeRBTree(rb);
+}
+
+void valid_delete(int *arr, size_t arr_sz, int del_val) {
+    elem_t _em;
+    rb_tree *rb = makeRBTree(elem_int_cmp);
+    setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    for(int i=0;i<arr_sz;i++){
+        setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
+    }       
+
+    size_t before_sz = __tree_size(rb);
+    setup_elem_i64(_em, del_val); rbTreeDeleteData(rb, _em);
+    setup_elem_i64(_em, del_val); _em = rbTreeGetData(rb, _em); 
+    printf("[%d] %s, ", del_val, valid_elem_t(_em)?"delete fail":"delete ok");
+    size_t after_sz = __tree_size(rb);
+    if(before_sz-after_sz!=1){
+        printf("ERROR\n");
+        exit(1);
+    }
+    printf("size=%zu -> size=%zu, sub:%d\n", before_sz, after_sz, before_sz-after_sz);
     freeRBTree(rb);
 }
 
@@ -172,21 +209,30 @@ int main(int argc, char **argv) {
     if(argc>=2){
         t_sz = strtol(argv[1], NULL, 10);
     }
-    // test_avl_sorted(t_sz);
+    test_avl_sorted(t_sz);
 
     //      8
     //    5   15
     //  1  7     18
-    int arr[10]={1,5,7,8,15,18};
+    // int arr[10]={1,5,7,8,15,18};
+    // for(int idx=0;idx<6;idx++) {
+    //     test_avl_delete(arr, 6, arr[idx]); // bug report: function stack memory pointer to heap location reused, same address no freed, memleak! 
+    // }
 
-    // delete all
-    // test_avl_delete(arr, 6, -1);
+    //     int arr1[7]= {10, 5, 15, 3, 7, 12, 18};
+    // int arr2[12] = {30, 20, 40, 10, 25, 35, 50, 5, 15, 28, 45, 60};
+    // int arr3[15] = {50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85};
+    // int arr4[9] = {9, 5, 10, 0, 6, 11, -1, 1, 2};
+    // for(int i=0;i<7;i++)
+    //     valid_delete(arr1, 7, arr1[i]);
+    // for(int i=0;i<12;i++)
+    //     valid_delete(arr2, 12, arr2[i]);
+    // for(int i=0;i<15;i++)
+    //     valid_delete(arr3, 15, arr3[i]);
+    // for(int i=0;i<9;i++)
+    //     valid_delete(arr4, 9, arr4[i]);
 
-    // delete each
-    for(int idx=0;idx<6;idx++) {
-        
-        test_avl_delete(arr, 6, arr[idx]); // bug report: function stack memory pointer to heap location reused, same address no freed, memleak! 
-    }
+    // test_avl_delete(arr4, 9, 1);
 
     return 0;
 }

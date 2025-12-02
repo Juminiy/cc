@@ -100,6 +100,7 @@ typedef struct _node_value{
 #define init_node_value(_val, _src) \
 	do { \
 		_val.src = _src; \
+		_val.dst.tag = ELEM_T_INVALID; \
 		_val.retcode = RB_NODE_OPT_NONE; \
 	} while(0)
 
@@ -115,7 +116,6 @@ elem_t rbTreeGetData(rb_tree *_tr, elem_t _dt);
 void rbTreeInsertNode(rb_tree *_tr, _node_value *_val);
 void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val);
 rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val);
-rb_node* rbTreeGetNodeInTree(rb_tree* _tr, elem_t _dt);
 
 // treeNode: (bst,rbtree,avltree)'s node
 rb_node* makeRBNode(rb_node *_left, rb_node *_right, elem_t _data);

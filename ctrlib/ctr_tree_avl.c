@@ -98,6 +98,9 @@ rb_node* rotate_lr(rb_node *_nd){
 }
 
 rb_node* avlNodeAdjust(rb_node *_rt, rb_node *_nd) {
+	if(!_nd){
+		return NULL;
+	}
 	for(rb_node *_cur = _nd; _cur; _cur=_cur->_parent) {
 		__update_size_height(_cur);
 		int cur_bf = __node_bf(_cur);
@@ -172,8 +175,33 @@ rb_node* avlNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	return bsNodeGetNode(_rt, _val, _tr);
 }
 
+// rb_node* avlNodeAdjustV2(rb_node *_rt, rb_node *_nd) {
+// 	for(rb_node *_cur = _nd; _cur; _cur=_cur->_parent) {
+// 		__update_size_height(_cur);
+// 		int cur_bf = __node_bf(_cur);
+// 		if(cur_bf==2) {				// right-heavy
+// 			int right_bf = __node_bf(_cur->_right);
+// 			if(right_bf>=0){
+// 				_cur = rotate_ll(_cur);
+// 			} else if(right_bf<0){
+// 				_cur = rotate_rl(_cur);
+// 			}
+
+// 		} else if(cur_bf==-2){		// left-heavy
+// 			int left_bf = __node_bf(_cur->_left);
+// 			if(left_bf<=0){
+// 				_cur = rotate_rr(_cur);
+// 			} else if(left_bf>0){
+// 				_cur = rotate_lr(_cur);
+// 			}
+// 		}
+// 		_rt = _cur;
+// 	}
+// 	return _rt;
+// }
+
 rb_node* avlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
-	rb_node *del_nd = rbTreeGetNodeInTree(_tr, _val->src);
+	rb_node *del_nd = avlNodeGetNode(_rt, _val, _tr);
 	if(del_nd==NULL){
 		_val->retcode = RB_NODE_DELETE_NOTFOUND;
 		return _rt;
@@ -185,7 +213,10 @@ rb_node* avlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	if (del_nd->_left&&del_nd->_right){ // left and right
 		rb_node *rpl = bsNodeMaxNode(del_nd->_left);
 		del_nd->_data = rpl->_data;
-		rb_node *lres = avlNodeDeleteNode(del_nd->_left, _val, _tr);
+		_node_value rpl_val; init_node_value(rpl_val, rpl->_data);
+		rb_node *del_left=del_nd->_left;
+		__unlink_left(del_nd);
+		rb_node *lres = avlNodeDeleteNode(del_left, &rpl_val, _tr);
 		__link_left(del_nd, lres);
 		_rt = avlNodeAdjust(_rt, del_nd);
 	} else {
@@ -193,9 +224,15 @@ rb_node* avlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 		int _dir = __node_dir(del_nd);
 		rb_node *rpl = del_nd->_left?del_nd->_left:del_nd->_right;
 		__link_(_p, rpl, _dir);
-		_rt = avlNodeAdjust(_rt, _p);
+
+		if(_p){
+			_rt = avlNodeAdjust(_rt, _p);
+		} else {
+			_rt = rpl;
+		}
+		
 		freeRBNode(del_nd);
 	}
 
-	return _rt==del_nd?NULL:_rt;
+	return _rt;
 }

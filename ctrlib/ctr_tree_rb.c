@@ -130,7 +130,7 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 
 // @return @param<_rt>: _tr->_root itself
 rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
-	rb_node *del_nd = rbTreeGetNodeInTree(_tr, _val->src);
+	rb_node *del_nd = rbNodeGetNode(_tr, _val, _tr);
 	if(del_nd==NULL){
 		_val->retcode = RB_NODE_DELETE_NOTFOUND;
 		return _rt;
