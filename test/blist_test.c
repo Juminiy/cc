@@ -8,12 +8,14 @@ void print_blist(blist *bl) {
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi))
         printf("%ld ", bNodeData(bn).i64);
     printf("]\n");
+    freeBIter(bi);
 
     printf("REV:blist=[ ");
     bi = makeBIter(bl, BLIST_ITER_BAKWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi))
         printf("%ld ", bNodeData(bn).i64);
     printf("]\n");
+    freeBIter(bi);
 }
 
 void print_bnode(bnode *bn) {
@@ -50,20 +52,20 @@ void test_head() {
     bListAddHead(bl, eleval);
     print_blist(bl);
 
-    bnode *nd=bListDelHead(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval = bListDelHead(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelHead(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval = bListDelHead(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelHead(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval = bListDelHead(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelHead(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval = bListDelHead(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelHead(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval = bListDelHead(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
     freeBList(bl);
 }
@@ -87,20 +89,20 @@ void test_tail() {
     bListAddTail(bl, eleval);
     print_blist(bl);
 
-    bnode *nd=bListDelTail(bl);         // delete 7
-    print_blist(bl); print_bnode(nd); 
+    eleval=bListDelTail(bl);                 // delete 7
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelTail(bl);                // delete 6
-    print_blist(bl); print_bnode(nd);   
+    eleval=bListDelTail(bl);                // delete 6
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelTail(bl);                // delete 5
-    print_blist(bl); print_bnode(nd);   
+    eleval=bListDelTail(bl);                // delete 5
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval)); 
 
-    nd=bListDelTail(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval=bListDelTail(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
-    nd=bListDelTail(bl);
-    print_blist(bl); print_bnode(nd);
+    eleval=bListDelTail(bl);
+    print_blist(bl); printf("%ld\n",get_elem_i64(eleval));
 
     freeBList(bl);
 }
@@ -117,32 +119,47 @@ void test_splice() {
     blist *l2=bListSplice(l0, l1);
     print_blist(l2);
 
-    blist *l3=bListSplice(l2, makeBList());
+    blist *_emptyLis=makeBList();
+    blist *l3=bListSplice(l2, _emptyLis);
     print_blist(l3);
 
-    blist *l4=bListSplice(makeBList(), l2);
+    blist *l4=bListSplice(_emptyLis, l2);
     print_blist(l4);
 
-    blist *l5=bListSplice(makeBList(), makeBList());
+    blist *l5=bListSplice(_emptyLis, _emptyLis);
     print_blist(l5);
+
+    freeBList(l0); printf("l0 ok\n");
+    freeBList(l1); printf("l1 ok\n");
+    freeBList(_emptyLis); printf("empty ok\n");
+    freeBList(l2); printf("l2 ok\n");
+    freeBList(l3); printf("l3 ok\n");
+    freeBList(l4); printf("l4 ok\n");
+    freeBList(l5); printf("l5 ok\n");
 }
 
 void test_copy() {
     blist *l0=makeBList();
     range_add_blist(l0, 0, 0);
-    print_blist(copyBList(l0));
+    blist *l0cpy=copyBList(l0);
+    print_blist(l0cpy); freeBList(l0cpy);
 
     blist *l1=makeBList();
     range_add_blist(l1, 0, 1);
-    print_blist(copyBList(l1));
+    blist *l1cpy=copyBList(l0);
+    print_blist(l1cpy); freeBList(l1cpy);
 
     blist *l2=makeBList();
     range_add_blist(l2, 0, 2);
-    print_blist(copyBList(l2));
-
+    blist *l2cpy=copyBList(l0);
+    print_blist(l2cpy); freeBList(l2cpy);
+ 
     blist *l3=makeBList();
     range_add_blist(l3, 19, 25);
-    print_blist(copyBList(l3));
+    blist *l3cpy=copyBList(l0);
+    print_blist(l3cpy); freeBList(l3cpy);
+
+    freeBList(l0), freeBList(l1), freeBList(l2), freeBList(l3);
 }
 
 int cmp_int(elem_t e0, elem_t e1) {
@@ -168,14 +185,16 @@ void test_search_index() {
     bn = bListIndex(l1, -1); print_bnode(bn);   // 19
 
     bn = bListIndex(l1, 22); print_bnode(bn);   // NULL
+
+    freeBList(l1);
 }
 
 int main() {
 
-    // test_tail();
-    // test_head();
-    // test_splice();
-    // test_copy();
+    test_tail();
+    test_head();
+    test_splice();
+    test_copy();
 
     test_search_index();
     return 0;

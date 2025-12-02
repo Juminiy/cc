@@ -16,7 +16,8 @@ void elem_int_set(elem_t _old, elem_t _new) {
 	do { \
 		elem_t elem_val; \
 		setup_elem_t(elem_val, 0, i64, ival); \
-		if(rbTreeGetData(rb, elem_val)==NULL) { \
+		elem_val = rbTreeGetData(rb, elem_val);\
+		if(valid_elem_t(elem_val)) { \
 			printf("%d Not Found\n", ival); \
 		} else { \
 			printf("%d Found\n", ival); \
@@ -29,7 +30,6 @@ void elem_int_set(elem_t _old, elem_t _new) {
 
 void test_insert_found() {
 	rb_tree *rb = makeRBTree(elem_int_cmp);
-	// rbTreeSetElemSet(rb, elem_int_set);
 
 	printf("put data\n");
 
@@ -55,6 +55,8 @@ void test_insert_found() {
 	test_found(rb, 7);
 	test_found(rb, 1);
 	test_found(rb, 18);
+
+	freeRBTree(rb);
 }
 
 void print_blist(blist *bl) {
@@ -75,7 +77,6 @@ void test_trav(int *arr, int sz, int delval, rbTreeTrav travfn) {
 
 	elem_t elem_val; 
 	rb_tree *rb = makeRBTree(elem_int_cmp);
-	// rbTreeSetElemSet(rb, elem_int_set);
 
 	printf("befor delete[%2d]: ", delval);
 	for (int i=0;i<sz;i++){
@@ -172,25 +173,24 @@ void print_kvnode(rb_node *nd) {
 
 void test_ssmap() {
 	rb_tree *rb = makeRBTree(elem_kvp_cmp);
-	// rbTreeSetElemSet(rb, elem_kvp_set);
 
 	elem_t elem_val; 
 	rb_node *nd=NULL;
 
 	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeInsertData(rb,elem_val); 						 // put-insert
 
-	setup_elem_ptr(elem_val, newkvp("c++",NULL)); nd = rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get-notFound		NULL
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); nd = rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:null>
+	setup_elem_ptr(elem_val, newkvp("c++",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get-notFound		NULL
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:null>
 
 	setup_elem_ptr(elem_val, newkvp("mysql","hachimi")); rbTreeInsertData(rb,elem_val);					 // put-update			
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); nd = rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:hachimi>
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:hachimi>
 
 	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeInsertData(rb,elem_val);					     // put-update			
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); nd = rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:null>
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:null>
 
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); nd = rbTreeDeleteData(rb,elem_val); print_kvnode(nd);// delete				<mysql:null>
-	setup_elem_ptr(elem_val, newkvp("c++",NULL)); nd = rbTreeDeleteData(rb,elem_val); print_kvnode(nd);	 // delete-notFound		<c++:null>
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); nd = rbTreeGetData(rb, elem_val); print_kvnode(nd);  // get-notFound		NULL
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeDeleteData(rb,elem_val); print_kvnode(nd);// delete				<mysql:null>
+	setup_elem_ptr(elem_val, newkvp("c++",NULL)); rbTreeDeleteData(rb,elem_val); print_kvnode(nd);	 // delete-notFound		<c++:null>
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);  // get-notFound		NULL
 
 	freeRBTree(rb);
 }
@@ -239,6 +239,7 @@ void test_bstree_delete(int tot_sz) {
 		check_order(rbTreeMidTrav(rb));
 	}
 	
+	freeRBTree(rb);
 }
 
 void test_del_trav_mem_bug() {
@@ -249,17 +250,21 @@ void test_del_trav_mem_bug() {
 }
 
 int main(int argc, char **argv) {	
-
-	// test_del_trav_bug();
-	int tot_sz = 100;
+	int tot_sz = 10;
 	if(argc>=2){
 		tot_sz = strtol(argv[1], NULL, 10);
 	}
 	test_bstree_delete(tot_sz);
 
-	// test_del_trav_mem_bug();
+	test_insert_found();
+	test_link_unlink();
+	test_del_trav();
+	test_del_trav2();
+	test_del_trav_bug();
+	test_del_trav_mem_bug();
 
-	// test_del_trav();
+	test_ssmap();
+	
 
 	return 0;
 }

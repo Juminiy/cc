@@ -11,7 +11,7 @@ void print_blist(blist *bl) {
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
 		rb_node *rbn = bNodeData(bn).ptr;
-		printf("%2ld ", get_elem_i64(rbn->_data), rbn->_size);
+		printf("%2ld ", get_elem_i64(rbn->_data));
 	}
     printf("]\n");
 	freeBIter(bi);
@@ -30,6 +30,8 @@ void test_rotate() {
 
 	tr->_root = rotate_right(tr->_root);
 	print_blist(rbTreeLelTrav(tr));
+
+	freeRBTree(tr);
 }
 
 void test_rb_node() {
@@ -46,6 +48,7 @@ void test_rb_node() {
 	print_blist(rbTreeMidTrav(tr));
 	print_blist(rbTreeLelTrav(tr));
 
+	freeRBTree(tr);
 }
 
 int main() {

@@ -16,7 +16,8 @@ void print_blist(blist *bl) {
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
 		rb_node *rbn = bNodeData(bn).ptr;   int64_t _cur_i64 = get_elem_i64(rbn->_data);
         rb_node *rbn_parent = rbn->_parent; int64_t _par_i64 = rbn_parent?get_elem_i64(rbn_parent->_data):-1;
-		printf("%2ld(p=%2ld)", _cur_i64, _par_i64);//(size=%2ld,height=%2ld) rbn->_size, rbn->_height
+		// printf("%2ld(p=%2ld) ", _cur_i64, _par_i64);//(size=%2ld,height=%2ld) rbn->_size, rbn->_height
+        printf("%2ld(ptr=%p) ",_cur_i64,rbn);
 	}
     printf("]\n");
 	freeBIter(bi);
@@ -50,6 +51,7 @@ void test_rotate_fn(int *arr, int arr_sz, rotate_fn _fn) {
     rb->_root = _fn(rb->_root);
     print_blist(rbTreeLelTrav(rb));
 
+    freeRBTree(rb);
 }
 
 
@@ -114,6 +116,7 @@ void test_avl_tree(int *arr, int arr_sz) {
     // printf("befor: ");
     print_blist(rbTreeLelTrav(rb));
 
+    freeRBTree(rb);
 }
 
 void test_avl_sorted(int tot_cnt) {
@@ -128,8 +131,28 @@ void test_avl_sorted(int tot_cnt) {
         tot_cnt, __tree_size(rb), __tree_height(rb), tot_cnt, log2(tot_cnt*1.0));
 
     // check order
-    // check_order(rbTreeMidTrav(rb));
+    check_order(rbTreeMidTrav(rb));
 
+    freeRBTree(rb);
+}
+
+void test_avl_delete(int *arr, size_t arr_sz, int del_val) {
+    elem_t _em;
+    rb_tree *rb = makeRBTree(elem_int_cmp);
+    // printf("tree=%p(root=%p)\n", rb, rb->_root);
+    setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    for(int i=0;i<arr_sz;i++){
+        // printf("insert: %d\n", arr[i]);
+        setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
+    }   
+    printf("befor del[%2d]: ", del_val);
+    print_blist(rbTreeLelTrav(rb));
+
+    setup_elem_i64(_em, del_val); rbTreeDeleteData(rb, _em);
+    printf("after del[%2d]: ", del_val);
+    print_blist(rbTreeLelTrav(rb));
+
+    freeRBTree(rb);
 }
 
 int main(int argc, char **argv) {
@@ -149,7 +172,21 @@ int main(int argc, char **argv) {
     if(argc>=2){
         t_sz = strtol(argv[1], NULL, 10);
     }
-    test_avl_sorted(t_sz);
+    // test_avl_sorted(t_sz);
+
+    //      8
+    //    5   15
+    //  1  7     18
+    int arr[10]={1,5,7,8,15,18};
+
+    // delete all
+    // test_avl_delete(arr, 6, -1);
+
+    // delete each
+    for(int idx=0;idx<6;idx++) {
+        
+        test_avl_delete(arr, 6, arr[idx]); // bug report: function stack memory pointer to heap location reused, same address no freed, memleak! 
+    }
 
     return 0;
 }

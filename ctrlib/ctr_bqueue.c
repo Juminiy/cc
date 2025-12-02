@@ -40,8 +40,7 @@ elem_t bQueueBack(bqueue *_bq) {
 elem_t bQueuePop(bqueue *_bq) {
     elem_t elem_val = {.tag = ELEM_T_INVALID};
     if(!bQueueEmpty(_bq)){
-        bnode *bn = bListDelHead(_bq->_bl);
-        elem_val = bn->_data;
+        return bListDelHead(_bq->_bl);
     }
     return elem_val;
 }

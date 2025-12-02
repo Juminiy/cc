@@ -4,9 +4,9 @@
 #define __link_bnode(_n0, _n1) \
     do { if(_n0) {_n0->_next=_n1;} if(_n1) {_n1->_prev=_n0;} } while(0)
 #define __unlink_prev(_n0) \
-    do { if(_n0->_prev) {_n0->_prev->_next=NULL; _n0->_prev=NULL;} } while(0)
+    do { if(_n0 && _n0->_prev) {_n0->_prev->_next=NULL; _n0->_prev=NULL;} } while(0)
 #define __unlink_next(_n0) \
-    do { if(_n0->_next) {_n0->_next->_prev=NULL; _n0->_next=NULL;} } while(0)
+    do { if(_n0 && _n0->_next) {_n0->_next->_prev=NULL; _n0->_next=NULL;} } while(0)
 
 bnode *makeBNode(bnode *_prev, elem_t _data, bnode *_next) {
     bnode *_bn = (bnode*)malloc(sizeof(bnode));
@@ -31,13 +31,42 @@ blist *makeBList() {
 }
 
 void freeBList(blist *_bl) {
-    for(bnode *_bn=_bl->_head; _bn; ) {
+    for(bnode *_bn=_bl->_head; _bn&&_bl->_size>0; ) {
         bnode *_nxt = _bn->_next;
-        freeBNode(_bn);
+        freeBNode(_bn);_bl->_size--;
         _bn = _nxt;
     }
     free(_bl);
 }
+
+bnode *bListAddHead(blist *_bl, elem_t _dt) {
+    return bListLinkHead(_bl, makeBNode(NULL,_dt,NULL));
+}
+
+elem_t bListDelHead(blist *_bl) {
+    elem_t _em={.tag=ELEM_T_INVALID};
+    bnode *bn = bListUnlinkHead(_bl);
+    if(bn){
+        _em = bn->_data;
+    }
+    freeBNode(bn);
+    return _em;
+}
+
+bnode *bListAddTail(blist *_bl, elem_t _dt) {
+    return bListLinkTail(_bl, makeBNode(NULL,_dt,NULL));
+}
+
+elem_t bListDelTail(blist *_bl) {
+    elem_t _em={.tag=ELEM_T_INVALID};
+    bnode *bn = bListUnlinkTail(_bl);
+    if(bn){
+        _em = bn->_data;
+    }
+    freeBNode(bn);
+    return _em;
+}
+
 
 bnode *bListLinkHead(blist *_bl, bnode *_bn) {
     __link_bnode(_bn, _bl->_head);
@@ -49,11 +78,7 @@ bnode *bListLinkHead(blist *_bl, bnode *_bn) {
     return _bn;
 }
 
-bnode *bListAddHead(blist *_bl, elem_t _dt) {
-    return bListLinkHead(_bl, makeBNode(NULL,_dt,NULL));
-}
-
-bnode *bListDelHead(blist *_bl) {
+bnode *bListUnlinkHead(blist *_bl) {
     bnode *_bn = _bl->_head;
     if(_bn) {
         _bl->_head = _bn->_next;
@@ -76,11 +101,7 @@ bnode *bListLinkTail(blist *_bl, bnode *_bn) {
     return _bn;
 }
 
-bnode *bListAddTail(blist *_bl, elem_t _dt) {
-    return bListLinkTail(_bl, makeBNode(NULL,_dt,NULL));
-}
-
-bnode *bListDelTail(blist *_bl) {
+bnode *bListUnlinkTail(blist *_bl) {
     bnode *_bn = _bl->_tail;
     if(_bn) {
         _bl->_tail = _bn->_prev;
@@ -93,7 +114,9 @@ bnode *bListDelTail(blist *_bl) {
     return _bn;
 }
 
+// @attention returned must be freed
 blist *bListSplice(blist *_bl0, blist *_bl1) {
+    _bl0 = copyBList(_bl0), _bl1 = copyBList(_bl1);
     bnode *_bn0=NULL, *_bn1=NULL;
     if(_bl0 && _bl0->_tail)
         _bn0 = _bl0->_tail;
@@ -104,6 +127,7 @@ blist *bListSplice(blist *_bl0, blist *_bl1) {
     _bl->_head = _bn0 ? _bl0->_head:_bl1->_head;
     _bl->_tail = _bn1 ? _bl1->_tail:_bl0->_tail;
     _bl->_size = _bl0->_size+_bl1->_size;
+    free(_bl0), free(_bl1);
     return _bl;
 }
 
@@ -127,6 +151,7 @@ bnode *bListNext(biter *_bi) {
     return cur;
 }
 
+// @attention returned must be freed
 blist *copyBList(blist *_bl) {
     blist *cpy=makeBList();
     biter *itr=makeBIter(_bl, BLIST_ITER_FORWARD);
@@ -139,26 +164,32 @@ blist *copyBList(blist *_bl) {
 
 bnode *bListSearch(blist *_bl, elem_t _dt) {
     biter *bi=makeBIter(_bl, BLIST_ITER_FORWARD);
+    bnode *ret = NULL;
     for(bnode *bn=bListNext(bi);bn;bn=bListNext(bi)) {
         if(_bl->_elem_cmp(bn->_data, _dt)==0){
-            return bn;
+            ret = bn; break;
         }
     }
     freeBIter(bi);
-    return NULL;
+    return ret;
 }
 
+// _idx >= 0
+//  0 -> 0
+//  1 -> 1
+// _idx <= 0
 // -1 -> 0
 // -2 -> 1
 bnode *bListIndex(blist *_bl, int _idx) {
     biter *bi=makeBIter(_bl, _idx>=0 ? BLIST_ITER_FORWARD:BLIST_ITER_BAKWARD);
     _idx = _idx >= 0 ? _idx : -_idx-1;
+    bnode *ret = NULL;
     for(bnode *bn=bListNext(bi);bn&&_idx>=0;bn=bListNext(bi)) {
         if(_idx==0){
-            return bn;
+            ret = bn; break;
         }
         _idx--;
     }
     freeBIter(bi);
-    return NULL;
+    return ret;
 }

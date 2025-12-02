@@ -1,5 +1,14 @@
 #include "ctr_rbtree.h"
 
+#define __link_(_nd, _ch, _dir) \
+	do { \
+		if(_dir==RB_NODE_DIR_LEFT){ \
+			__link_left(_nd, _ch); \
+		} else if(_dir==RB_NODE_DIR_RIGHT){ \
+			__link_right(_nd, _ch); \
+		} \
+	} while(0)
+
 //		A				B	
 //   B		Ar	->  Bl	   A
 // Bl Br		  C		 Br	 Ar
@@ -88,44 +97,8 @@ rb_node* rotate_lr(rb_node *_nd){
     return rotate_right(_nd);
 }
 
-/* @return @param<_rt>
- * 1. if found(cmp=0), copy data, return _rt
- * 2. else insert, adjust, return _rt
- * 3. return _rt because _root will change in every rotation
-*/ 
-rb_node* avlNodeInsertNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	// 1). insert _nd
-	rb_node *_cur = _rt, *_p=NULL;
-	int _dir = RB_NODE_DIR_NONE;
-	while(_cur){
-		_p = _cur;
-		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
-		if(cmp_res == 0){				// exsits, replace value return
-			_cur->_data = _nd->_data;	
-			return _rt;
-		} else if(cmp_res < 0){
-			_cur = _cur->_right;
-			_dir = RB_NODE_DIR_RIGHT;
-		} else {
-			_cur = _cur->_left;
-			_dir = RB_NODE_DIR_LEFT;
-		}
-	}
-	if(!_cur){
-		if(_dir==RB_NODE_DIR_LEFT){
-			__link_left(_p, _nd);
-		} else if(_dir==RB_NODE_DIR_RIGHT){
-			__link_right(_p, _nd);
-		} else {
-			return _nd;				// root is null, insert return
-		}
-	}
-
-
-	// 2). 
-	// search _nd._p._p._p... ancestors for loop, rectify
-	// update size and height
-	for(_cur = _nd; _cur; _cur=_cur->_parent) {
+rb_node* avlNodeAdjust(rb_node *_rt, rb_node *_nd) {
+	for(rb_node *_cur = _nd; _cur; _cur=_cur->_parent) {
 		__update_size_height(_cur);
 		int cur_bf = __node_bf(_cur);
 		if(cur_bf==2) {				// right-heavy
@@ -146,15 +119,83 @@ rb_node* avlNodeInsertNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 		}
 		_rt = _cur;
 	}
+	return _rt;
+}
+
+/* @return @param<_rt>
+ * 1. if found(cmp=0), copy data, return _rt
+ * 2. else insert, adjust, return _rt
+ * 3. return _rt because _root will change in every rotation
+*/ 
+rb_node* avlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
+	// 1). insert _nd
+	rb_node *_cur = _rt, *_p=NULL;
+	int _dir = RB_NODE_DIR_NONE;
+	while(_cur){
+		_p = _cur;
+		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
+		if(cmp_res == 0){				// exsits, replace value return
+			_cur->_data = _val->src;	
+			_val->retcode = RB_NODE_INSERT_REPLACED;
+			return _rt;
+		} else if(cmp_res < 0){
+			_cur = _cur->_right;
+			_dir = RB_NODE_DIR_RIGHT;
+		} else {
+			_cur = _cur->_left;
+			_dir = RB_NODE_DIR_LEFT;
+		}
+	}
+
+	rb_node *_nd = makeRBNode(NULL,NULL,_val->src);
+	_val->retcode = RB_NODE_INSERT_CREATED;
+	if(!_cur){
+		if(_dir==RB_NODE_DIR_LEFT){
+			__link_left(_p, _nd);
+		} else if(_dir==RB_NODE_DIR_RIGHT){
+			__link_right(_p, _nd);
+		} else {
+			return _nd;				// root is null, insert return
+		}
+	}
+
+
+	// 2). 
+	// search _nd._p._p._p... ancestors for loop, rectify
+	// update size and height
+	_rt = avlNodeAdjust(_rt, _nd);
 
 	return _rt;
 }
 
-rb_node* avlNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	return bsNodeGetNode(_rt, _nd, _tr);
+rb_node* avlNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
+	return bsNodeGetNode(_rt, _val, _tr);
 }
 
-rb_node* avlNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
+rb_node* avlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
+	rb_node *del_nd = rbTreeGetNodeInTree(_tr, _val->src);
+	if(del_nd==NULL){
+		_val->retcode = RB_NODE_DELETE_NOTFOUND;
+		return _rt;
+	}
 
-	return _rt;
+	_val->dst = del_nd->_data;
+	_val->retcode = RB_NODE_DELETE_SUCCESS;
+
+	if (del_nd->_left&&del_nd->_right){ // left and right
+		rb_node *rpl = bsNodeMaxNode(del_nd->_left);
+		del_nd->_data = rpl->_data;
+		rb_node *lres = avlNodeDeleteNode(del_nd->_left, _val, _tr);
+		__link_left(del_nd, lres);
+		_rt = avlNodeAdjust(_rt, del_nd);
+	} else {
+		rb_node *_p = del_nd->_parent;
+		int _dir = __node_dir(del_nd);
+		rb_node *rpl = del_nd->_left?del_nd->_left:del_nd->_right;
+		__link_(_p, rpl, _dir);
+		_rt = avlNodeAdjust(_rt, _p);
+		freeRBNode(del_nd);
+	}
+
+	return _rt==del_nd?NULL:_rt;
 }

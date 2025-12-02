@@ -25,4 +25,5 @@
 2. associative: rbtree
 
 ## Debug
-1. `gdb ./rbtree_test.d -x rbtree_test.gdbinit`
+1. `gdb ./a.out -x a.gdbinit`
+2. `valgrind --tool=memcheck --leak-check=full a.out`

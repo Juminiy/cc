@@ -33,12 +33,18 @@ blist *makeBList();
 void freeBList(blist *_bl);
 blist *copyBList(blist *_bl);
 blist *bListSplice(blist *_bl0, blist *_bl1);
+
+// safe api
 bnode *bListAddHead(blist *_bl, elem_t _dt);
-bnode *bListLinkHead(blist *_bl, bnode *_bn);
-bnode *bListDelHead(blist *_bl);
+elem_t bListDelHead(blist *_bl);
 bnode *bListAddTail(blist *_bl, elem_t _dt);
+elem_t bListDelTail(blist *_bl);
+
+// unsafe api
+bnode *bListLinkHead(blist *_bl, bnode *_bn);
+bnode *bListUnlinkHead(blist *_bl);
 bnode *bListLinkTail(blist *_bl, bnode *_bn);
-bnode *bListDelTail(blist *_bl);
+bnode *bListUnlinkTail(blist *_bl);
 
 biter *makeBIter(blist *_bl, int _dire);
 void freeBIter(biter *_bi);

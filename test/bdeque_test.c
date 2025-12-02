@@ -41,7 +41,7 @@ void test_bqueue() {
 
 int main() {
 
-    // test_bstack();
+    test_bstack();
 
     test_bqueue();
 

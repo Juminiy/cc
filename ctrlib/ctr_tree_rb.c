@@ -31,16 +31,17 @@ void rbNodeInsertAdjust(rb_node *_nd) {
 }
 
 // @return @param _rt: _tr->_root itself
-rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
+rb_node* rbNodeInsertNode(rb_node* _rt, _node_value *_val, rb_tree *_tr) {
 	rb_node *_cur = _rt, *_cur_parent=NULL;
 	int _dir = RB_NODE_DIR_NONE;
 	
 	// find insert or update position
 	while(_cur) {
 		_cur_parent = _cur;
-		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
+		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
 		if(cmp_res==0){ // find update
-			_cur->_data = _nd->_data;
+			_cur->_data = _val->src;
+			_val->retcode = RB_NODE_INSERT_REPLACED;
 			return _rt;
 		} else if(cmp_res<0){
 			_cur = _cur->_right;
@@ -50,6 +51,9 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 			_dir = RB_NODE_DIR_LEFT;
 		}
 	}
+
+	rb_node *_nd = makeRBNode(NULL,NULL,_val->src);
+	_val->retcode = RB_NODE_INSERT_CREATED;
 	if(!_cur){
 		if(_dir==RB_NODE_DIR_LEFT){
 			__link_left(_cur_parent, _nd);
@@ -73,8 +77,8 @@ rb_node* rbNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
 }
 
 // @return if found: node, else: NULL
-rb_node* rbNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	return bsNodeGetNode(_rt, _nd, _tr);
+rb_node* rbNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
+	return bsNodeGetNode(_rt, _val, _tr);
 }
 
 void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
@@ -125,21 +129,23 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 }
 
 // @return @param<_rt>: _tr->_root itself
-rb_node* rbNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
-	rb_node *del_nd = rbTreeGetNodeInTree(_rt, _nd->_data);
+rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
+	rb_node *del_nd = rbTreeGetNodeInTree(_tr, _val->src);
 	if(del_nd==NULL){
+		_val->retcode = RB_NODE_DELETE_NOTFOUND;
 		return _rt;
 	}
 
-	_nd->_data = del_nd->_data;
-	_nd = del_nd;
+	_val->dst = del_nd->_data;
+	_val->retcode = RB_NODE_DELETE_SUCCESS;
+	rb_node *_nd = del_nd;
 	rb_node *_res=NULL;
 	if(_nd->_left&&_nd->_right){
-		rb_node *_suc = bsNodeMinNode(_nd->_right,_tr);
+		rb_node *_suc = bsNodeMinNode(_nd->_right);
 		__swap_(elem_t, _suc->_data, _nd->_data);
 		_res = _nd, _nd = _suc;
 	} else {
-		_res = bsNodeNextNode(_nd, _tr);
+		_res = bsNodeNextNode(_nd);
 	}
 
 	int n_dir=__node_dir(_nd);

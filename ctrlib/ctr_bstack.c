@@ -32,8 +32,7 @@ elem_t bStackTop(bstack *_bstk) {
 elem_t bStackPop(bstack *_bstk) {
     elem_t elem_val = {.tag = ELEM_T_INVALID};
     if(!bStackEmpty(_bstk)){
-        bnode *bn = bListDelTail(_bstk->_bl);
-        elem_val = bn->_data;
+        return bListDelTail(_bstk->_bl);
     }
     return elem_val;
 }

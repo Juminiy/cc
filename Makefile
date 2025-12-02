@@ -1,5 +1,6 @@
 optargs=-Wunused-result -O2
-debugargs=-g -lm
+debugargs=-g -O0 -lm
+memsant=-fsanitize=address
 cplargs=$(debugargs)
 
 VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test

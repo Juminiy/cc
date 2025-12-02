@@ -19,7 +19,8 @@
         bListAddTail(addr_blist, elem_addr); \
     } while(0)
 
-// each interface IP
+// @attention returned must be freed
+// each interface IPv4
 blist* get_intf_ipv4() {
     struct ifaddrs *addrs;
     blist *addrlist = makeBList();
@@ -41,6 +42,8 @@ blist* get_intf_ipv4() {
     return addrlist;
 }
 
+// @attention returned must be freed
+// each interface IPv6
 blist* get_intf_ipv6() {
     struct ifaddrs *addrs;
     blist *addrlist = makeBList();

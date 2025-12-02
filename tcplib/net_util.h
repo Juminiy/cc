@@ -21,6 +21,8 @@ blist* get_intf_ipv6();
             __printf("interface name: %s, ip: %s\n",  \
                 intfipval->_name, intfipval->_ip); \
         } \
+        freeBIter(bi); \
+        freeBList(bl); \
     }while(0)
 
 #endif 

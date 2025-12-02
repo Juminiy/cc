@@ -26,7 +26,8 @@ void freeRBNode(rb_node* _nd) {
 	free(_nd);
 }
 
-rb_node* bsNodeMinNode(rb_node* _rt, rb_tree *_tr) {
+// Minimum
+rb_node* bsNodeMinNode(rb_node* _rt) {
 	rb_node *_cur = _rt;
 	while(_cur && _cur->_left) {
 		_cur = _cur->_left;
@@ -34,7 +35,8 @@ rb_node* bsNodeMinNode(rb_node* _rt, rb_tree *_tr) {
 	return _cur;
 }
 
-rb_node* bsNodeMaxNode(rb_node* _rt, rb_tree *_tr) {
+// Maximum
+rb_node* bsNodeMaxNode(rb_node* _rt) {
 	rb_node *_cur = _rt;
 	while(_cur && _cur->_right) {
 		_cur = _cur->_right;
@@ -43,9 +45,9 @@ rb_node* bsNodeMaxNode(rb_node* _rt, rb_tree *_tr) {
 }
 
 // Predecessor
-rb_node* bsNodePreNode(rb_node* _rt, rb_tree *_tr) { 
+rb_node* bsNodePreNode(rb_node* _rt) { 
 	if(_rt->_left){
-		return bsNodeMaxNode(_rt->_left, _tr);
+		return bsNodeMaxNode(_rt->_left);
 	}
 	rb_node *_p = _rt->_parent;
 	while(_p&&_p->_left==_rt){
@@ -55,9 +57,9 @@ rb_node* bsNodePreNode(rb_node* _rt, rb_tree *_tr) {
 }
 
 // Successor
-rb_node* bsNodeNextNode(rb_node* _rt, rb_tree *_tr) {
+rb_node* bsNodeNextNode(rb_node* _rt) {
 	if(_rt->_right){
-		return bsNodeMinNode(_rt->_right, _tr);
+		return bsNodeMinNode(_rt->_right);
 	}
 	rb_node *_p = _rt->_parent;
 	while(_p&&_p->_right==_rt){
@@ -66,58 +68,63 @@ rb_node* bsNodeNextNode(rb_node* _rt, rb_tree *_tr) {
 	return _p;
 }
 
-
-rb_node* bsNodeInsertNode(rb_node* _rt, rb_node* _nd, rb_tree *_tr) {
+rb_node* bsNodeInsertNode(rb_node* _rt, _node_value *_val, rb_tree *_tr) {
 	if(!_rt) {
-		return _nd;
+		_val->retcode = RB_NODE_INSERT_CREATED;
+		return makeRBNode(NULL, NULL, _val->src);
 	}
-	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
+	int cmp_res = _tr->_elem_cmp(_rt->_data, _val->src);
 	if(cmp_res==0) {
 		// _tr->_elem_set(_rt->_data, _nd->_data); 
-		_rt->_data = _nd->_data; // set new to old
+		_rt->_data = _val->src; // set new to old
+		_val->retcode = RB_NODE_INSERT_REPLACED;
 	} else if (cmp_res < 0) {
-		rb_node *rres = bsNodeInsertNode(_rt->_right, _nd, _tr);
+		rb_node *rres = bsNodeInsertNode(_rt->_right, _val, _tr);
 		__link_right(_rt, rres);
 	} else {
-		rb_node *lres = bsNodeInsertNode(_rt->_left, _nd, _tr);
+		rb_node *lres = bsNodeInsertNode(_rt->_left, _val, _tr);
 		__link_left(_rt, lres);
 	}
 	return _rt;
 }
 
 // @return @param<_nd>: copy data to _nd and return _nd
-rb_node* bsNodeGetNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
+rb_node* bsNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	rb_node *_cur = _rt;
 	while(_cur){
-		int cmp_res = _tr->_elem_cmp(_cur->_data, _nd->_data);
+		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
 		if(cmp_res == 0){
-			_nd->_data = _cur->_data;
-			return _nd;
+			_val->dst = _cur->_data;
+			_val->retcode = RB_NODE_GET_SUCCESS;
+			return _cur;
 		} else if(cmp_res < 0){
 			_cur = _cur->_right;
 		} else {
 			_cur = _cur->_left;
 		}
 	}
+	_val->retcode = RB_NODE_GET_NOTFOUND;
 	return NULL;
 }
 
 // @return @param<_rt>: copy data to _nd and return _rt
-rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
+rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	if(_rt==NULL) {
+		_val->retcode = RB_NODE_DELETE_NOTFOUND;
 		return NULL;
 	}
 
-	int cmp_res = _tr->_elem_cmp(_rt->_data, _nd->_data);
+	int cmp_res = _tr->_elem_cmp(_rt->_data, _val->src);
 	if (cmp_res < 0) {
-		rb_node *rres = bsNodeDeleteNode(_rt->_right, _nd, _tr);
+		rb_node *rres = bsNodeDeleteNode(_rt->_right, _val, _tr);
 		__link_right(_rt, rres);
 	} else if (cmp_res > 0) {
-		rb_node *lres = bsNodeDeleteNode(_rt->_left, _nd, _tr);
+		rb_node *lres = bsNodeDeleteNode(_rt->_left, _val, _tr);
 		__link_left(_rt, lres);
 	} else {
 		// _tr->_elem_set(_nd->_data, _rt->_data); 
-		_nd->_data = _rt->_data; // set old to new
+		_val->dst = _rt->_data; // set old to new
+		_val->retcode = RB_NODE_DELETE_SUCCESS;
 
 		if(_rt->_right==NULL) {
 			rb_node *_tmp=_rt->_left;
@@ -128,9 +135,9 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, rb_node *_nd, rb_tree *_tr) {
 			freeRBNode(_rt);
 			return _tmp;
 		} else {
-			rb_node *rpl = bsNodeMaxNode(_rt->_left, _tr); // may be leaf, must child<=1
+			rb_node *rpl = bsNodeMaxNode(_rt->_left); // may be leaf, must child<=1
 			_rt->_data = rpl->_data;
-			rb_node *lres = bsNodeDeleteNode(_rt->_left, rpl, _tr);
+			rb_node *lres = bsNodeDeleteNode(_rt->_left, _val, _tr);
 			__link_left(_rt, lres);
 		}
 	}
@@ -192,36 +199,42 @@ void freeRBTree(rb_tree* _tr) {
 	free(_tr);
 }
 
-rb_node* rbTreeInsertData(rb_tree* _tr, elem_t _dt) {
-	rb_node *_nd = makeRBNode(NULL, NULL, _dt);
-	// todo: if replace only, should be freed 
-	return rbTreeInsertNode(_tr, _nd);
+int rbTreeInsertData(rb_tree* _tr, elem_t _dt) {
+	_node_value _val; init_node_value(_val, _dt);
+	rbTreeInsertNode(_tr, &_val);
+	return _val.retcode;
+}
+
+int rbTreeDeleteData(rb_tree* _tr, elem_t _dt) {
+	_node_value _val; init_node_value(_val, _dt);
+	rbTreeDeleteNode(_tr, &_val);
+	return _val.retcode;
+}
+
+elem_t rbTreeGetData(rb_tree* _tr, elem_t _dt) {
+	_node_value _val; init_node_value(_val, _dt);
+	rbTreeGetNode(_tr, &_val);
+	return _val.dst;
 }
 
 /*
  * @return @param<_nd>: an inserted node
 */
-rb_node* rbTreeInsertNode(rb_tree* _tr, rb_node *_nd) {
+void rbTreeInsertNode(rb_tree *_tr, _node_value *_val) {
 	switch (_tr->_tree_node_type) {
 		case TREE_NODE_TYPE_AVL:
-		_tr->_root = avlNodeInsertNode(_tr->_root, _nd, _tr);
+		_tr->_root = avlNodeInsertNode(_tr->_root, _val, _tr);
 		break;
 
 		case TREE_NODE_TYPE_RB:
-		_tr->_root = rbNodeInsertNode(_tr->_root, _nd, _tr);
+		_tr->_root = rbNodeInsertNode(_tr->_root, _val, _tr);
 		_tr->_root->_color = RB_NODE_CLR_BLK; // set root BLACK
 		break;
 
 		default: // TREE_NODE_TYPE_BS, or other
-		_tr->_root = bsNodeInsertNode(_tr->_root, _nd, _tr);
+		_tr->_root = bsNodeInsertNode(_tr->_root, _val, _tr);
 		break;
 	}
-	return _nd;
-}
-
-rb_node* rbTreeDeleteData(rb_tree* _tr, elem_t _dt) {
-	rb_node *_nd = makeRBNode(NULL, NULL, _dt);
-	return rbTreeDeleteNode(_tr, _nd);
 }
 
 /*
@@ -230,30 +243,20 @@ rb_node* rbTreeDeleteData(rb_tree* _tr, elem_t _dt) {
  * 2. copy _data to _nd
  * 3. return _nd
 */
-rb_node* rbTreeDeleteNode(rb_tree* _tr, rb_node *_nd) {
+void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val) {
 	switch (_tr->_tree_node_type) {
 		case TREE_NODE_TYPE_AVL:
-		_tr->_root = avlNodeDeleteNode(_tr->_root, _nd, _tr);
+		_tr->_root = avlNodeDeleteNode(_tr->_root, _val, _tr);
 		break;
 
 		case TREE_NODE_TYPE_RB:
-		_tr->_root = rbNodeDeleteNode(_tr->_root, _nd, _tr);
+		_tr->_root = rbNodeDeleteNode(_tr->_root, _val, _tr);
 		break;
 
 		default: // TREE_NODE_TYPE_BS, or other
-		_tr->_root = bsNodeDeleteNode(_tr->_root, _nd, _tr);
+		_tr->_root = bsNodeDeleteNode(_tr->_root, _val, _tr);
 		break;
 	}
-	return _nd;
-}
-
-rb_node* rbTreeGetData(rb_tree* _tr, elem_t _dt) {
-	rb_node *_nd = makeRBNode(NULL, NULL, _dt);
-	rb_node *_found = rbTreeGetNode(_tr, _nd);
-	if(!_found){
-		free(_nd);
-	}
-	return _found;
 }
 
 /*
@@ -261,43 +264,34 @@ rb_node* rbTreeGetData(rb_tree* _tr, elem_t _dt) {
  * 1. copy node in tree _data to _nd
  * 2. will not return node in tree, only return _nd
 */
-rb_node* rbTreeGetNode(rb_tree* _tr, rb_node *_nd) {
+rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val) {
+	rb_node *_nd;
 	switch (_tr->_tree_node_type) {
 		case TREE_NODE_TYPE_AVL:
-		_nd = avlNodeGetNode(_tr->_root, _nd, _tr);
+		_nd = avlNodeGetNode(_tr->_root, _val, _tr);
 		break;
 
 		case TREE_NODE_TYPE_RB:
-		_nd = rbNodeGetNode(_tr->_root, _nd, _tr);
+		_nd = rbNodeGetNode(_tr->_root, _val, _tr);
 		break;
 
 		default: // TREE_NODE_TYPE_BS, or other
-		_nd = bsNodeGetNode(_tr->_root, _nd, _tr);
+		_nd = bsNodeGetNode(_tr->_root, _val, _tr);
 		break;
 	}
 	return _nd;
 }
 
 rb_node* rbTreeGetNodeInTree(rb_tree* _tr, elem_t _dt) {
-	rb_node *_cur = _tr->_root;
-	while(_cur){
-		int cmp_res = _tr->_elem_cmp(_cur->_data, _dt);
-		if(cmp_res == 0){
-			return _cur;
-		} else if(cmp_res < 0){
-			_cur = _cur->_right;
-		} else {
-			_cur = _cur->_left;
-		}
-	}
-	return NULL;
+	_node_value _val; init_node_value(_val, _dt);
+	return rbTreeGetNode(_tr, &_val);
 }
-
 
 /*==============================================================================
  * MARK: - Tree Traversal (Implementation)
  *============================================================================*/
 
+// @attention returned must be freed
 blist* rbTreeMidTrav(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // <rb_node*>
 	blist *bl = makeBList();			// list<rb_node*>
@@ -322,12 +316,15 @@ blist* rbTreeMidTrav(rb_tree* _tr) {
 	return bl;
 }
 
+// @attention returned must be freed
 blist* rbTreeLelTrav(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; 
 	blist *bl = makeBList();
 	bqueue *bq = makeBQueue();
 	rb_node *nd = _tr->_root;
-	setup_elem_ptr(_el, nd); bQueuePush(bq, _el);
+	if(nd){
+		setup_elem_ptr(_el, nd); bQueuePush(bq, _el);
+	}
 
 	while(!bQueueEmpty(bq)) {
 		_el = bQueuePop(bq);
