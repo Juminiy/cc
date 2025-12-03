@@ -15,13 +15,13 @@
 
 #include <pthread.h>
 
-int glb_skt_fd = -1;
-void __attribute__((destructor)) __inexit() {
-    INFO("clean socket");
-    if (glb_skt_fd != -1) {
-        close(glb_skt_fd);
-    }
-}
+// int glb_skt_fd = -1;
+// void __attribute__((destructor)) __inexit() {
+//     INFO("clean socket");
+//     if (glb_skt_fd != -1) {
+//         close(glb_skt_fd);
+//     }
+// }
 
 typedef struct {
     int skt_fd;
@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
         FATAL("Create Socket");
     }
     DEBUGF("Create Socket success, [client_fd:%d]", skt_fd);
-    glb_skt_fd = skt_fd;
+    // glb_skt_fd = skt_fd;
 
     struct sockaddr_in skt_addr;
     sktaddrin_set(skt_addr, AF_INET, srv_port, srv_addr);

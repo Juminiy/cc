@@ -37,7 +37,7 @@ void test_rotate() {
 void test_rb_node() {
 	elem_t _em;
 	rb_tree *tr=makeRBTree(elem_int_cmp);
-	setTreeNodeType(tr, TREE_NODE_TYPE_RB);
+	setRBTreeNodeType(tr, TREE_NODE_TYPE_RB);
 	int arr[14]={18,13,22,5,16,29,25,33,4,17,24,27,26,28};
 	
 	for(int i=0;i<14;i++){

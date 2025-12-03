@@ -1,1 +1,1 @@
-b rr.c:2
+b main

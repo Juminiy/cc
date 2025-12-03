@@ -16,15 +16,13 @@ vpath %.o
 	g++ -std=c++11 -o $@ $^
 
 %.d: %.o
-	$(CC) $(cplargs) -o $@ $^
+	$(CC) -std=c99 -o $@ $^ $(cplargs)
 
 all: tcp_srv.d tcp_cli.d
 
-tcp_srv.d: tcp_srv.o tcp_lib.o skt_select.o skt_fdset.o skt_epoll.o net_util.o ctr_blist.o
-tcp_cli.d: tcp_cli.o util.o net_util.o ctr_blist.o
+tcp_srv.d: tcpsrv/tcp_srv.c tcp_lib.o skt_select.o skt_fdset.o skt_epoll.o net_util.o ctr_blist.o
+tcp_cli.d: tcpcli/tcp_cli.c util.o net_util.o ctr_blist.o
 
-tcp_srv.o: tcpsrv/tcp_srv.c
-tcp_cli.o: tcpcli/tcp_cli.c
 skt_select.o: tcplib/skt_select.c
 skt_epoll.o: tcplib/skt_epoll.c
 skt_fdset.o: tcplib/skt_fdset.c
@@ -57,7 +55,8 @@ bstree_test.d: test/bstree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree
 rbtree_test.d: test/rbtree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
 avltree_test.d: test/avltree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
 map_test.d: test/map_test.c ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o
-cppmap_test.d: test/cppmap_test.cpp
+stdmap_test.d: test/stdmap_test.cpp
+map_correct_test.d: test/map_correct_test.cpp ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

@@ -3,6 +3,7 @@
 
 #include "ctr_elemt.h"
 #include "ctr_blist.h"
+#include "ctr_util.h"
 
 #define TREE_NODE_TYPE_BS  0
 #define TREE_NODE_TYPE_RB  1
@@ -26,12 +27,14 @@ typedef struct rb_node {
 
 typedef struct rb_tree {
     elem_t_cmp _elem_cmp; 						// 8B, +required, compare _data
+	elem_t_free _elem_free;						// 8B, +optional, free _data
 	rb_node *_root;								// 8B
 	size_t   _size;							    // 4B
-	int 	 _tree_node_type;					// 4B, +optional, default=TREE_NODE_TYPE_BS
+	int 	 _node_type;					// 4B, +optional, default=TREE_NODE_TYPE_BS
 } rb_tree;
 
-#define setTreeNodeType(_rb, _type) (_rb->_tree_node_type=_type)
+#define setRBTreeNodeType(_rb, _type) (_rb->_node_type=_type)
+#define setRBTreeDataFree(_rb, _free) (_rb->_elem_free=_free)
 
 // please use the MACRO carefully, because the `link` and `unlink` operation is bidirectional
 
@@ -73,14 +76,8 @@ typedef struct rb_tree {
 		_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+1; \
 		_nd->_height=__max_(__node_height(_nd->_left),__node_height(_nd->_right))+1; \
 	} while(0)
-
-static inline size_t __max_(size_t _a, size_t _b){
-	return _a > _b ? _a : _b;
-}
-
-static inline size_t __min_(size_t _a, size_t _b){
-	return _a < _b ? _a : _b;
-}
+#define __free_data(tr, _dt) \
+	do { if(tr->_elem_free) {tr->_elem_free(_dt);} } while(0)
 
 #define RB_NODE_OPT_NONE		(0)	   // 00000000
 #define RB_NODE_INSERT_ERROR	(1<<0) // 00000001
@@ -119,7 +116,7 @@ rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val);
 
 // treeNode: (bst,rbtree,avltree)'s node
 rb_node* makeRBNode(rb_node *_left, rb_node *_right, elem_t _data);
-void freeRBNode(rb_node *_nd);
+void freeRBNode(rb_node *_nd, rb_tree *_tr);
 
 // bsnode: binary search tree node
 rb_node* bsNodeMinNode(rb_node *_rt);

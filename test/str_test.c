@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../ctrlib/ctr_util.h"
+
 int main() {
 
     // // 1. test '\0' truncated str's strlen
@@ -17,9 +19,16 @@ int main() {
     // }
 
     // 3. test ssprintf
-    char strcts[20];
-    sprintf(strcts, "%d %s", 1, "hachimi");
-    printf("%s\n", strcts);
+    // char strcts[20];
+    // sprintf(strcts, "%d %s", 1, "hachimi");
+    // printf("%s\n", strcts);
+
+    // 4. test cpy
+    char *s0=__strdup(NULL),*s1=__strdup(""),*s2=__strdup("hachimi");
+    printf("s0=%s,size=%zu\n", s0?s0:"NULL", __strlen(s0));
+    printf("s1=%s,size=%zu\n", s1?s1:"NULL", __strlen(s1));
+    printf("s2=%s,size=%zu\n", s2?s2:"NULL", __strlen(s2));
+    free(s0),free(s1),free(s2);
 
     return 0;
 }

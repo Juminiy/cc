@@ -56,6 +56,7 @@ typedef struct elem_t {
 // _e0 < _e1: any val<0
 // _e0 > _e1: any val>0
 typedef int(*elem_t_cmp)(elem_t _e0, elem_t _e1);
+typedef void(*elem_t_free)(elem_t _e0);
 
 #define __swap_(_type, _v0, _v1) \
     do { _type _tmp=_v0; _v0=_v1; _v1=_tmp; } while(0)

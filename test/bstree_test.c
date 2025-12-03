@@ -68,6 +68,7 @@ void print_blist(blist *bl) {
 	}
     printf("]\n");
 	freeBIter(bi);
+	freeBList(bl);
 }
 
 
@@ -138,34 +139,50 @@ typedef struct kvp{
 
 kvp* newkvp(char *key,char*val) {
 	kvp *kv = (kvp*)malloc(sizeof(kvp));
-	kv->key=key;
-	kv->val=val;
+	kv->key=__strdup(key);
+	kv->val=__strdup(val);
 	return kv;
 }
 
 int elem_kvp_cmp(elem_t e0, elem_t e1) {
 	kvp *kvp0 = (kvp*)get_elem_ptr(e0);
 	kvp *kvp1 = (kvp*)get_elem_ptr(e1);
-	return strcmp(kvp0->key, kvp1->key);
+	return __strcmp(kvp0->key, kvp1->key);
 }
 
-void elem_kvp_set(elem_t _old, elem_t _new) {
-	kvp *oldkvp = (kvp*)get_elem_ptr(_old);
-	kvp *newkvp = (kvp*)get_elem_ptr(_new);
-	if(newkvp->val){
-		if(oldkvp->val==NULL)
-			oldkvp->val=malloc(strlen(newkvp->val));
-		strcpy(oldkvp->val, newkvp->val);
-	} else {
-		free(oldkvp->val);
-		oldkvp->val=NULL;
-	}
+// void elem_kvp_set(elem_t _old, elem_t _new) {
+// 	kvp *oldkvp = (kvp*)get_elem_ptr(_old);
+// 	kvp *newkvp = (kvp*)get_elem_ptr(_new);
+// 	if(newkvp->val){
+// 		if(oldkvp->val==NULL)
+// 			oldkvp->val=malloc(strlen(newkvp->val));
+// 		strcpy(oldkvp->val, newkvp->val);
+// 	} else {
+// 		free(oldkvp->val);
+// 		oldkvp->val=NULL;
+// 	}
+// }
+
+void elem_kvp_free(elem_t _e) {
+	kvp *kv=(kvp*)(get_elem_ptr(_e));
+	free(kv->key);
+	free(kv->val);
+	free(kv);
 }
 
-void print_kvnode(rb_node *nd) {
-	if(nd){
-		kvp *kv=(kvp*)get_elem_ptr(nd->_data);
-		printf("<%s:%s>\n", kv->key,kv->val?kv->val:"null");
+// void print_kvnode(rb_node *nd) {
+// 	if(nd){
+// 		kvp *kv=(kvp*)get_elem_ptr(nd->_data);
+// 		printf("<%s:%s>\n", kv->key,kv->val?kv->val:"null");
+// 	} else {
+// 		printf("NULL\n");
+// 	}
+// }
+
+void print_kvp_elem(elem_t _e) {
+	if(valid_elem_t(_e)){
+		kvp *kv=(kvp*)get_elem_ptr(_e);
+		printf("<%s:%s>\n", kv->key?kv->key:"null",kv->val?kv->val:"null");
 	} else {
 		printf("NULL\n");
 	}
@@ -173,24 +190,31 @@ void print_kvnode(rb_node *nd) {
 
 void test_ssmap() {
 	rb_tree *rb = makeRBTree(elem_kvp_cmp);
+	setRBTreeNodeType(rb, TREE_NODE_TYPE_BS);
+	setRBTreeDataFree(rb, elem_kvp_free);
 
 	elem_t elem_val; 
 	rb_node *nd=NULL;
+	#define get_print() \
+		do {elem_val=rbTreeGetData(rb, elem_val); print_kvp_elem(elem_val);} while(0)
 
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeInsertData(rb,elem_val); 						 // put-insert
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeInsertData(rb,elem_val); 				// put-insert
 
-	setup_elem_ptr(elem_val, newkvp("c++",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get-notFound		NULL
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:null>
+	setup_elem_ptr(elem_val, newkvp("c++",NULL)); get_print();									// get-notFound			NULL
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); get_print();	 							// get					<mysql:null>
 
-	setup_elem_ptr(elem_val, newkvp("mysql","hachimi")); rbTreeInsertData(rb,elem_val);					 // put-update			
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:hachimi>
+	setup_elem_ptr(elem_val, newkvp("mysql","hachimi")); rbTreeInsertData(rb,elem_val);			// put-update			
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); get_print();	 							// get					<mysql:hachimi>
 
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeInsertData(rb,elem_val);					     // put-update			
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);	 // get					<mysql:null>
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeInsertData(rb,elem_val);				// put-update			
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); get_print();	 							// get					<mysql:null>
 
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeDeleteData(rb,elem_val); print_kvnode(nd);// delete				<mysql:null>
-	setup_elem_ptr(elem_val, newkvp("c++",NULL)); rbTreeDeleteData(rb,elem_val); print_kvnode(nd);	 // delete-notFound		<c++:null>
-	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeGetData(rb, elem_val); print_kvnode(nd);  // get-notFound		NULL
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); rbTreeDeleteData(rb,elem_val); get_print();	// delete				NULL
+	setup_elem_ptr(elem_val, newkvp("c++",NULL)); rbTreeDeleteData(rb,elem_val); get_print();	// delete-notFound		NULL
+	setup_elem_ptr(elem_val, newkvp("mysql",NULL)); get_print();  								// get-notFound			NULL
+
+	setup_elem_ptr(elem_val, newkvp("",NULL)); rbTreeInsertData(rb,elem_val); get_print();
+	setup_elem_ptr(elem_val, newkvp(NULL,NULL)); rbTreeInsertData(rb,elem_val); get_print();
 
 	freeRBTree(rb);
 }
@@ -218,13 +242,15 @@ void check_order(blist *bl){
         }
         prev_val=_cur_i64;
 	}
+	freeBIter(bi);
+	freeBList(bl);
 }
 
 void test_bstree_delete(int tot_sz) {
 	srand(time(NULL));
 	elem_t elem_val; 
 	rb_tree *rb = makeRBTree(elem_int_cmp);
-	setTreeNodeType(rb, TREE_NODE_TYPE_BS);
+	setRBTreeNodeType(rb, TREE_NODE_TYPE_BS);
 	int arr[tot_sz+1];
 	for (int i=0;i<tot_sz;i++){
 		arr[i]=rand();
@@ -257,14 +283,12 @@ int main(int argc, char **argv) {
 	test_bstree_delete(tot_sz);
 
 	test_insert_found();
-	// test_link_unlink();
 	test_del_trav();
 	test_del_trav2();
 	test_del_trav_bug();
 	test_del_trav_mem_bug();
 
 	test_ssmap();
-	
 
 	return 0;
 }

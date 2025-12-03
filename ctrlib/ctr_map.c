@@ -3,15 +3,36 @@
 #include <string.h>
 #include <stdlib.h>
 
-int __elem_t_str_str_map_cmp(elem_t _e0, elem_t _e1) {
+#define setup_strstrpair(pair, key, val) \
+    do { pair._key=key; pair._val=val; } while(0)
+
+strstrpair* makestrstrpair(const char *_key, const char *_val) {
+    strstrpair *_pair = malloc(sizeof(strstrpair));
+    _pair->_key = __strdup(_key);
+    _pair->_val = __strdup(_val);
+    // DEBUGF("alloc === pair<key,val>=(%p<%s,%s>)", _pair, _pair->_key, _pair->_val);
+    return _pair;
+}
+
+void freestrstrpair(elem_t _e) {
+    strstrpair *_pair = (strstrpair*)get_elem_ptr(_e);
+    // DEBUGF("freed === pair<key,val>=(%p<%s,%s>)", _pair, _pair->_key, _pair->_val);
+    free(_pair->_key);
+    free(_pair->_val);   
+    free(_pair);
+}
+
+int strstrpaircmp(elem_t _e0, elem_t _e1) {
     strstrpair *_pair0 = get_elem_ptr(_e0);
     strstrpair *_pair1 = get_elem_ptr(_e1);
-    return strcmp(_pair0->_key, _pair1->_key);
+    return __strcmp(_pair0->_key, _pair1->_key);
 }
 
 strstrmap makestrstrmap() {
     strstrmap _map;
-    _map._tr = makeRBTree(__elem_t_str_str_map_cmp);
+    _map._tr = makeRBTree(strstrpaircmp);
+    setRBTreeDataFree(_map._tr, freestrstrpair);
+    setRBTreeNodeType(_map._tr, TREE_NODE_TYPE_AVL);
     return _map;
 }
 
@@ -19,46 +40,31 @@ void freestrstrmap(strstrmap _map) {
     freeRBTree(_map._tr);
 }
 
-strstrpair* makestrstrpair(char *_key, char *_val) {
-    strstrpair *_pair = malloc(sizeof(strstrpair));
-    if(_key){
-        _pair->_key = malloc(strlen(_key)); strcpy(_pair->_key, _key);
-    }
-    if(_val){
-        _pair->_val = malloc(strlen(_val)); strcpy(_pair->_val, _val);
-    }
-    return _pair;
-}
-
-void strstrmapPut(strstrmap _map, char *_key, char *_val) {
-    elem_t _em; 
-    setup_elem_ptr(_em, makestrstrpair(_key,_val)); // inserted pair
+void strstrmapPut(strstrmap _map, const char *_key, const char *_val) {
+    strstrpair *_ptr = makestrstrpair(_key,_val);
+    elem_t _em; setup_elem_ptr(_em, _ptr);
     rbTreeInsertData(_map._tr, _em);
 }
 
-char* strstrmapGet(strstrmap _map, char *_key) {
-    elem_t _em;
-    strstrpair *_pair = makestrstrpair(_key, NULL); // created pair
-    setup_elem_ptr(_em, _pair);
-    rb_node *_nd = rbTreeGetData(_map._tr, _em);
-    free(_pair); // created pair
-    if(!_nd || !valid_elem_t(_nd->_data)){
-        return NULL;
+char* strstrmapGet(strstrmap _map, const char *_key) {
+    strstrpair _pair; setup_strstrpair(_pair, _key, NULL);
+    elem_t _em; setup_elem_ptr(_em, &_pair);
+    _em = rbTreeGetData(_map._tr, _em);
+    if(valid_elem_t(_em)){
+        _pair = *(strstrpair*)get_elem_ptr(_em);
+        return _pair._val;
     }
-    _em = _nd->_data;
-    _pair = (strstrpair*)get_elem_ptr(_em);
-    char *_ret = _pair->_val;
-    return _ret;
+    return NULL;
 }
 
-void strstrmapDel(strstrmap _map, char *_key) {
-    elem_t _em;
-    strstrpair *_pair = makestrstrpair(_key, NULL); // created pair
-    setup_elem_ptr(_em, _pair);
-    rb_node *_nd = rbTreeDeleteData(_map._tr, _em);
-    free(_pair); // created pair // inserted pair
-    // if(_nd)
-    //     free(get_elem_ptr(_nd->_data)); // error: double free
+void strstrmapDel(strstrmap _map, const char *_key) {
+    strstrpair _pair; setup_strstrpair(_pair, _key, NULL);
+    elem_t _em; setup_elem_ptr(_em, &_pair);
+    rbTreeDeleteData(_map._tr, _em);
+}
+
+size_t strstrmapSize(strstrmap _map) {
+    return __tree_size(_map._tr);
 }
 
 void strstrmapIter(strstrmap _map, strstrmapIterFunc _fn) {
@@ -75,7 +81,6 @@ void strstrmapIter(strstrmap _map, strstrmapIterFunc _fn) {
             break;
         }
     }
-
     freeBIter(_it);
     freeBList(_bl);
 }

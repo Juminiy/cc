@@ -20,9 +20,8 @@ rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 	return nd;
 }
 
-void freeRBNode(rb_node* _nd) {
-	// __unlink_left(_nd);
-	// __unlink_right(_nd);
+void freeRBNode(rb_node* _nd, rb_tree* _tr) {
+	__free_data(_tr, _nd->_data);
 	free(_nd);
 }
 
@@ -75,8 +74,8 @@ rb_node* bsNodeInsertNode(rb_node* _rt, _node_value *_val, rb_tree *_tr) {
 	}
 	int cmp_res = _tr->_elem_cmp(_rt->_data, _val->src);
 	if(cmp_res==0) {
-		// _tr->_elem_set(_rt->_data, _nd->_data); 
-		_rt->_data = _val->src; // set new to old
+		__free_data(_tr, _rt->_data);
+		_rt->_data = _val->src;
 		_val->retcode = RB_NODE_INSERT_REPLACED;
 	} else if (cmp_res < 0) {
 		rb_node *rres = bsNodeInsertNode(_rt->_right, _val, _tr);
@@ -128,11 +127,11 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 
 		if(_rt->_right==NULL) {
 			rb_node *_tmp=_rt->_left;
-			freeRBNode(_rt);
+			freeRBNode(_rt, _tr);
 			return _tmp;
 		} else if(_rt->_left==NULL) {
 			rb_node *_tmp=_rt->_right;
-			freeRBNode(_rt);
+			freeRBNode(_rt, _tr);
 			return _tmp;
 		} else {
 			rb_node *rpl = bsNodeMaxNode(_rt->_left); // may be leaf, must child<=1
@@ -145,7 +144,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	return _rt;
 }
 
-// deprecated:
+// @deprecated
 // rbNodeDeleteNode
 // rb_node *rpl_nd = NULL;
 // if(del_nd->_left) {
@@ -182,21 +181,22 @@ rb_tree* makeRBTree(elem_t_cmp _elem_cmp) {
 	_tr->_root = NULL;
 	_tr->_size = 0;
 	_tr->_elem_cmp = _elem_cmp;
-	_tr->_tree_node_type = TREE_NODE_TYPE_BS;
+	_tr->_elem_free = NULL;
+	_tr->_node_type = TREE_NODE_TYPE_BS;
 	return _tr;
 }
 
-void freeRBNodeRec(rb_node *_nd) {
+void freeRBNodeRec(rb_node *_nd, rb_tree *_tr) {
 	if(_nd==NULL)
 		return;
-	freeRBNodeRec(_nd->_left);
-	freeRBNodeRec(_nd->_right);
-	freeRBNode(_nd);
+	freeRBNodeRec(_nd->_left, _tr);
+	freeRBNodeRec(_nd->_right, _tr);
+	freeRBNode(_nd, _tr);
 }
 
 void freeRBTree(rb_tree* _tr) {
 	// free them recursively
-	freeRBNodeRec(_tr->_root);
+	freeRBNodeRec(_tr->_root, _tr);
 	free(_tr);
 }
 
@@ -219,10 +219,10 @@ elem_t rbTreeGetData(rb_tree* _tr, elem_t _dt) {
 }
 
 /*
- * @return @param<_nd>: an inserted node
+ * @return void
 */
 void rbTreeInsertNode(rb_tree *_tr, _node_value *_val) {
-	switch (_tr->_tree_node_type) {
+	switch (_tr->_node_type) {
 		case TREE_NODE_TYPE_AVL:
 		_tr->_root = avlNodeInsertNode(_tr->_root, _val, _tr);
 		break;
@@ -239,13 +239,10 @@ void rbTreeInsertNode(rb_tree *_tr, _node_value *_val) {
 }
 
 /*
- * @return @param<_nd>: an deleted node
- * 1. delete node(cmp=0) from tree
- * 2. copy _data to _nd
- * 3. return _nd
+ * @return void
 */
 void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val) {
-	switch (_tr->_tree_node_type) {
+	switch (_tr->_node_type) {
 		case TREE_NODE_TYPE_AVL:
 		_tr->_root = avlNodeDeleteNode(_tr->_root, _val, _tr);
 		break;
@@ -261,13 +258,11 @@ void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val) {
 }
 
 /*
- * @return @param<_nd> 
- * 1. copy node in tree _data to _nd
- * 2. will not return node in tree, only return _nd
+ * @return node in tree with links
 */
 rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val) {
 	rb_node *_nd;
-	switch (_tr->_tree_node_type) {
+	switch (_tr->_node_type) {
 		case TREE_NODE_TYPE_AVL:
 		_nd = avlNodeGetNode(_tr->_root, _val, _tr);
 		break;

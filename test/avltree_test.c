@@ -111,7 +111,7 @@ void test_rotate() {
 void test_avl_tree(int *arr, int arr_sz) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
-    setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
     for(int i=0;i<arr_sz;i++){
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
     }   
@@ -125,11 +125,14 @@ void test_avl_sorted(int tot_cnt) {
     srand(time(NULL));
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
-    setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
-    int arr[tot_cnt+1];
+    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    int arr[tot_cnt+1]; int arr_sz=0;
     for(int idx=0;idx<tot_cnt;idx++){
-        arr[idx] = rand();
-        setup_elem_i64(_em, arr[idx]); rbTreeInsertData(rb, _em);
+        int genrand = rand();
+        setup_elem_i64(_em, genrand); 
+        if(rbTreeInsertData(rb, _em)==RB_NODE_INSERT_CREATED){
+            arr[arr_sz++]=genrand;
+        }
     }
     printf("insert: %d, tree_size: %ld, tree_height: %ld, log_2(%d)=%.2f\n", 
         tot_cnt, __tree_size(rb), __tree_height(rb), tot_cnt, log2(tot_cnt*1.0));
@@ -137,9 +140,14 @@ void test_avl_sorted(int tot_cnt) {
     // check order
     check_order(rbTreeMidTrav(rb));
     
-
+    int szof=__tree_size(rb);
     for(int idx=0;idx<tot_cnt/2;idx++){
+        szof--;
         setup_elem_i64(_em, arr[idx]); rbTreeDeleteData(rb, _em);
+        if(__tree_size(rb)!=szof){
+            printf("ERROR size:%zu, real=%d\n", __tree_size(rb),szof);
+            exit(1);
+        }
     }
     printf("after delete, tree_size: %ld, tree_height: %ld, log_2(%d)=%.2f\n", 
         __tree_size(rb), __tree_height(rb), tot_cnt/2, log2(tot_cnt*1.0/2.0));
@@ -154,7 +162,7 @@ void test_avl_delete(int *arr, size_t arr_sz, int del_val) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
     // printf("tree=%p(root=%p)\n", rb, rb->_root);
-    setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
     for(int i=0;i<arr_sz;i++){
         // printf("insert: %d\n", arr[i]);
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
@@ -174,7 +182,7 @@ void test_avl_delete(int *arr, size_t arr_sz, int del_val) {
 void valid_delete(int *arr, size_t arr_sz, int del_val) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
-    setTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
     for(int i=0;i<arr_sz;i++){
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
     }       
@@ -188,7 +196,7 @@ void valid_delete(int *arr, size_t arr_sz, int del_val) {
         printf("ERROR\n");
         exit(1);
     }
-    printf("size=%zu -> size=%zu, sub:%d\n", before_sz, after_sz, before_sz-after_sz);
+    printf("size=%zu -> size=%zu, sub:%ld\n", before_sz, after_sz, before_sz-after_sz);
     freeRBTree(rb);
 }
 

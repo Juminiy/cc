@@ -13,13 +13,13 @@
 #include "../tcplib/tcp_lib.h"
 #include "../tcplib/net_util.h"
 
-int glb_skt_fd = -1;
-void __attribute__((destructor)) __inexit() {
-    INFOF("clean socket");
-    if (glb_skt_fd != -1) {
-        close(glb_skt_fd);
-    }
-}
+// int glb_skt_fd = -1;
+// void __attribute__((destructor)) __inexit() {
+//     INFOF("clean socket");
+//     if (glb_skt_fd != -1) {
+//         close(glb_skt_fd);
+//     }
+// }
 
 int main(int argc, char** argv) {
 
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
         FATAL("Creating TCP Socket");
     }
     DEBUGF("Create Socket success, [server_fd:%d]", skt_fd);
-    glb_skt_fd = skt_fd;
+    // glb_skt_fd = skt_fd;
 
     // Assign socket an `IPv4:Port` Address
     struct sockaddr_in svr_addr;

@@ -39,7 +39,8 @@ rb_node* rbNodeInsertNode(rb_node* _rt, _node_value *_val, rb_tree *_tr) {
 	while(_cur) {
 		_cur_parent = _cur;
 		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
-		if(cmp_res==0){ // find update
+		if(cmp_res==0){
+			__free_data(_tr, _cur->_data);
 			_cur->_data = _val->src;
 			_val->retcode = RB_NODE_INSERT_REPLACED;
 			return _rt;
@@ -130,7 +131,7 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 
 // @return @param<_rt>: _tr->_root itself
 rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
-	rb_node *del_nd = rbNodeGetNode(_tr, _val, _tr);
+	rb_node *del_nd = rbNodeGetNode(_rt, _val, _tr);
 	if(del_nd==NULL){
 		_val->retcode = RB_NODE_DELETE_NOTFOUND;
 		return _rt;
@@ -168,6 +169,6 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	
 	rbNodeDeleteAdjust(_nd, _tr);
 
-	freeRBNode(del_nd);
+	freeRBNode(del_nd, _tr);
 	return _rt;
 }

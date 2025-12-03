@@ -2,7 +2,9 @@
 #include <string.h>
 
 #include <arpa/inet.h>
+#include <sys/ioctl.h>
 #include <net/if.h>
+#include <linux/if.h>
 #include <ifaddrs.h>
 
 #include "util.h"
@@ -10,7 +12,7 @@
 
 #define add_intfip_list(addr_blist, intf) \
     do { \
-        struct sockaddr_in *sa_in = intf->ifa_addr; \
+        struct sockaddr_in *sa_in = (struct sockaddr_in *)intf->ifa_addr; \
         intfip *intfipaddr = (intfip*)malloc(sizeof(intfip)); \
         strcpy(intfipaddr->_ip, inet_ntoa(sa_in->sin_addr)); \
         intfipaddr->_name = intf->ifa_name; \
