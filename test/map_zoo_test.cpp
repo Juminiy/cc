@@ -1,25 +1,10 @@
 #include "../ctrlib/ctr_map.h"
+#include "strstrpair.h"
+
 #include <map>
 #include <string>
 #include <cstdlib>
 #include <ctime>
-
-typedef struct kv {
-    char *k, *v;
-} kv;
-
-void freekv(kv kvp){
-    free(kvp.k), free(kvp.v);
-}
-
-char* rand_str(size_t _sz) {
-    srand(time(NULL));
-    char *_ss = (char*)malloc(sizeof(char)*(_sz+1));
-    for(size_t _i=0;_i<_sz;_i++)
-        _ss[_i] = '0' + rand()%72;
-    _ss[_sz]='\0';
-    return _ss;
-}
 
 int main(int argc, char **argv) {
     srand(time(NULL));
@@ -28,19 +13,16 @@ int main(int argc, char **argv) {
         opt_cnt = std::strtol(argv[1], NULL, 10);
     }
 
-    
     std::map<std::string, std::string> _stdssmap;
     strstrmap _avlmap = makestrstrmap();
 
-    kv kvs[opt_cnt+1];
-    for(int i=0;i<opt_cnt;i++){
-        kvs[i].k = rand_str(rand()%15);   
-        kvs[i].v = rand_str(rand()%15);   
-        printf("<%s : %s>\n", kvs[i].k, kvs[i].v);
+    kv *kvs = makekvs(opt_cnt);
+    for(int i=0;i<opt_cnt;i++){ 
         _stdssmap[std::string(kvs[i].k)] = std::string(kvs[i].v);
         strstrmapPut(_avlmap, kvs[i].k, kvs[i].v);
     }
 
+    printf("stdmap_size:%zu, avlmap_size:%zu\n", _stdssmap.size(), strstrmapSize(_avlmap));
 
     auto get_key = [&_stdssmap, &_avlmap](char *_skey) -> bool{
         size_t _cnt = _stdssmap.count(std::string(_skey));
@@ -88,11 +70,7 @@ int main(int argc, char **argv) {
 
     printf("stdmap_size:%zu, avlmap_size:%zu\n", _stdssmap.size(), strstrmapSize(_avlmap));
 
-
-    for(int i=0;i<opt_cnt;i++){
-        freekv(kvs[i]);
-    }
-
+    freekvs(kvs, opt_cnt);
     freestrstrmap(_avlmap);
     return 0;
 }
