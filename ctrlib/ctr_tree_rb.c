@@ -1,12 +1,5 @@
 #include "ctr_rbtree.h"
 
-#define __child_(_nd, _dir) ((_dir)==RB_NODE_DIR_LEFT?_nd->_left:_nd->_right)
-#define __rotate_(_nd, _dir) \
-	do { \
-		if((_dir)==RB_NODE_DIR_LEFT) rotate_left(_nd); \
-		else if((_dir)==RB_NODE_DIR_RIGHT) rotate_right(_nd); \
-	} while(0)
-
 void rbNodeInsertAdjust(rb_node *_nd) {
 	
 	for(rb_node *_p = _nd->_parent;__is_red(_p);_p = _nd->_parent){

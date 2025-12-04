@@ -5,9 +5,10 @@
 #include "ctr_blist.h"
 #include "ctr_util.h"
 
-#define TREE_NODE_TYPE_BS  0
-#define TREE_NODE_TYPE_RB  1
-#define TREE_NODE_TYPE_AVL 2
+#define TREE_NODE_TYPE_BS   0
+#define TREE_NODE_TYPE_RB   1
+#define TREE_NODE_TYPE_AVL  2
+#define TREE_NODE_TYPE_MAVL 3
 
 #define RB_NODE_CLR_BLK 0
 #define RB_NODE_CLR_RED 1
@@ -22,7 +23,7 @@ typedef struct rb_node {
 	size_t _size;							  // 4B
     elem_t _data;							  // 16B
 	size_t _height;							  // 4B
-	size_t __attribute__((unused)) __align;	  // 4B
+	size_t _cnt;	  						  // 4B
 } rb_node;
 
 typedef struct rb_tree {
@@ -30,7 +31,7 @@ typedef struct rb_tree {
 	elem_t_free _elem_free;						// 8B, +optional, free _data
 	rb_node *_root;								// 8B
 	size_t   _size;							    // 4B
-	int 	 _node_type;					// 4B, +optional, default=TREE_NODE_TYPE_BS
+	int 	 _node_type;						// 4B, +optional, default=TREE_NODE_TYPE_BS
 } rb_tree;
 
 #define setRBTreeNodeType(_rb, _type) (_rb->_node_type=_type)
@@ -43,6 +44,15 @@ typedef struct rb_tree {
 
 #define __link_right(nd, right) \
 	do { if(nd) {nd->_right=right;} if(right) {right->_parent=nd;} } while(0)
+
+#define __link_(_nd, _ch, _dir) \
+	do { \
+		if(_dir==RB_NODE_DIR_LEFT){ \
+			__link_left(_nd, _ch); \
+		} else if(_dir==RB_NODE_DIR_RIGHT){ \
+			__link_right(_nd, _ch); \
+		} \
+	} while(0)
 
 // __unlink is the BUGGY maker, do not use it!
 #define __unlink_left(nd) \
@@ -68,16 +78,25 @@ typedef struct rb_tree {
 #define __is_black(nd) (!nd||(nd&&nd->_color==RB_NODE_CLR_BLK))
 #define __node_size(nd) (nd?nd->_size:0)
 #define __node_height(nd) (nd?nd->_height:0)
+#define __node_cnt(nd) (nd?nd->_cnt:0)
 #define __node_bf(nd) (__node_height(nd->_right)-__node_height(nd->_left))
 #define __tree_size(tr) (tr&&tr->_root?tr->_root->_size:0)
 #define __tree_height(tr) (tr?__node_height(tr->_root):0)
 #define __update_size_height(_nd) \
 	do { \
-		_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+1; \
+		_nd->_size=__node_size(_nd->_left)+__node_size(_nd->_right)+__node_cnt(_nd); \
 		_nd->_height=__max_(__node_height(_nd->_left),__node_height(_nd->_right))+1; \
 	} while(0)
+#define __update_cnt(_nd, _inc) \
+	do { _nd->_cnt += _inc; _nd->_size += _inc;} while(0)
 #define __free_data(tr, _dt) \
 	do { if(tr->_elem_free) {tr->_elem_free(_dt);} } while(0)
+#define __child_(_nd, _dir) ((_dir)==RB_NODE_DIR_LEFT?_nd->_left:_nd->_right)
+#define __rotate_(_nd, _dir) \
+	do { \
+		if((_dir)==RB_NODE_DIR_LEFT) rotate_left(_nd); \
+		else if((_dir)==RB_NODE_DIR_RIGHT) rotate_right(_nd); \
+	} while(0)
 
 #define RB_NODE_OPT_NONE		(0)	   // 00000000
 #define RB_NODE_INSERT_ERROR	(1<<0) // 00000001
@@ -152,5 +171,10 @@ rb_node* avlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* rbNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* rbNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
+
+// avltree: multiple-AVL tree node 
+rb_node* mavlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
+rb_node* mavlNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
+rb_node* mavlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 
 #endif

@@ -13,15 +13,20 @@ rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 	rb_node *nd = (rb_node*)malloc(sizeof(rb_node));
 	__link_left(nd, _left);
 	__link_right(nd, _right);
+	nd->_parent = NULL;
 	nd->_data = _data;
 	nd->_color = RB_NODE_CLR_RED;
 	nd->_size = 1;
 	nd->_height = 1;
+	nd->_cnt = 1;
 	return nd;
 }
 
 void freeRBNode(rb_node* _nd, rb_tree* _tr) {
 	__free_data(_tr, _nd->_data);
+	// __unlink_left(_nd);
+	// __unlink_right(_nd);
+	// __unlink_parent(_nd);
 	free(_nd);
 }
 
@@ -223,6 +228,10 @@ elem_t rbTreeGetData(rb_tree* _tr, elem_t _dt) {
 */
 void rbTreeInsertNode(rb_tree *_tr, _node_value *_val) {
 	switch (_tr->_node_type) {
+		case TREE_NODE_TYPE_MAVL:
+		_tr->_root = mavlNodeInsertNode(_tr->_root, _val, _tr);
+		break;
+
 		case TREE_NODE_TYPE_AVL:
 		_tr->_root = avlNodeInsertNode(_tr->_root, _val, _tr);
 		break;
@@ -243,6 +252,10 @@ void rbTreeInsertNode(rb_tree *_tr, _node_value *_val) {
 */
 void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val) {
 	switch (_tr->_node_type) {
+		case TREE_NODE_TYPE_MAVL:
+		_tr->_root = mavlNodeDeleteNode(_tr->_root, _val, _tr);
+		break;
+
 		case TREE_NODE_TYPE_AVL:
 		_tr->_root = avlNodeDeleteNode(_tr->_root, _val, _tr);
 		break;
@@ -263,6 +276,10 @@ void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val) {
 rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val) {
 	rb_node *_nd;
 	switch (_tr->_node_type) {
+		case TREE_NODE_TYPE_MAVL:
+		_nd = mavlNodeGetNode(_tr->_root, _val, _tr);
+		break;
+
 		case TREE_NODE_TYPE_AVL:
 		_nd = avlNodeGetNode(_tr->_root, _val, _tr);
 		break;

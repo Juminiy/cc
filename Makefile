@@ -35,6 +35,7 @@ ctr_bqueue.o: ctrlib/ctr_bqueue.c
 ctr_tree_bs.o: ctrlib/ctr_tree_bs.c
 ctr_tree_rb.o: ctrlib/ctr_tree_rb.c
 ctr_tree_avl.o: ctrlib/ctr_tree_avl.c
+ctr_tree_mavl.o: ctrlib/ctr_tree_mavl.c
 ctr_map.o: ctrlib/ctr_map.c
 strstrpair.o: test/strstrpair.c
 
@@ -54,7 +55,7 @@ blist_test.d: test/blist_test.c ctr_blist.o
 bdeque_test.d: test/bdeque_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o
 bstree_test.d: test/bstree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
 rbtree_test.d: test/rbtree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
-avltree_test.d: test/avltree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
+avltree_test.d: test/avltree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
 map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o
 map_std_test.d: test/map_std_test.cpp strstrpair.o
 map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o

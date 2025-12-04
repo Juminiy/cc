@@ -50,7 +50,9 @@ int main(int argc, char **argv) {
             }
         }
     }
-    
+
+    freekvs(kvs, opt_cnt);
+
     printf(
         "tot_siz=%d, ops_cnt=%d, get_ops=%d, del_ops=%d, put_ops=%d\n", 
         opt_cnt, opt_cnt, getops, delops, putops 

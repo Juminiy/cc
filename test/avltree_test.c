@@ -6,6 +6,8 @@
 #include <time.h>
 #include <math.h>
 
+int TREE_TYPE = TREE_NODE_TYPE_MAVL;
+
 int elem_int_cmp(elem_t _e0, elem_t _e1) {
 	return _e0.uni.i64-_e1.uni.i64;
 }
@@ -18,7 +20,7 @@ void print_blist(blist *bl) {
         int64_t _cur_i64 = get_elem_i64(rbn->_data);
         // rb_node *rbn_parent = rbn?rbn->_parent:NULL; 
         // int64_t _par_i64 = rbn_parent?get_elem_i64(rbn_parent->_data):-1;
-		printf("%2ld ", _cur_i64);//(p=%2ld,size=%2ld,height=%2ld) _par_i64, rbn->_size, rbn->_height,  
+		printf("%2ld(cnt=%2ld) ", _cur_i64, rbn->_cnt);//(p=%2ld,size=%2ld,height=%2ld) _par_i64, rbn->_size, rbn->_height,  
         // printf("%2ld(ptr=%p) ",_cur_i64,rbn);
 	}
     printf("]\n");
@@ -37,6 +39,8 @@ void check_order(blist *bl){
         }
         prev_val=_cur_i64;
 	}
+    freeBIter(bi);
+    freeBList(bl);
 }
 
 typedef rb_node*(*rotate_fn)(rb_node*);
@@ -111,7 +115,7 @@ void test_rotate() {
 void test_avl_tree(int *arr, int arr_sz) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
-    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_TYPE);
     for(int i=0;i<arr_sz;i++){
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
     }   
@@ -125,7 +129,7 @@ void test_avl_sorted(int tot_cnt) {
     srand(time(NULL));
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
-    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_TYPE);
     int arr[tot_cnt+1]; int arr_sz=0;
     for(int idx=0;idx<tot_cnt;idx++){
         int genrand = rand();
@@ -162,7 +166,7 @@ void test_avl_delete(int *arr, size_t arr_sz, int del_val) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
     // printf("tree=%p(root=%p)\n", rb, rb->_root);
-    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_TYPE);
     for(int i=0;i<arr_sz;i++){
         // printf("insert: %d\n", arr[i]);
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
@@ -182,7 +186,7 @@ void test_avl_delete(int *arr, size_t arr_sz, int del_val) {
 void valid_delete(int *arr, size_t arr_sz, int del_val) {
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
-    setRBTreeNodeType(rb, TREE_NODE_TYPE_AVL);
+    setRBTreeNodeType(rb, TREE_TYPE);
     for(int i=0;i<arr_sz;i++){
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
     }       
@@ -192,55 +196,76 @@ void valid_delete(int *arr, size_t arr_sz, int del_val) {
     setup_elem_i64(_em, del_val); _em = rbTreeGetData(rb, _em); 
     printf("[%d] %s, ", del_val, valid_elem_t(_em)?"delete fail":"delete ok");
     size_t after_sz = __tree_size(rb);
+
+    printf("size=%zu -> size=%zu, sub:%ld\n", before_sz, after_sz, before_sz-after_sz);
     if(before_sz-after_sz!=1){
         printf("ERROR\n");
         exit(1);
     }
-    printf("size=%zu -> size=%zu, sub:%ld\n", before_sz, after_sz, before_sz-after_sz);
     freeRBTree(rb);
 }
 
-int main(int argc, char **argv) {
+void valid_delete_all(int *arr, size_t arr_sz) {
+    elem_t _em;
+    rb_tree *rb = makeRBTree(elem_int_cmp);
+    setRBTreeNodeType(rb, TREE_TYPE);
+    for(int i=0;i<arr_sz;i++){
+        setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
+        print_blist(rbTreeMidTrav(rb));
+    }       
 
-    // report: after rotate nd->_parent is bug
-    // same bug as: rb_tree insert 1,2,3,4,5 bug
-    // caused by: nd->_parent ERROR bug, if _nd is _root, set returned value _parent=NULL;
-    // test_rotate();
+    for(int i=0;i<arr_sz;i++){
+        setup_elem_i64(_em, arr[i]); rbTreeDeleteData(rb, _em);
+        print_blist(rbTreeMidTrav(rb));
+    }  
 
-    // int arr0[10]={1,2,3,4,5,6};
-    // test_avl_tree(arr0, 6);
+    freeRBTree(rb);
+}
 
-    // int arr1[10]={6,5,4,3,2,1};
-    // test_avl_tree(arr1, 6);
-
-    int t_sz = 100;
-    if(argc>=2){
-        t_sz = strtol(argv[1], NULL, 10);
-    }
-    test_avl_sorted(t_sz);
-
+void test_avl_cases() {
     //      8
     //    5   15
     //  1  7     18
-    // int arr[10]={1,5,7,8,15,18};
-    // for(int idx=0;idx<6;idx++) {
-    //     test_avl_delete(arr, 6, arr[idx]); // bug report: function stack memory pointer to heap location reused, same address no freed, memleak! 
-    // }
+    int arr[10]={1,5,7,8,15,18};
+    for(int idx=0;idx<6;idx++) {
+        test_avl_delete(arr, 6, arr[idx]); // bug report: function stack memory pointer to heap location reused, same address no freed, memleak! 
+    }
 
-    //     int arr1[7]= {10, 5, 15, 3, 7, 12, 18};
-    // int arr2[12] = {30, 20, 40, 10, 25, 35, 50, 5, 15, 28, 45, 60};
-    // int arr3[15] = {50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85};
-    // int arr4[9] = {9, 5, 10, 0, 6, 11, -1, 1, 2};
-    // for(int i=0;i<7;i++)
-    //     valid_delete(arr1, 7, arr1[i]);
-    // for(int i=0;i<12;i++)
-    //     valid_delete(arr2, 12, arr2[i]);
-    // for(int i=0;i<15;i++)
-    //     valid_delete(arr3, 15, arr3[i]);
-    // for(int i=0;i<9;i++)
-    //     valid_delete(arr4, 9, arr4[i]);
+    int arr1[7]= {10, 5, 15, 3, 7, 12, 18}; 
+    for(int i=0;i<7;i++) valid_delete(arr1, 7, arr1[i]);
+    
+    int arr2[12] = {30, 20, 40, 10, 25, 35, 50, 5, 15, 28, 45, 60};
+    for(int i=0;i<12;i++) valid_delete(arr2, 12, arr2[i]);
 
-    // test_avl_delete(arr4, 9, 1);
+    int arr3[15] = {50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 45, 55, 65, 75, 85};
+    for(int i=0;i<15;i++) valid_delete(arr3, 15, arr3[i]);
 
+    int arr4[9] = {9, 5, 10, 0, 6, 11, -1, 1, 2};
+    for(int i=0;i<9;i++) valid_delete(arr4, 9, arr4[i]);
+}
+
+void test_mavl_cases() {
+    int arr[10]={1,1,1,2,3,4,4,4,5,5};
+
+    // each item delete
+    // for(int i=0;i<10;i++)
+    //     valid_delete(arr,10,arr[i]);
+
+    // all items delete
+    valid_delete_all(arr, 10);
+
+    // int arr[1]={1};
+    // valid_delete_all(arr,1);
+}
+
+int main(int argc, char **argv) {
+    int t_sz = 0;
+    if(argc>=2){
+        t_sz = strtol(argv[1], NULL, 10);
+    }
+    // test_avl_sorted(t_sz);
+
+    test_mavl_cases();
+    
     return 0;
 }

@@ -14,21 +14,19 @@ int main() {
 		case 2: // delete(b,1)
 		break;
 
-		case 3: // rank(b)
+		case 3: // rank(b), maynot exist
 		break;
 
 		case 4: // rank_k(b)
 		break;
 
-		case 5: // prev
+		case 5: // prev(b), maynot exist
 		break;
 
-		case 6: // next
+		case 6: // next(b), maynot exist
 		break;
 		}
 	}
-
-
-
+	
 	return 0;
 }
