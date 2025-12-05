@@ -16,6 +16,8 @@ static inline size_t __min_(size_t _a, size_t _b){
 	return _a < _b ? _a : _b;
 }
 
+#define __range_(_l, _x, _r) ((_l)<=(_x) && (_x)<=(_r)) 
+
 // safe strlen
 #define __strlen(__s) (__s ? strlen(__s): 0)
 

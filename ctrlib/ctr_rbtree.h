@@ -29,6 +29,7 @@ typedef struct rb_node {
 typedef struct rb_tree {
     elem_t_cmp _elem_cmp; 						// 8B, +required, compare _data
 	elem_t_free _elem_free;						// 8B, +optional, free _data
+	elem_t_merge _elem_merge;					// 8B, +optional, merge _data
 	rb_node *_root;								// 8B
 	size_t   _size;							    // 4B
 	int 	 _node_type;						// 4B, +optional, default=TREE_NODE_TYPE_BS
@@ -37,7 +38,7 @@ typedef struct rb_tree {
 #define setRBTreeNodeType(_rb, _type) (_rb->_node_type=_type)
 #define setRBTreeDataFree(_rb, _free) (_rb->_elem_free=_free)
 
-// please use the MACRO carefully, because the `link` and `unlink` operation is bidirectional
+// please use the `*link*, *unlink*` MACRO carefully, because the `link` and `unlink` operation is bidirectional
 
 #define __link_left(nd, left) \
 	do { if(nd) {nd->_left=left;} if(left) {left->_parent=nd;} } while(0)
@@ -51,10 +52,11 @@ typedef struct rb_tree {
 			__link_left(_nd, _ch); \
 		} else if(_dir==RB_NODE_DIR_RIGHT){ \
 			__link_right(_nd, _ch); \
+		} else { \
+			if(_ch) {_ch->_parent = NULL;} \
 		} \
 	} while(0)
 
-// __unlink is the BUGGY maker, do not use it!
 #define __unlink_left(nd) \
 	do { if(nd && nd->_left) {nd->_left->_parent=NULL;nd->_left=NULL;} } while(0) 
 
@@ -91,6 +93,8 @@ typedef struct rb_tree {
 	do { _nd->_cnt += _inc; _nd->_size += _inc;} while(0)
 #define __free_data(tr, _dt) \
 	do { if(tr->_elem_free) {tr->_elem_free(_dt);} } while(0)
+#define __merge_data(tr, _dst, _src) \
+	do { if(tr->_elem_merge) { _dst = tr->_elem_merge(_dst, _src); } } while(0)
 #define __child_(_nd, _dir) ((_dir)==RB_NODE_DIR_LEFT?_nd->_left:_nd->_right)
 #define __rotate_(_nd, _dir) \
 	do { \
@@ -120,41 +124,39 @@ typedef struct _node_value{
 		_val.retcode = RB_NODE_OPT_NONE; \
 	} while(0)
 
-// tree: bst,rbtree,avltree
+// Tree high level API
 rb_tree* makeRBTree(elem_t_cmp _elem_cmp);
 void freeRBTree(rb_tree* _tr);
-
-// tree: Rebalance Binary Tree 
 int rbTreeInsertData(rb_tree *_tr, elem_t _dt);
 int rbTreeDeleteData(rb_tree *_tr, elem_t _dt);
 elem_t rbTreeGetData(rb_tree *_tr, elem_t _dt);
+elem_t rbTreeMaxData(rb_tree *_tr);
+elem_t rbTreeMinData(rb_tree *_tr);
+elem_t bsDataPrevData(rb_tree *_tr, elem_t _dt);
+elem_t bsDataNextData(rb_tree *_tr, elem_t _dt);
+size_t bsDataRank(rb_tree *_tr, elem_t _dt);
+elem_t bsDataRankKData(rb_tree *_tr, size_t _rank);
 
+// Tree lower level API
 void rbTreeInsertNode(rb_tree *_tr, _node_value *_val);
 void rbTreeDeleteNode(rb_tree *_tr, _node_value *_val);
 rb_node* rbTreeGetNode(rb_tree *_tr, _node_value *_val);
 
-// treeNode: (bst,rbtree,avltree)'s node
+typedef blist*(*rbTreeTrav)(rb_tree*);
+blist* rbTreeMidTravData(rb_tree* _tr);
+blist* rbTreeLelTravData(rb_tree* _tr);
+blist* rbTreeMidTrav(rb_tree *_tr);
+blist* rbTreeLelTrav(rb_tree *_tr);
+
+// TreeNode API
 rb_node* makeRBNode(rb_node *_left, rb_node *_right, elem_t _data);
 void freeRBNode(rb_node *_nd, rb_tree *_tr);
-
-// bsnode: binary search tree node
+void freeRBNodeRec(rb_node *_nd, rb_tree *_tr);
 rb_node* bsNodeMinNode(rb_node *_rt);
 rb_node* bsNodeMaxNode(rb_node *_rt);
 rb_node* bsNodePreNode(rb_node *_rt);
 rb_node* bsNodeNextNode(rb_node *_rt);
 
-// bsnode: binary search tree node
-typedef rb_node*(*rbNodeOpt)(rb_node*, _node_value*, rb_tree*);
-rb_node* bsNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
-rb_node* bsNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
-rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
-
-// tree: traverse
-typedef blist*(*rbTreeTrav)(rb_tree*);
-blist* rbTreeMidTrav(rb_tree *_tr);
-blist* rbTreeLelTrav(rb_tree *_tr);
-
-// avltree: balance tree node
 rb_node* rotate_right(rb_node *_nd);
 rb_node* rotate_left(rb_node *_nd);
 rb_node* rotate_ll(rb_node *_nd);
@@ -162,17 +164,23 @@ rb_node* rotate_rl(rb_node *_nd);
 rb_node* rotate_rr(rb_node *_nd);
 rb_node* rotate_lr(rb_node *_nd);
 
-// avltree: AVL tree node
+// BST TreeNode
+typedef rb_node*(*rbNodeOpt)(rb_node*, _node_value*, rb_tree*);
+rb_node* bsNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
+rb_node* bsNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
+rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
+
+// AVL TreeNode
 rb_node* avlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* avlNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* avlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 
-// rbtree: red black tree node
+// RB TreeNode
 rb_node* rbNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* rbNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 
-// avltree: multiple-AVL tree node 
+// MAVL TreeNode
 rb_node* mavlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* mavlNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);
 rb_node* mavlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr);

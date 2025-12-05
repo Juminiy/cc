@@ -1,5 +1,9 @@
 #include "ctr_rbtree.h"
 
+/*==============================================================================
+ * MARK: - MAVL TreeNode (Implementation)
+ *============================================================================*/
+
 rb_node* mavlNodeAdjust(rb_node *_rt, rb_node *_nd) {
 	if(!_nd){
 		return NULL;
@@ -47,9 +51,8 @@ rb_node* mavlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	while(_cur){
 		_p = _cur;
 		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
-		if(cmp_res == 0){			
-			__free_data(_tr, _cur->_data);
-			_cur->_data = _val->src;	
+		if(cmp_res == 0){				
+			__merge_data(_tr, _cur->_data, _val->src);
             __update_cnt(_cur, +1);
             __update_psize(_cur, +1);
 			_val->retcode = RB_NODE_INSERT_REPLACED;

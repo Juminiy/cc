@@ -22,7 +22,9 @@
 
 ## CTRLIB (Container Library)
 1. sequential: blist, bqueue, bstack
-2. associative: rbtree
+2. associative: bstree, avltree, rbtree
+3. multiple-associative: m-bst, m-avl, m-rb
+4. ring, skiplist
 
 ## Debug
 1. `gdb ./a.out -x a.gdbinit`

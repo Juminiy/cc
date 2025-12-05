@@ -1,5 +1,9 @@
 #include "ctr_rbtree.h"
 
+/*==============================================================================
+ * MARK: - RB TreeNode (Implementation)
+ *============================================================================*/
+
 void rbNodeInsertAdjust(rb_node *_nd) {
 	
 	for(rb_node *_p = _nd->_parent;__is_red(_p);_p = _nd->_parent){

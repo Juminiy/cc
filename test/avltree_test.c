@@ -25,6 +25,7 @@ void print_blist(blist *bl) {
 	}
     printf("]\n");
 	freeBIter(bi);
+    freeBList(bl);
 }
 
 void check_order(blist *bl){
@@ -193,7 +194,7 @@ void valid_delete(int *arr, size_t arr_sz, int del_val) {
 
     size_t before_sz = __tree_size(rb);
     setup_elem_i64(_em, del_val); rbTreeDeleteData(rb, _em);
-    setup_elem_i64(_em, del_val); _em = rbTreeGetData(rb, _em); 
+    setup_elem_i64(_em, del_val); rbTreeGetData(rb, _em); 
     printf("[%d] %s, ", del_val, valid_elem_t(_em)?"delete fail":"delete ok");
     size_t after_sz = __tree_size(rb);
 
@@ -211,12 +212,12 @@ void valid_delete_all(int *arr, size_t arr_sz) {
     setRBTreeNodeType(rb, TREE_TYPE);
     for(int i=0;i<arr_sz;i++){
         setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
-        print_blist(rbTreeMidTrav(rb));
+        printf("insert: %d; ", arr[i]); print_blist(rbTreeMidTrav(rb));
     }       
 
     for(int i=0;i<arr_sz;i++){
         setup_elem_i64(_em, arr[i]); rbTreeDeleteData(rb, _em);
-        print_blist(rbTreeMidTrav(rb));
+        printf("delete: %d; ", arr[i]); print_blist(rbTreeMidTrav(rb));
     }  
 
     freeRBTree(rb);
@@ -248,24 +249,87 @@ void test_mavl_cases() {
     int arr[10]={1,1,1,2,3,4,4,4,5,5};
 
     // each item delete
-    // for(int i=0;i<10;i++)
-    //     valid_delete(arr,10,arr[i]);
+    for(int i=0;i<10;i++)
+        valid_delete(arr,10,arr[i]);
 
     // all items delete
     valid_delete_all(arr, 10);
 
-    // int arr[1]={1};
-    // valid_delete_all(arr,1);
+    int arr1[1]={1};
+    valid_delete_all(arr1,1);
+
+    int arr2[3]={1,1,2};
+    valid_delete_all(arr2,3);
+
+}
+
+void test_pre_next() {
+    elem_t _em;
+    rb_tree *rb = makeRBTree(elem_int_cmp);
+    setRBTreeNodeType(rb, TREE_TYPE);
+
+    int arr[5] = {1,3,5,7,9};
+    for(int i=0;i<5;i++){
+        setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
+    }
+
+    int fnd[13] = {-1919810,0,1,2,3,4,5,6,7,8,9,10,114514};
+    for(int i=0;i<13;i++){
+        setup_elem_i64(_em, fnd[i]); 
+        elem_t _prev = bsDataPrevData(rb, _em);
+        elem_t _next = bsDataNextData(rb, _em);
+        if(valid_elem_t(_prev)) {
+            printf("%2d -prev-> %2ld, ", fnd[i], get_elem_i64(_prev));
+        } else {
+            printf("%2d -prev-> NULL,", fnd[i]);
+        }
+        if(valid_elem_t(_next)) {
+            printf("%2d -next-> %2ld\n", fnd[i], get_elem_i64(_next));
+        } else {
+            printf("%2d -next-> NULL\n", fnd[i]);
+        }
+    }
+
+    freeRBTree(rb);
+}
+
+void test_rnk() {
+    elem_t _em;
+    rb_tree *rb = makeRBTree(elem_int_cmp);
+    setRBTreeNodeType(rb, TREE_TYPE);
+
+    int arr[14] = {1,1,1,2,2,3,4,4,5,5,5,7,7,9};
+    for(int i=0;i<14;i++){
+        setup_elem_i64(_em, arr[i]); rbTreeInsertData(rb, _em);
+    }
+
+    //              0       0 1 4 6 7 9 12 12 14 14  15 15
+    int fnd[13] = {-1919810,0,1,2,3,4,5,6, 7, 8, 9,  10,114514};
+    for(int i=0;i<13;i++){
+        setup_elem_i64(_em, fnd[i]); 
+        printf("%d rank is %zu\n", fnd[i], bsDataRank(rb, _em));
+    }
+
+    for(int i=0;i<=16;i++){
+        _em = bsDataRankKData(rb, i);
+        printf("rank_%d is: %ld\n", i, valid_elem_t(_em)?get_elem_i64(_em):0x7fffffff);
+    }
+
+    freeRBTree(rb);
 }
 
 int main(int argc, char **argv) {
-    int t_sz = 0;
+    int t_sz = 10;
     if(argc>=2){
         t_sz = strtol(argv[1], NULL, 10);
     }
-    // test_avl_sorted(t_sz);
+    test_avl_sorted(t_sz);
 
     test_mavl_cases();
-    
+
+    test_pre_next();
+
+    test_rnk();
+
     return 0;
 }

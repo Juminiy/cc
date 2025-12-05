@@ -38,6 +38,10 @@ ctr_tree_avl.o: ctrlib/ctr_tree_avl.c
 ctr_tree_mavl.o: ctrlib/ctr_tree_mavl.c
 ctr_map.o: ctrlib/ctr_map.c
 strstrpair.o: test/strstrpair.c
+ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o
+	ar rcs $@ $^
+ctr_tree.a: ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
+	ar rcs $@ $^
 
 test: 
 
@@ -52,13 +56,14 @@ mt_test.d: test/mt_test.c
 os_test.d: test/os_test.c
 net_test.d: test/net_test.c net_util.o ctr_blist.o
 blist_test.d: test/blist_test.c ctr_blist.o
-bdeque_test.d: test/bdeque_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o
-bstree_test.d: test/bstree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
-rbtree_test.d: test/rbtree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o
-avltree_test.d: test/avltree_test.c ctr_bstack.o ctr_bqueue.o ctr_blist.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
-map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o
+bdeque_test.d: test/bdeque_test.c ctr_seq.a
+bstree_test.d: test/bstree_test.c ctr_tree.a ctr_seq.a 
+rbtree_test.d: test/rbtree_test.c ctr_tree.a ctr_seq.a
+avltree_test.d: test/avltree_test.c ctr_tree.a ctr_seq.a 
+map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
 map_std_test.d: test/map_std_test.cpp strstrpair.o
-map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_bstack.o ctr_bqueue.o ctr_blist.o
+map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
+luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

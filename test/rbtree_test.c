@@ -15,6 +15,7 @@ void print_blist(blist *bl) {
 	}
     printf("]\n");
 	freeBIter(bi);
+	freeBList(bl);
 }
 
 void test_rotate() {
