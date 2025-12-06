@@ -15,6 +15,7 @@ rb_tree* makeRBTree(elem_t_cmp _elem_cmp) {
 	_tr->_size = 0;
 	_tr->_elem_cmp = _elem_cmp;
 	_tr->_elem_free = NULL;
+	_tr->_elem_merge = NULL;
 	_tr->_node_type = TREE_NODE_TYPE_BS;
 	return _tr;
 }
@@ -430,7 +431,7 @@ rb_node* bsNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 blist* rbTreeMidTravData(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // <*rb_node>
 	blist *bl = makeBList();			// blist<*rb_node->_data>
-	bstack *bstk = makeBStack();		// bstack<*rb_node>
+	bstack bstk = makeBStack();			// bstack<*rb_node>
 	rb_node *nd = _tr->_root;
 
 	// setup_elem_ptr(_el, nd); bStackPush(bstk, _el);
@@ -455,7 +456,7 @@ blist* rbTreeMidTravData(rb_tree* _tr) {
 blist* rbTreeLelTravData(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // *rb_node
 	blist *bl = makeBList();			// blist<*rb_node->data>
-	bqueue *bq = makeBQueue();			// bqueue<*rb_node>
+	bqueue bq = makeBQueue();			// bqueue<*rb_node>
 	rb_node *nd = _tr->_root;
 	if(nd){
 		setup_elem_ptr(_el, nd); bQueuePush(bq, _el);
@@ -481,7 +482,7 @@ blist* rbTreeLelTravData(rb_tree* _tr) {
 blist* rbTreeMidTrav(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // <rb_node*>
 	blist *bl = makeBList();			// blist<rb_node*>
-	bstack *bstk = makeBStack();		// bstack<rb_node*>
+	bstack bstk = makeBStack();			// bstack<rb_node*>
 	rb_node *nd = _tr->_root;
 
 	// setup_elem_ptr(_el, nd); bStackPush(bstk, _el);
@@ -506,7 +507,7 @@ blist* rbTreeMidTrav(rb_tree* _tr) {
 blist* rbTreeLelTrav(rb_tree* _tr) {
 	elem_t _el = {.tag=ELEM_T_INVALID}; // <rb_node*>
 	blist *bl = makeBList();			// blist<rb_node*>
-	bqueue *bq = makeBQueue();			// bqueue<rb_node*>
+	bqueue bq = makeBQueue();			// bqueue<rb_node*>
 	rb_node *nd = _tr->_root;
 	if(nd){
 		setup_elem_ptr(_el, nd); bQueuePush(bq, _el);

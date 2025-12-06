@@ -37,6 +37,7 @@ typedef struct rb_tree {
 
 #define setRBTreeNodeType(_rb, _type) (_rb->_node_type=_type)
 #define setRBTreeDataFree(_rb, _free) (_rb->_elem_free=_free)
+#define setRBTreeDataMerge(_rb, _merge) (_rb->_elem_merge=_merge)
 
 // please use the `*link*, *unlink*` MACRO carefully, because the `link` and `unlink` operation is bidirectional
 

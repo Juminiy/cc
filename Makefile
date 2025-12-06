@@ -37,6 +37,7 @@ ctr_tree_rb.o: ctrlib/ctr_tree_rb.c
 ctr_tree_avl.o: ctrlib/ctr_tree_avl.c
 ctr_tree_mavl.o: ctrlib/ctr_tree_mavl.c
 ctr_map.o: ctrlib/ctr_map.c
+ctr_barray.o: ctrlib/ctr_barray.c
 strstrpair.o: test/strstrpair.c
 ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o
 	ar rcs $@ $^
@@ -64,6 +65,8 @@ map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree.a ctr_seq.
 map_std_test.d: test/map_std_test.cpp strstrpair.o
 map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
 luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
+mem_test.d: test/mem_test.c
+barray_test.d: test/barray_test.c ctr_barray.o
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM
