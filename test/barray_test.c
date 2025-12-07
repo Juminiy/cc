@@ -11,7 +11,10 @@ void print_intarr(barray arr) {
     printf("]\n");
 }
 
-void test_append_len_cap(barray arr, int sz){
+void test_append_len_cap(int sz){
+    barray arr = makeBArray(0, 8);
+    bArraySetElemCmp(arr, __elem_cmp_int);
+
     elem_t em;
     for(int i=0;i<sz;i++){
         setup_elem_i64(em,i); arr = bArrayAppend(arr, em);
@@ -21,9 +24,13 @@ void test_append_len_cap(barray arr, int sz){
     print_intarr(arr);
 
     printf("size=%zu, cap=%zu\n", bArrayLen(arr), bArrayCap(arr));
+    freeBArray(arr);
 }
 
-void test_array_modify(barray arr) {
+void test_array_modify() {
+    barray arr = makeBArray(0, 8);
+    bArraySetElemCmp(arr, __elem_cmp_int);
+
     elem_t em;
 
     for(int i=0;i<8;i++) {
@@ -55,9 +62,13 @@ void test_array_modify(barray arr) {
     freeBArray(aslc);
 
     print_intarr(arr);
+    freeBArray(arr);
 }
 
-void test_cmpof(barray arr) {
+void test_cmpof() {
+    barray arr = makeBArray(0, 8);
+    bArraySetElemCmp(arr, __elem_cmp_int);
+
     elem_t em;
     for(int i=0;i<11;i++){
         setup_elem_i64(em, i); arr = bArrayAppend(arr, em);
@@ -65,6 +76,7 @@ void test_cmpof(barray arr) {
     for(size_t i=0;i<bArrayLen(arr);i++){
         printf("%zu,%zu ", i, bArrayIndexOf(arr, bArrayAt(arr, i), 0));
     }
+    freeBArray(arr);
 }
 
 int main(int argc, char **argv) {
@@ -72,17 +84,12 @@ int main(int argc, char **argv) {
     if(argc>=2){
         sz = strtol(argv[1], NULL, 10);
     }
+    
+    test_append_len_cap(sz);
 
-    barray arr = makeBArray(0, 8);
-    bArraySetElemCmp(arr, __elem_cmp_int);
+    test_array_modify();
 
-    test_append_len_cap(arr, sz);
-
-    test_array_modify(arr);
-
-    test_cmpof(arr);
-
-    freeBArray(arr);
+    test_cmpof();
 
     return 0;
 }

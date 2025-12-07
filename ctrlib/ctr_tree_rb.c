@@ -5,7 +5,6 @@
  *============================================================================*/
 
 void rbNodeInsertAdjust(rb_node *_nd) {
-	
 	for(rb_node *_p = _nd->_parent;__is_red(_p);_p = _nd->_parent){
 		int p_dir = __node_dir(_p);
 		rb_node *_g=_p->_parent; 
@@ -79,6 +78,7 @@ rb_node* rbNodeGetNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	return bsNodeGetNode(_rt, _val, _tr);
 }
 
+// todo: fix
 void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 	int n_dir = __node_dir(_nd);
 	rb_node *_p = _nd->_parent;
@@ -127,6 +127,7 @@ void rbNodeDeleteAdjust(rb_node *_nd, rb_tree *_tr) {
 }
 
 // @return @param<_rt>: _tr->_root itself
+// todo: fix
 rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	rb_node *del_nd = rbNodeGetNode(_rt, _val, _tr);
 	if(del_nd==NULL){
@@ -149,16 +150,12 @@ rb_node* rbNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 	int n_dir=__node_dir(_nd);
 	rb_node *_p=_nd->_parent, *_s=_nd->_left?_nd->_left:_nd->_right;
 	if(_s){
-		_s->_parent=_p;
+		__link_(_s, _p, n_dir);
 	}
 	if(!_p){
 		_tr->_root = _s;
 	} else {
-		if(n_dir==RB_NODE_DIR_LEFT){
-			_p->_left=_s;
-		} else if(n_dir==RB_NODE_DIR_RIGHT){
-			_p->_right=_s;
-		}
+		__link_(_p, _s, n_dir);
 		for(rb_node *_curnd=_p;_curnd;_curnd=_curnd->_parent){
 			_curnd->_size--;
 		}

@@ -21,8 +21,8 @@
    4. server give the avaliable ipv4 or ipv6 network addresses.
 
 ## CTRLIB (Container Library)
-1. sequential: blist, bqueue, bstack
-2. associative: bstree, avltree, rbtree
+1. sequential: blist, bqueue, bstack, barray
+2. associative: bstree, avltree, rbtree, bheap
 3. multiple-associative: m-bst, m-avl, m-rb
 4. ring, skiplist
 
