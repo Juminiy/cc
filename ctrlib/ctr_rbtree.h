@@ -103,27 +103,13 @@ typedef struct rb_tree {
 		else if((_dir)==RB_NODE_DIR_RIGHT) rotate_right(_nd); \
 	} while(0)
 
-#define RB_NODE_OPT_NONE		(0)	   // 00000000
-#define RB_NODE_INSERT_ERROR	(1<<0) // 00000001
-#define RB_NODE_INSERT_CREATED  (1<<1) // 00000010
-#define RB_NODE_INSERT_REPLACED (1<<2) // 00000100
-#define RB_NODE_DELETE_ERROR    (1<<3) // 00001000
-#define RB_NODE_DELETE_SUCCESS  (1<<4) // 00010000
-#define RB_NODE_DELETE_NOTFOUND (1<<5) // 00100000
-#define RB_NODE_GET_SUCCESS		(1<<6) // 01000000
-#define RB_NODE_GET_NOTFOUND    (1<<7) // 10000000
-
-typedef struct _node_value{
-	elem_t src, dst;
-	int retcode;
-} _node_value;
-
-#define init_node_value(_val, _src) \
-	do { \
-		_val.src = _src; \
-		_val.dst.tag = ELEM_T_INVALID; \
-		_val.retcode = RB_NODE_OPT_NONE; \
-	} while(0)
+#define RB_NODE_OPT_NONE	 	ELEM_OPT_NONE
+#define RB_NODE_INSERT_CREATED  ELEM_INSERT_CREATED
+#define RB_NODE_INSERT_REPLACED ELEM_INSERT_REPLACED
+#define RB_NODE_DELETE_SUCCESS  ELEM_DELETE_REMOVED
+#define RB_NODE_DELETE_NOTFOUND ELEM_DELETE_NOTFOUND
+#define RB_NODE_GET_SUCCESS	    ELEM_GET_SUCCESS
+#define RB_NODE_GET_NOTFOUND    ELEM_GET_NOTFOUND
 
 // Tree high level API
 rb_tree* makeRBTree(elem_t_cmp _elem_cmp);

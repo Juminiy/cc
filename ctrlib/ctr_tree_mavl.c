@@ -55,7 +55,7 @@ rb_node* mavlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 			__merge_data(_tr, _cur->_data, _val->src);
             __update_cnt(_cur, +1);
             __update_psize(_cur, +1);
-			_val->retcode = RB_NODE_INSERT_REPLACED;
+			_val->retcode = ELEM_INSERT_MERGED;
 			return _rt;
 		} else if(cmp_res < 0){
 			_cur = _cur->_right;
@@ -100,6 +100,7 @@ rb_node* mavlNodeDeleteNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
     if(del_nd->_cnt>0){
 		__update_cnt(del_nd, -1);
         __update_psize(del_nd, -1);
+		_val->retcode = ELEM_DELETE_DECREASED;
 		if(del_nd->_cnt>0)
         	return _rt;
     }

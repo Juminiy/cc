@@ -34,6 +34,8 @@ typedef struct elem_t {
 
 #define ELEM_T_INVALID 0
 #define ELEM_T_VALID   1
+#define ELEM_T_MIN     0x8000000000000000
+#define ELEM_T_MAX     0x7FFFFFFFFFFFFFFF
 #define valid_elem_t(elem) (elem.tag!=ELEM_T_INVALID)
 
 #define setup_elem_t(elem, elem_tag, uni_field, elem_val) \
@@ -68,5 +70,29 @@ static inline int __elem_cmp_int(elem_t _e0, elem_t _e1) {
 static inline int __elem_cmp_uint(elem_t _e0, elem_t _e1) {
 	return get_elem_u64(_e0) - get_elem_u64(_e1);
 }
+
+#define ELEM_OPT_NONE		  (0)	 // 00000000
+#define ELEM_INSERT_ERROR	  (1<<0) // 00000001
+#define ELEM_INSERT_CREATED   (1<<1) // 00000010
+#define ELEM_INSERT_REPLACED  (1<<2) // 00000100
+#define ELEM_INSERT_MERGED    (1<<3) // 00001000
+#define ELEM_DELETE_ERROR     (1<<4) // 00010000
+#define ELEM_DELETE_DECREASED (1<<5) // 00100000
+#define ELEM_DELETE_REMOVED   (1<<6) // 01000000
+#define ELEM_DELETE_NOTFOUND  (1<<7) // 10000000
+#define ELEM_GET_SUCCESS	  (1<<8) // 00000001
+#define ELEM_GET_NOTFOUND     (1<<9) // 00000010
+
+typedef struct _node_value{
+	elem_t src, dst;
+	int retcode;
+} _node_value;
+
+#define init_node_value(_val, _src) \
+	do { \
+		_val.src = _src; \
+		_val.dst.tag = ELEM_T_INVALID; \
+		_val.retcode = RB_NODE_OPT_NONE; \
+	} while(0)
 
 #endif
