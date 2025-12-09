@@ -92,7 +92,7 @@ typedef struct _node_value{
 	do { \
 		_val.src = _src; \
 		_val.dst.tag = ELEM_T_INVALID; \
-		_val.retcode = RB_NODE_OPT_NONE; \
+		_val.retcode = ELEM_OPT_NONE; \
 	} while(0)
 
 #endif

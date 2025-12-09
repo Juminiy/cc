@@ -6,7 +6,7 @@
 void print_intarr(barray arr) {
     printf("[ ");
     for(size_t i=0;i<bArrayLen(arr);i++){
-        printf("%lld ", get_elem_i64(bArrayAt(arr, i)));
+        printf("%ld ", get_elem_i64(bArrayAt(arr, i)));
     }
     printf("]\n");
 }

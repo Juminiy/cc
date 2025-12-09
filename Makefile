@@ -39,8 +39,9 @@ ctr_tree_mavl.o: ctrlib/ctr_tree_mavl.c
 ctr_map.o: ctrlib/ctr_map.c
 ctr_barray.o: ctrlib/ctr_barray.c
 ctr_bheap.o: ctrlib/ctr_bheap.c
+ctr_skiplist.o: ctrlib/ctr_skiplist.c
 strstrpair.o: test/strstrpair.c
-ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o
+ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o ctr_barray.o ctr_bheap.o
 	ar rcs $@ $^
 ctr_tree.a: ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
 	ar rcs $@ $^
@@ -67,8 +68,9 @@ map_std_test.d: test/map_std_test.cpp strstrpair.o
 map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
 luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
 mem_test.d: test/mem_test.c
-barray_test.d: test/barray_test.c ctr_barray.o
-bheap_test.d: test/bheap_test.c ctr_bheap.o ctr_barray.o 
+barray_test.d: test/barray_test.c ctr_seq.a
+bheap_test.d: test/bheap_test.c ctr_seq.a
+skiplist_test.d: test/skiplist_test.c ctr_skiplist.o ctr_tree.a ctr_seq.a
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

@@ -9,7 +9,8 @@
 #include "ctr_barray.h"
 
 typedef struct skipnode {
-    barray _next; // barray<skipnode*>
+    struct skipnode **_next;
+    int _level;
     elem_t _data;
 } skipnode;
 
@@ -17,7 +18,7 @@ typedef struct skiplist {
     skipnode *_head,*_tail;
 
     size_t _size;
-    size_t _level;
+    int _level;
     elem_t_cmp _cmp;
     elem_t_free _free;
     elem_t_merge _merge;
@@ -31,6 +32,8 @@ typedef struct skiplist {
 #define SKIP_NODE_GET_SUCCESS     ELEM_GET_SUCCESS
 #define SKIP_NODE_GET_NOTFOUND    ELEM_GET_NOTFOUND
 
+#define __sl_len(sl) (sl->_size)
+#define __sl_level(sl) (sl->_level)
 #define __sl_data_free(sl, _dt) \
     do { if(sl->_free) {sl->_free(_dt);} } while(0)
 #define __sl_data_merge(sl, _dest, _src) \
@@ -46,7 +49,9 @@ void skipListInsertNode(skiplist *_sl, _node_value *_val);
 void skipListDeleteNode(skiplist *_sl, _node_value *_val);
 skipnode* skipListGetNode(skiplist *_sl, _node_value *_val);
 
-skipnode* makeSkipNode(elem_t _dt);
+skipnode* makeSkipNode(elem_t _dt, size_t _level);
 void freeSkipNode(skipnode *_sn, skiplist *_sl);
+
+barray skipList2Array(skiplist *_sl);
 
 #endif

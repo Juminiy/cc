@@ -2,6 +2,7 @@
 
 #include "ctr_bstack.h"
 #include "ctr_bqueue.h"
+#include "ctr_barray.h"
 
 #include <stdlib.h>
 
@@ -527,4 +528,28 @@ blist* rbTreeLelTrav(rb_tree* _tr) {
 
 	freeBQueue(bq);
 	return bl;
+}
+
+barray rbTree2Array(rb_tree* _tr) {
+	elem_t _el = {.tag=ELEM_T_INVALID}; // <*rb_node>
+	barray barr = makeBArray(0, __tree_size(_tr));	// barray<*rb_node->_data>
+	bstack bstk = makeBStack();			// bstack<*rb_node>
+	rb_node *nd = _tr->_root;
+
+	// setup_elem_ptr(_el, nd); bStackPush(bstk, _el);
+	while(!bStackEmpty(bstk) || nd) {
+		while(nd) {
+			setup_elem_ptr(_el, nd); bStackPush(bstk, _el);
+			nd = nd->_left;
+		}
+		if(!bStackEmpty(bstk)) {
+			_el = bStackPop(bstk); 
+			nd = (rb_node*)get_elem_ptr(_el);
+			barr = bArrayAppend(barr, nd->_data);
+			nd = nd->_right;
+		}
+	}
+
+	freeBStack(bstk);
+	return barr;
 }

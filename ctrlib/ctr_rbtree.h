@@ -4,6 +4,7 @@
 #include "ctr_elemt.h"
 #include "ctr_blist.h"
 #include "ctr_util.h"
+#include "ctr_barray.h"
 
 #define TREE_NODE_TYPE_BS   0
 #define TREE_NODE_TYPE_RB   1
@@ -134,6 +135,7 @@ blist* rbTreeMidTravData(rb_tree* _tr);
 blist* rbTreeLelTravData(rb_tree* _tr);
 blist* rbTreeMidTrav(rb_tree *_tr);
 blist* rbTreeLelTrav(rb_tree *_tr);
+barray rbTree2Array(rb_tree* _tr);
 
 // TreeNode API
 rb_node* makeRBNode(rb_node *_left, rb_node *_right, elem_t _data);
