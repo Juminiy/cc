@@ -33,6 +33,7 @@ blist *makeBList();
 void freeBList(blist *_bl);
 blist *copyBList(blist *_bl);
 blist *bListSplice(blist *_bl0, blist *_bl1);
+blist *bListRange(blist *_bl, size_t _lr, size_t _rr);
 
 // safe api
 bnode *bListAddHead(blist *_bl, elem_t _dt);

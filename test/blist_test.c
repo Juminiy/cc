@@ -189,6 +189,23 @@ void test_search_index() {
     freeBList(l1);
 }
 
+void test_range() {
+    blist *l1=makeBList();
+    range_add_blist(l1, 4, 22);// idx[0,17)
+    print_blist(l1); // [4,21]
+
+    blist *l2=bListRange(l1, 3, 13); // idx[3,13)
+    print_blist(l2); freeBList(l2); // [7,16]
+
+    blist *l3=bListRange(l1, 0, 1); 
+    print_blist(l3); freeBList(l3); // [4,4]
+
+    blist *l4=bListRange(l1, 17, 18);
+    print_blist(l4); freeBList(l4); // [21,21]
+
+    freeBList(l1);
+}
+
 int main() {
 
     test_tail();
@@ -197,5 +214,7 @@ int main() {
     test_copy();
 
     test_search_index();
+    test_range();
+
     return 0;
 }

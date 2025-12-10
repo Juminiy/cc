@@ -128,6 +128,7 @@ blist *bListSplice(blist *_bl0, blist *_bl1) {
     _bl->_head = _bn0 ? _bl0->_head:_bl1->_head;
     _bl->_tail = _bn1 ? _bl1->_tail:_bl0->_tail;
     _bl->_size = _bl0->_size+_bl1->_size;
+    _bl->_elem_cmp = _bl0->_elem_cmp ? _bl0->_elem_cmp:_bl1->_elem_cmp;
     free(_bl0), free(_bl1);
     return _bl;
 }
@@ -159,6 +160,7 @@ blist *copyBList(blist *_bl) {
     for(bnode *nd=bListNext(itr);nd;nd=bListNext(itr)) {
         bListAddTail(cpy, nd->_data);
     }
+    cpy->_elem_cmp = _bl->_elem_cmp;
     freeBIter(itr);
     return cpy;
 }
@@ -193,4 +195,27 @@ bnode *bListIndex(blist *_bl, int _idx) {
     }
     freeBIter(bi);
     return ret;
+}
+
+// _bl[_lr, _rr)
+blist *bListRange(blist *_bl, size_t _lr, size_t _rr) {
+    if(_lr>=bListSize(_bl)||_rr>bListSize(_bl)||_lr>=_rr) {
+        return NULL;
+    }
+    blist *rg = makeBList();
+    biter *bi = makeBIter(_bl, BLIST_ITER_FORWARD);
+
+    size_t _i=0;
+    for(bnode *cur=bListNext(bi);
+        cur&&_lr<_rr;
+        cur=bListNext(bi),_i++){
+        if(_i>=_lr) {
+            bListAddTail(rg, cur->_data);
+            _lr++;
+        }
+    }
+    rg->_elem_cmp = _bl->_elem_cmp;
+
+    freeBIter(bi);
+    return rg;
 }
