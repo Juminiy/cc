@@ -16,5 +16,6 @@ bheap bHeapPush(bheap _bh, elem_t _em);
 elem_t bHeapTop(bheap _bh);
 bheap bHeapPop(bheap _bh);
 bool bHeapEmpty(bheap _bh);
+bheap bHeapRemove(bheap _bh, size_t _idx);
 
 #endif

@@ -42,11 +42,11 @@ int main() {
     setup_elem_ptr(em, makeii(1,1)); lruTPut(t, em); // [(1,1)]
     setup_elem_ptr(em, makeii(2,2)); lruTPut(t, em); // [(2,2),(1,1)]
 
-    get_i(1); // 1
+    get_i(1); // 1 [(1,1),(2,2)]
 
-    setup_elem_ptr(em, makeii(3,3)); lruTPut(t, em); // [(3,3),(2,2)]
+    setup_elem_ptr(em, makeii(3,3)); lruTPut(t, em); // [(3,3),(1,1)]
 
-    get_i(2); // 2
+    get_i(2); // -1
 
     setup_elem_ptr(em, makeii(4,4)); lruTPut(t, em); // [(4,4),(3,3)]
 

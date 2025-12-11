@@ -87,3 +87,14 @@ bheap bHeapPop(bheap _bh) {
 bool bHeapEmpty(bheap _bh) {
 	return bHeapLen(_bh) == 0;
 }
+
+// todo:
+bheap bHeapRemove(bheap _bh, size_t _idx) {
+	size_t _hsz = bHeapLen(_bh);
+	if(_hsz > 0 && _hsz-1!=_idx) {
+		__swap_(elem_t, _bh._ll._arr[_idx], _bh._ll._arr[_hsz-1]);
+		bHeapAdjustTop2Down(_bh, _idx);
+		bHeapAdjustDown2Top(_bh, _idx);
+	}
+	return bHeapPop(_bh);
+}

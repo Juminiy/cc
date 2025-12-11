@@ -18,7 +18,14 @@ void freeLRUT(lru_t *_t) {
 }
 
 elem_t lruTGet(lru_t *_t, elem_t _dt) {
-    return bNodeMapGetData(_t->_map, _dt);
+    bnode *nd = bNodeMapGetNode(_t->_map, _dt);
+    elem_t em={.tag=ELEM_T_INVALID};
+    if(nd) {
+        nd = bListDeleteNode(_t->_bl, nd);
+        nd = bListLinkHead(_t->_bl, nd);
+        em = nd->_data;
+    }
+    return em;
 }
 
 void lruTPut(lru_t *_t, elem_t _dt) {

@@ -58,3 +58,4 @@ dkms.conf
 *.out
 
 data/
+.idea/

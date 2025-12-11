@@ -13,7 +13,8 @@ func Constructor(capacity int) LRUCache {
 	return LRUCache{
 		KN: make(map[int]*node, capacity),
 		h:  nil, t: nil,
-		C: capacity,
+		sz: 0,
+		C:  capacity,
 	}
 }
 
@@ -30,7 +31,7 @@ func (this *LRUCache) Put(key int, value int) {
 	var cur *node
 	if nd, ok := this.KN[key]; ok {
 		nd.V = value
-		this.delNd(nd)
+		nd = this.delNd(nd)
 		cur = nd
 	} else {
 		cur = &node{K: key, V: value}
@@ -39,70 +40,89 @@ func (this *LRUCache) Put(key int, value int) {
 	this.addHead(cur)
 
 	if this.sz > this.C {
-		this.sz--
+		cur = this.delTail()
+		delete(this.KN, cur.K)
 	}
 }
 
 func (this *LRUCache) delHead() *node {
-	if this.h == nil {
-		return nil
-	}
 	hd := this.h
-	this.h = this.h.n
-	this.sz--
-	if this.h == nil {
+	if hd != nil {
+		this.h = hd.n
+		unlinknext(hd)
+		this.sz--
+	}
+	if this.sz == 0 {
 		this.t = nil
 	}
-
-	hd.n = nil
 	return hd
 }
 
 func (this *LRUCache) delTail() *node {
-	if this.t == nil {
-		return nil
-	}
 	tl := this.t
-	this.t = this.t.p
-	this.sz--
-	if this.t == nil {
+	if tl != nil {
+		this.t = tl.p
+		unlinkprev(tl)
+		this.sz--
+	}
+	if this.sz == 0 {
 		this.h = nil
 	}
-
-	tl.p = nil
 	return tl
 }
 
 func (this *LRUCache) delNd(nd *node) *node {
 	if this.h == nd {
-		this.delHead()
+		return this.delHead()
 	} else if this.t == nd {
-		this.delTail()
+		return this.delTail()
 	}
 
 	ndp, ndn := nd.p, nd.n
-	ndp.n, ndn.p = ndn, ndp
+	linknode(ndp, ndn)
 	this.sz--
 	return nd
 }
 
 func (this *LRUCache) addHead(nd *node) {
-	nd.p = nil
-	nd.n = this.h
+	linknode(nd, this.h)
 	this.h = nd
-	if this.t == nil {
+	if this.sz == 0 {
 		this.t = nd
 	}
 	this.sz++
 }
+
 func (this *LRUCache) addTail(nd *node) {
-	nd.n = nil
-	nd.p = this.h
-	this.h = nd
-	if this.h == nil {
+	linknode(this.t, nd)
+	this.t = nd
+	if this.sz == 0 {
 		this.h = nd
 	}
 	this.sz++
+}
+
+func linknode(n1, n2 *node) {
+	if n1 != nil {
+		n1.n = n2
+	}
+	if n2 != nil {
+		n2.p = n1
+	}
+}
+
+func unlinkprev(n *node) {
+	if n != nil && n.p != nil {
+		n.p.n = nil
+		n.p = nil
+	}
+}
+
+func unlinknext(n *node) {
+	if n != nil && n.n != nil {
+		n.n.p = nil
+		n.n = nil
+	}
 }
 
 type node struct {
@@ -110,15 +130,29 @@ type node struct {
 	K, V int
 }
 
+func printlist(n *node) {
+	fmt.Printf("[ ")
+	for ; n != nil; n = n.n {
+		fmt.Printf("%d ", n.K)
+	}
+	fmt.Println("]")
+}
+
 func main() {
 	ca := Constructor(2)
-	ca.Put(1, 1)
-	ca.Put(2, 2)
-	fmt.Println(ca.Get(1))
-	ca.Put(3, 3)
-	fmt.Println(ca.Get(2))
-	ca.Put(4, 4)
-	fmt.Println(ca.Get(1))
-	fmt.Println(ca.Get(3))
-	fmt.Println(ca.Get(4))
+	ca.Put(1, 1) // [(1,1)]
+	printlist(ca.h)
+	ca.Put(2, 2) // [(2,2),(1,1)]
+	printlist(ca.h)
+	fmt.Println(ca.Get(1)) // 1, [(1,1),(2,2)]
+	printlist(ca.h)
+	ca.Put(3, 3) // [(3,3),(1,1)]
+	printlist(ca.h)
+	fmt.Println(ca.Get(2)) // -1
+	printlist(ca.h)
+	ca.Put(4, 4) // [(4,4),(3,3)]
+	printlist(ca.h)
+	fmt.Println(ca.Get(1)) // -1
+	fmt.Println(ca.Get(3)) // 3 [(3,3),(4,4)]
+	fmt.Println(ca.Get(4)) // 4 [(4,4),(3,3)]
 }

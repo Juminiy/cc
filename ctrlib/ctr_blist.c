@@ -252,5 +252,6 @@ bnode *bListDeleteNode(blist *_bl, bnode *_bn) {
     __unlink_prev(_bn); 
     __unlink_next(_bn);
     __link_bnode(_prev,_next);
+    _bl->_size--;
     return _bn;
 }

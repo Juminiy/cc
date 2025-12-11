@@ -2,7 +2,6 @@ package main
 
 import (
 	"container/heap"
-	_ "container/heap"
 	"fmt"
 )
 
@@ -22,9 +21,19 @@ func Constructor(capacity int) LFUCache {
 	}
 }
 
+//func (this *LFUCache) pushIndex(nd *node) {
+//	nd.I = min(len(this.KN), this.Cap-1)
+//
+//}
+
 func (this *LFUCache) Get(key int) int {
+	this.Ts++
+
 	if nd, ok := this.KN[key]; ok {
-		
+		heap.Remove(&this.H, nd.I)
+		nd.Refs++
+		nd.Ts = this.Ts
+		heap.Push(&this.H, nd)
 		return nd.V
 	}
 	return -1
@@ -37,18 +46,19 @@ func (this *LFUCache) Put(key int, value int) {
 	if nd, ok := this.KN[key]; ok {
 		nd.Refs++
 		nd.Ts = this.Ts
+		nd.V = value
+		heap.Remove(&this.H, nd.I)
 		cur = nd
 	} else {
-		cur = &node{Ts: this.Ts, Refs: 1, K: key, V: value}
+		if len(this.KN) == this.Cap {
+			rmnd := heap.Pop(&this.H).(*node)
+			delete(this.KN, rmnd.K)
+		}
+		cur = &node{Ts: this.Ts, Refs: 1, K: key, V: value, I: min(len(this.KN), this.Cap-1)}
 	}
-
-	heap.Push(&this.H, cur)
 	this.KN[key] = cur
+	heap.Push(&this.H, cur)
 
-	if len(this.KN) > this.Cap {
-		cur = heap.Pop(&this.H).(*node)
-		delete(this.KN, cur.K)
-	}
 }
 
 type hp []*node
@@ -61,6 +71,7 @@ func (h hp) Less(i, j int) bool {
 	return h[i].Refs < h[j].Refs
 }
 func (h hp) Swap(i, j int) {
+	h[i].I, h[j].I = h[j].I, h[i].I
 	h[i], h[j] = h[j], h[i]
 }
 
@@ -81,21 +92,55 @@ func (h *hp) Top() any {
 }
 
 type node struct {
-	Ts   int // low is upper
-	Refs int // low is upper
-	K, V int
+	Ts      int // low is upper
+	Refs    int // low is upper
+	I, K, V int
+}
+
+func test1() {
+	ca := Constructor(2)
+	ca.Put(1, 1)
+	ca.Put(2, 2)
+	fmt.Println(ca.Get(1)) // 1
+	ca.Put(3, 3)
+	fmt.Println(ca.Get(2)) // -1
+	fmt.Println(ca.Get(3)) // 3
+	ca.Put(4, 4)
+	fmt.Println(ca.Get(1)) // -1
+	fmt.Println(ca.Get(3)) // 3
+	fmt.Println(ca.Get(4)) // 4
+}
+
+func test2() {
+	ca := Constructor(2)
+	ca.Put(2, 1)
+	ca.Put(2, 2)
+	fmt.Println(ca.Get(2)) // 2
+	ca.Put(1, 1)
+	ca.Put(4, 1)
+	fmt.Println(ca.Get(2)) // 2
+}
+
+func test3() {
+	ca := Constructor(3)
+	ca.Put(1, 1)
+	ca.Put(2, 2)
+	ca.Put(3, 3)
+	ca.Put(4, 4)
+	fmt.Println(ca.Get(4)) // 4
+	fmt.Println(ca.Get(3)) // 3
+	fmt.Println(ca.Get(2)) // 2
+	fmt.Println(ca.Get(1)) // -1
+	ca.Put(5, 5)
+	fmt.Println(ca.Get(1)) // -1
+	fmt.Println(ca.Get(2)) // 2
+	fmt.Println(ca.Get(3)) // 3
+	fmt.Println(ca.Get(4)) // -1
+	fmt.Println(ca.Get(5)) // 5
 }
 
 func main() {
-	ca := Constructor(2)
-	ca.Put(1, 1)           //
-	ca.Put(2, 2)           //
-	fmt.Println(ca.Get(1)) // 1
-	ca.Put(3, 3)
-	fmt.Println(ca.Get(2))
-	fmt.Println(ca.Get(3))
-	ca.Put(4, 4)
-	fmt.Println(ca.Get(1))
-	fmt.Println(ca.Get(3))
-	fmt.Println(ca.Get(4))
+	test1()
+	test2()
+	test3()
 }
