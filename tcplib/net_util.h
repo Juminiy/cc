@@ -17,7 +17,7 @@ blist* get_intf_ipv6();
         blist *bl = get_intf_ipv4(); \
         biter *bi = makeBIter(bl,BLIST_ITER_FORWARD); \
         for(bnode *bn=bListNext(bi);bn;bn=bListNext(bi)){ \
-            intfip *intfipval = bNodeData(bn).ptr; \
+            intfip *intfipval = get_elem_ptr(bn->_data); \
             __printf("interface name: %s, ip: %s\n",  \
                 intfipval->_name, intfipval->_ip); \
         } \

@@ -149,7 +149,7 @@ rb_node* makeRBNode(rb_node* _left, rb_node* _right, elem_t _data) {
 }
 
 void freeRBNode(rb_node* _nd, rb_tree* _tr) {
-	__free_data(_tr, _nd->_data);
+	__tr_free_data(_tr, _nd->_data);
 	// __unlink_left(_nd);
 	// __unlink_right(_nd);
 	// __unlink_parent(_nd);
@@ -324,7 +324,7 @@ rb_node* bsNodeInsertNode(rb_node* _rt, _node_value *_val, rb_tree *_tr) {
 	}
 	int cmp_res = _tr->_elem_cmp(_rt->_data, _val->src);
 	if(cmp_res==0) {
-		__free_data(_tr, _rt->_data);
+		__tr_free_data(_tr, _rt->_data);
 		_rt->_data = _val->src;
 		_val->retcode = RB_NODE_INSERT_REPLACED;
 	} else if (cmp_res < 0) {

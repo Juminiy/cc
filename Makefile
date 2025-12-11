@@ -40,6 +40,7 @@ ctr_map.o: ctrlib/ctr_map.c
 ctr_barray.o: ctrlib/ctr_barray.c
 ctr_bheap.o: ctrlib/ctr_bheap.c
 ctr_skiplist.o: ctrlib/ctr_skiplist.c
+ctr_lru.o: ctrlib/ctr_lru.c
 strstrpair.o: test/strstrpair.c
 ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o ctr_barray.o ctr_bheap.o
 	ar rcs $@ $^
@@ -71,6 +72,7 @@ mem_test.d: test/mem_test.c
 barray_test.d: test/barray_test.c ctr_seq.a
 bheap_test.d: test/bheap_test.c ctr_seq.a
 skiplist_test.d: test/skiplist_test.c ctr_skiplist.o ctr_tree.a ctr_seq.a
+lru_test.d: test/lru_test.c ctr_lru.o ctr_tree.a ctr_seq.a
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

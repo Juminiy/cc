@@ -16,9 +16,10 @@ bnode *makeBNode(bnode *_prev, elem_t _data, bnode *_next) {
     return _bn;
 }
 
-void freeBNode(bnode *_bn) {
-    __unlink_prev(_bn);
-    __unlink_next(_bn);
+void freeBNode(bnode *_bn, blist *_bl) {
+    // __unlink_prev(_bn);
+    // __unlink_next(_bn);
+    __blist_data_free(_bl, _bn->_data);
     free(_bn);
 }
 
@@ -34,7 +35,7 @@ blist *makeBList() {
 void freeBList(blist *_bl) {
     for(bnode *_bn=_bl->_head; _bn&&_bl->_size>0; ) {
         bnode *_nxt = _bn->_next;
-        freeBNode(_bn);_bl->_size--;
+        freeBNode(_bn, _bl);_bl->_size--;
         _bn = _nxt;
     }
     free(_bl);
@@ -50,7 +51,7 @@ elem_t bListDelHead(blist *_bl) {
     if(bn){
         _em = bn->_data;
     }
-    freeBNode(bn);
+    freeBNode(bn, _bl);
     return _em;
 }
 
@@ -64,7 +65,7 @@ elem_t bListDelTail(blist *_bl) {
     if(bn){
         _em = bn->_data;
     }
-    freeBNode(bn);
+    freeBNode(bn, _bl);
     return _em;
 }
 
@@ -218,4 +219,38 @@ blist *bListRange(blist *_bl, size_t _lr, size_t _rr) {
 
     freeBIter(bi);
     return rg;
+}
+
+bnode *bListInsertBefore(blist *_bl, bnode *_bn, bnode *_next) {
+    if(_next==_bl->_head) {
+        return bListLinkHead(_bl, _bn);
+    }
+    bnode *_nextprev = _next->_prev;
+    __link_bnode(_nextprev, _bn);
+    __link_bnode(_bn, _next);
+    return _bn;
+}
+
+bnode *bListInsertAfter(blist *_bl, bnode *_bn, bnode *_prev) {
+    if(_prev==_bl->_tail) {
+        return bListLinkTail(_bl, _bn);
+    }
+    bnode *_prevnext = _prev->_next;
+    __link_bnode(_prev, _bn);
+    __link_bnode(_bn, _prevnext);
+    return _bn;
+}
+
+bnode *bListDeleteNode(blist *_bl, bnode *_bn) {
+    if(_bn==_bl->_head) {
+        return bListUnlinkHead(_bl);
+    } else if(_bn==_bl->_tail) {
+        return bListUnlinkTail(_bl);
+    }
+    bnode *_prev=_bn->_prev;
+    bnode *_next=_bn->_next;
+    __unlink_prev(_bn); 
+    __unlink_next(_bn);
+    __link_bnode(_prev,_next);
+    return _bn;
 }

@@ -8,12 +8,16 @@ typedef struct barray {
     size_t _siz;
     size_t _cap;
 
-    elem_t_cmp _cmp;
+    elem_t_cmp _cmp;     // +optional
+    elem_t_free _free;   // +optional
+    elem_t_merge _merge; // +optional
 } barray;
 
 #define bArrayLen(_ba) (_ba._siz)
 #define bArrayCap(_ba) (_ba._cap)
-#define bArraySetElemCmp(_ba, __cmp) (_ba._cmp=__cmp)
+#define bArraySetElemCmp(_ba, _f) (_ba._cmp=_f)
+#define bArraySetElemFree(_ba, _f) (_ba._free=_f)
+#define bArraySetElemMerge(_ba, _f) (_ba._merge=_f)
 
 barray makeBArray(size_t _siz, size_t _cap);
 void freeBArray(barray _ba);

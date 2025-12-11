@@ -6,21 +6,21 @@ void print_blist(blist *bl) {
     printf("LIS:blist=[ ");
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi))
-        printf("%ld ", bNodeData(bn).i64);
+        printf("%ld ", get_elem_i64(bn->_data));
     printf("]\n");
     freeBIter(bi);
 
     printf("REV:blist=[ ");
     bi = makeBIter(bl, BLIST_ITER_BAKWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi))
-        printf("%ld ", bNodeData(bn).i64);
+        printf("%ld ", get_elem_i64(bn->_data));
     printf("]\n");
     freeBIter(bi);
 }
 
 void print_bnode(bnode *bn) {
     if (bn) 
-        printf("bnode=%ld\n", bNodeData(bn).i64);
+        printf("bnode=%ld\n", get_elem_i64(bn->_data));
     else
         printf("bnode=NULL\n");
 }

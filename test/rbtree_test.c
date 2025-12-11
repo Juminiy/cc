@@ -10,7 +10,7 @@ void print_blist(blist *bl) {
     printf("LIS:blist=[ ");
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
-		rb_node *rbn = bNodeData(bn).ptr;
+		rb_node *rbn = get_elem_ptr(bn->_data); 
 		printf("%2ld ", get_elem_i64(rbn->_data));
 	}
     printf("]\n");

@@ -52,7 +52,7 @@ rb_node* mavlNodeInsertNode(rb_node *_rt, _node_value *_val, rb_tree *_tr) {
 		_p = _cur;
 		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
 		if(cmp_res == 0){				
-			__merge_data(_tr, _cur->_data, _val->src);
+			__tr_merge_data(_tr, _cur->_data, _val->src);
             __update_cnt(_cur, +1);
             __update_psize(_cur, +1);
 			_val->retcode = ELEM_INSERT_MERGED;

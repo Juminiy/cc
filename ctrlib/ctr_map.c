@@ -74,7 +74,7 @@ void strstrmapIter(strstrmap _map, strstrmapIterFunc _fn) {
         _bn;
         _bn=bListNext(_it)
     ){
-        rb_node *_rbnd = bNodeData(_bn).ptr;
+        rb_node *_rbnd = get_elem_ptr(_bn->_data);
         strstrpair *_pair = get_elem_ptr(_rbnd->_data);
         bool _ret = _fn(_pair->_key, _pair->_val);
         if(!_ret){

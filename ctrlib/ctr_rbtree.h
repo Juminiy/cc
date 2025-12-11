@@ -93,9 +93,9 @@ typedef struct rb_tree {
 	} while(0)
 #define __update_cnt(_nd, _inc) \
 	do { _nd->_cnt += _inc; _nd->_size += _inc;} while(0)
-#define __free_data(tr, _dt) \
+#define __tr_free_data(tr, _dt) \
 	do { if(tr->_elem_free) {tr->_elem_free(_dt);} } while(0)
-#define __merge_data(tr, _dst, _src) \
+#define __tr_merge_data(tr, _dst, _src) \
 	do { if(tr->_elem_merge) { _dst = tr->_elem_merge(_dst, _src); } } while(0)
 #define __child_(_nd, _dir) ((_dir)==RB_NODE_DIR_LEFT?_nd->_left:_nd->_right)
 #define __rotate_(_nd, _dir) \

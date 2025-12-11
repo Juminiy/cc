@@ -61,7 +61,7 @@ typedef struct elem_t {
 // _e0 > _e1: any val>0
 typedef int(*elem_t_cmp)(elem_t _e0, elem_t _e1);
 typedef void(*elem_t_free)(elem_t _e0);
-typedef elem_t(*elem_t_merge)(elem_t _e0, elem_t _e1);
+typedef elem_t(*elem_t_merge)(elem_t _dest, elem_t _src);
 
 static inline int __elem_cmp_int(elem_t _e0, elem_t _e1) {
 	return get_elem_i64(_e0) - get_elem_i64(_e1);

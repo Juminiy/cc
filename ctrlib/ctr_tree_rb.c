@@ -36,7 +36,7 @@ rb_node* rbNodeInsertNode(rb_node* _rt, _node_value *_val, rb_tree *_tr) {
 		_cur_parent = _cur;
 		int cmp_res = _tr->_elem_cmp(_cur->_data, _val->src);
 		if(cmp_res==0){
-			__free_data(_tr, _cur->_data);
+			__tr_free_data(_tr, _cur->_data);
 			_cur->_data = _val->src;
 			_val->retcode = RB_NODE_INSERT_REPLACED;
 			return _rt;

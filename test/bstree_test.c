@@ -63,7 +63,7 @@ void print_blist(blist *bl) {
     printf("LIS:blist=[ ");
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
-		rb_node *rbn = bNodeData(bn).ptr;
+		rb_node *rbn = get_elem_ptr(bn->_data); 
 		printf("%2ld ", get_elem_i64(rbn->_data));
 	}
     printf("]\n");
@@ -234,7 +234,7 @@ void check_order(blist *bl){
     biter *bi = makeBIter(bl, BLIST_ITER_FORWARD);
     int64_t prev_val = -1;
     for(bnode *bn = bListNext(bi); bn; bn = bListNext(bi)){
-		rb_node *rbn = bNodeData(bn).ptr;   
+		rb_node *rbn = get_elem_ptr(bn->_data); 
         int64_t _cur_i64 = get_elem_i64(rbn->_data);
         if(_cur_i64<prev_val){
             printf("[ERROR]: %ld < %ld\n", _cur_i64, prev_val);
