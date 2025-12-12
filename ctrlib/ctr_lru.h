@@ -23,7 +23,7 @@ typedef struct lru_t {
     blist   *_bl;   // blist<_data>
 
     size_t _cap;    // max accommodation
-    elem_t_cmp _cmp;
+    elem_t_cmp _cmp; // raw data cmp
     elem_t_free _free;
     elem_t_merge _merge;
 } lru_t;

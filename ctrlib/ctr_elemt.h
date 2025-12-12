@@ -62,6 +62,7 @@ typedef struct elem_t {
 typedef int(*elem_t_cmp)(elem_t _e0, elem_t _e1);
 typedef void(*elem_t_free)(elem_t _e0);
 typedef elem_t(*elem_t_merge)(elem_t _dest, elem_t _src);
+typedef void(*elem_t_swap)(elem_t *_e0, elem_t *_e1);
 
 static inline int __elem_cmp_int(elem_t _e0, elem_t _e1) {
 	return get_elem_i64(_e0) - get_elem_i64(_e1);
@@ -69,6 +70,20 @@ static inline int __elem_cmp_int(elem_t _e0, elem_t _e1) {
 
 static inline int __elem_cmp_uint(elem_t _e0, elem_t _e1) {
 	return get_elem_u64(_e0) - get_elem_u64(_e1);
+}
+
+static inline int __elem_cmp_double(elem_t _e0, elem_t _e1) {
+	return get_elem_f64(_e0) - get_elem_f64(_e1);
+}
+
+static inline int __elem_cmp_none(elem_t _e0, elem_t _e1) {
+    return 0;
+}
+
+static void __elem_swap_normalized(elem_t *_e0, elem_t *_e1) {
+    elem_t _em = *_e0;
+    *_e0 = *_e1;
+    *_e1 = _em;
 }
 
 #define ELEM_OPT_NONE		  (0)	 // 00000000

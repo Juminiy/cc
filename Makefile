@@ -1,5 +1,5 @@
-optargs=-Wunused-result -O2
-debugargs=-g -O0 -lm
+optargs=-Wunused-result -O2 -std=c99
+debugargs=-g -O0 -lm -std=c99 -DIDEBUG
 memsant=-fsanitize=address
 cplargs=$(debugargs)
 
@@ -7,16 +7,16 @@ VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test
 vpath %.o
 
 %.o: %.c
-	$(CC) -std=c99 -c -o $@ $< $(cplargs)
+	$(CC) -c -o $@ $< $(cplargs)
 
 %.d: %.c
-	$(CC) -std=c99 -o $@ $^ $(cplargs)
+	$(CC) -o $@ $^ $(cplargs)
 
 %.d: %.cpp
 	g++ -std=c++11 -o $@ $^
 
 %.d: %.o
-	$(CC) -std=c99 -o $@ $^ $(cplargs)
+	$(CC) -o $@ $^ $(cplargs)
 
 all: tcp_srv.d tcp_cli.d
 
@@ -41,6 +41,7 @@ ctr_barray.o: ctrlib/ctr_barray.c
 ctr_bheap.o: ctrlib/ctr_bheap.c
 ctr_skiplist.o: ctrlib/ctr_skiplist.c
 ctr_lru.o: ctrlib/ctr_lru.c
+ctr_lfu.o: ctrlib/ctr_lfu.c 
 strstrpair.o: test/strstrpair.c
 ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o ctr_barray.o ctr_bheap.o
 	ar rcs $@ $^
@@ -73,6 +74,7 @@ barray_test.d: test/barray_test.c ctr_seq.a
 bheap_test.d: test/bheap_test.c ctr_seq.a
 skiplist_test.d: test/skiplist_test.c ctr_skiplist.o ctr_tree.a ctr_seq.a
 lru_test.d: test/lru_test.c ctr_lru.o ctr_tree.a ctr_seq.a
+lfu_test.d: test/lfu_test.c ctr_lfu.o ctr_tree.a ctr_seq.a
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

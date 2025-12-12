@@ -14,6 +14,7 @@ typedef struct lfu_node {
 
 typedef struct lfu_map {
 	rb_tree *_tr; // rb_tree<lfu_node*>
+	elem_t_cmp _cmp; // raw data cmp
 } lfu_map;
 
 typedef struct lfu_t {
@@ -22,12 +23,12 @@ typedef struct lfu_t {
 	size_t _ts;  // lastes clock
 	size_t _cap; // max accommodation
 
-	elem_t_cmp _cmp;
-  elem_t_free _free;
-  elem_t_merge _merge;
+	elem_t_cmp _cmp; // raw data cmp
+  	elem_t_free _free;
+  	elem_t_merge _merge;
 } lfu_t;
 
-#define lfuTSize(_t) (__tree_size(_t->_tr))
+#define lfuTSize(_t) (bHeapLen(_t->_hp))
 #define lfuTCap(_t) (_t->_cap)
 #define lfuTSetElemFree(_t, _f) \
     do { _t->_free=_f; } while(0)
@@ -44,13 +45,14 @@ elem_t lfuTGet(lfu_t *_t, elem_t _dt);
 void lfuTPut(lfu_t *_t, elem_t _dt);
 
 // internal api
-lfu_node* makeLFUNode(lfu_t *_t);
-void freeLFUNode(lfu_node *_nd);
+lfu_node* makeLFUNode(elem_t _dt, lfu_t *_t);
+void freeLFUNode(lfu_node *_nd, lfu_t *_t);
 
 lfu_map makeLFUMap(elem_t_cmp _cmp);
 void freeLFUMap(lfu_map _map);
 void lfuMapPut(lfu_map _map, lfu_node *_nd);
 void lfuMapDel(lfu_map _map, elem_t _dt);
-lfu_node lfuMapGetNode(lfu_map _map, elem_t _dt);
+lfu_node* lfuMapGetNode(lfu_map _map, elem_t _dt);
+blist* lfuT2List(lfu_t *_t);
 
 #endif
