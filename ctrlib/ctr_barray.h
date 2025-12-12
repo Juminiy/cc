@@ -37,6 +37,6 @@ void bArrayIter(barray _ba, bArrayIterFunc _fn);
 
 size_t bArrayIndexOf(barray _ba, elem_t _dt, size_t _idx);
 barray bArrayDeleteValue(barray _ba, elem_t _dt, size_t _idx);
-void bArraySort(barray _ba);
+// void bArraySort(barray _ba);
 
 #endif

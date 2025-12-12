@@ -87,10 +87,6 @@ func (h *hp) Pop() any {
 	return x
 }
 
-func (h *hp) Top() any {
-	return (*h)[len(*h)-1]
-}
-
 type node struct {
 	Ts      int // low is upper
 	Refs    int // low is upper

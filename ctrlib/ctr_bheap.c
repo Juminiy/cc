@@ -102,13 +102,16 @@ elem_t bHeapAt(bheap _bh, size_t _idx) {
 
 bheap bHeapRemove(bheap _bh, size_t _idx) {
 	size_t _hsz = bHeapLen(_bh);
-	if(_hsz > 0 && _hsz-1!=_idx) {
-		__bheap_swap(_idx, _hsz-1);
-		if (!bHeapAdjustTop2Down(_bh, _idx, _hsz-1)){
-			bHeapAdjustDown2Top(_bh, _idx);
+	if(_hsz > 0 ) {
+		if (_hsz-1!=_idx){
+			__bheap_swap(_idx, _hsz-1);
+			if (!bHeapAdjustTop2Down(_bh, _idx, _hsz-1)){
+				bHeapAdjustDown2Top(_bh, _idx);
+			}
 		}
+		_bh._ll._siz--;
 	}
-	return bHeapPop(_bh);
+	return _bh;
 }
 
 bool bHeapCheck(bheap _bh) {

@@ -10,6 +10,8 @@ barray makeBArray(size_t _siz, size_t _cap) {
     _ba._arr = _ba._cap > 0 ? 
         (elem_t*)calloc(_ba._cap, sizeof(elem_t)) : NULL;
     _ba._cmp = NULL;
+    _ba._free = NULL;
+    _ba._merge = NULL;
     return _ba;
 }
 
@@ -143,13 +145,13 @@ barray bArrayDeleteValue(barray _ba, elem_t _dt, size_t _idx) {
     return _ba;
 }
 
-int __compar_fn_elem(const void *_e0, const void *_e1) {
-    elem_t *__e0 = (elem_t*)(_e0);
-    elem_t *__e1 = (elem_t*)(_e1);
-    // todo: lack of a parameter
-    return 0;
-}
+// can use elem_t<elem_t,_cmp> to make a new elem, but cost too much
+// int __compar_fn_elem(const void *_e0, const void *_e1) {
+//     elem_t *__e0 = (elem_t*)(_e0);
+//     elem_t *__e1 = (elem_t*)(_e1);
+//     return 0;
+// }
 
-void bArraySort(barray _ba) {
-    qsort(_ba._arr, _ba._siz, sizeof(elem_t), __compar_fn_elem);
-}
+// void bArraySort(barray _ba) {
+//     qsort(_ba._arr, _ba._siz, sizeof(elem_t), __compar_fn_elem);
+// }

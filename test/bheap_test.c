@@ -16,6 +16,28 @@ int elem_int_less(elem_t e0, elem_t e1) {
 	return -__elem_cmp_int(e0,e1);
 }
 
+void test_bheap_print(int idx) {
+	elem_t em;
+	bheap bh = makeBHeap(__elem_cmp_int, NULL);
+	int arr[14]={-1, 9, 6, 4, 3, 2, 5, 1, 18, 22, 3, 75, 99, -2};
+	for(int i=0;i<14;i++){
+		setup_elem_i64(em, arr[i]); bh = bHeapPush(bh, em);
+		assert(bHeapCheck(bh));
+	}
+
+	print_intarr(bh._ll);
+	bh = bHeapRemove(bh, idx); assert(bHeapCheck(bh)); 
+	print_intarr(bh._ll);
+
+	// while(!bHeapEmpty(bh)){
+	// 	printf("%ld ", get_elem_i64(bHeapTop(bh)));
+	// 	bh = bHeapPop(bh);
+	// 	assert(bHeapCheck(bh));
+	// }
+	printf("\n");
+	freeBHeap(bh);
+}
+
 void test_bheap(int tot, int inc) {
 	elem_t em;
 	bheap bh = makeBHeap(inc > 0 ?__elem_cmp_int:elem_int_less, NULL);
@@ -64,7 +86,9 @@ int main(int argc, char **argv){
 		inc = strtol(argv[2], NULL, 10);
 	}
 
-	test_bheap(tot, inc);
+	// test_bheap(tot, inc);
+	for(int i=0;i<14;i++)
+		test_bheap_print(i);
 
 	return 0;
 }
