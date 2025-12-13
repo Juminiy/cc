@@ -100,12 +100,21 @@ lfu_map makeLFUMap(elem_t_cmp _cmp) {
     lfu_map _map;
     _map._tr = makeRBTree(__elem_cmp_lfunode_raw);
     _map._cmp = _cmp;
+    _map._free = NULL;
     setRBTreeNodeType(_map._tr, TREE_NODE_TYPE_AVL);
-    // setRBTreeDataFree(_map._tr, );
+    // setRBTreeDataFree(_map._tr, __elem_free_lfunode);
     return _map;
 }
 
 void freeLFUMap(lfu_map _map) {
+    barray nds = rbTree2Array(_map._tr);
+    for(size_t i=0;i<bArrayLen(nds);i++) {
+        lfu_node *nd=(lfu_node*)get_elem_ptr(bArrayAt(nds, i));
+        if(_map._free)
+            _map._free(nd->_data);
+        free(nd);
+    }
+    freeBArray(nds);
     freeRBTree(_map._tr);
 }
 

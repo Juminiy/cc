@@ -15,6 +15,7 @@ typedef struct lfu_node {
 typedef struct lfu_map {
 	rb_tree *_tr; // rb_tree<lfu_node*>
 	elem_t_cmp _cmp; // raw data cmp
+	elem_t_free _free; // raw data free
 } lfu_map;
 
 typedef struct lfu_t {
@@ -31,7 +32,7 @@ typedef struct lfu_t {
 #define lfuTSize(_t) (bHeapLen(_t->_hp))
 #define lfuTCap(_t) (_t->_cap)
 #define lfuTSetElemFree(_t, _f) \
-    do { _t->_free=_f; } while(0)
+    do { _t->_free=_f; _t->_map._free=_f;} while(0)
 #define lfuTSetElemMerge(_t, _f) (_t->_merge=_f) 
 #define __lfut_free(_t, _dt) \
     do { if(_t->_free) { _t->_free(_dt); } } while(0)
