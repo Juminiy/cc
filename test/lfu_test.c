@@ -24,6 +24,32 @@ void freeii(elem_t e){
     free(iikv);
 }
 
+blist* lfuT2List(lfu_t *_t) {
+    // raw data cmp, nothing counts!!!
+    // return rbTreeMidTravData(_t->_map._tr); 
+    
+    // heap data cmp, really counts
+    blist *bl=makeBList();
+    for(size_t i=0;i<bHeapLen(_t->_hp);i++){
+        bListAddTail(bl, bHeapAt(_t->_hp, i));
+    }
+    return bl;
+}
+
+void __debug_lfuTNodesDetail(lfu_t *_t) {
+    blist *ls = lfuT2List(_t);
+    biter *bi = makeBIter(ls, BLIST_ITER_FORWARD);
+    for(bnode *bn=bListNext(bi);
+        bn;
+        bn=bListNext(bi)
+    ) {
+        lfu_node* lfun=(lfu_node*)get_elem_ptr(bn->_data);
+        DEBUGF("(refs=%zu,ts=%zu,idx=%zu,<%p>) ",lfun->_refs,lfun->_ts,lfun->_idx, get_elem_ptr(lfun->_data));   
+    }
+    freeBIter(bi);
+    freeBList(ls);
+}
+
 #define put_i(_ikey, _ival) \
     do { \
         elem_t em; \

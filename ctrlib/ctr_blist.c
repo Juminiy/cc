@@ -29,6 +29,8 @@ blist *makeBList() {
     _bl->_tail = NULL;
     _bl->_size = 0;
     _bl->_elem_cmp = NULL;
+    _bl->_elem_free = NULL;
+    _bl->_elem_merge = NULL;
     return _bl;
 }
 

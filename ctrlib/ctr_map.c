@@ -10,13 +10,11 @@ strstrpair* makestrstrpair(const char *_key, const char *_val) {
     strstrpair *_pair = malloc(sizeof(strstrpair));
     _pair->_key = __strdup(_key);
     _pair->_val = __strdup(_val);
-    // DEBUGF("alloc === pair<key,val>=(%p<%s,%s>)", _pair, _pair->_key, _pair->_val);
     return _pair;
 }
 
 void freestrstrpair(elem_t _e) {
     strstrpair *_pair = (strstrpair*)get_elem_ptr(_e);
-    // DEBUGF("freed === pair<key,val>=(%p<%s,%s>)", _pair, _pair->_key, _pair->_val);
     free(_pair->_key);
     free(_pair->_val);   
     free(_pair);

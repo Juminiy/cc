@@ -53,6 +53,5 @@ void freeLFUMap(lfu_map _map);
 void lfuMapPut(lfu_map _map, lfu_node *_nd);
 void lfuMapDel(lfu_map _map, elem_t _dt);
 lfu_node* lfuMapGetNode(lfu_map _map, elem_t _dt);
-blist* lfuT2List(lfu_t *_t);
 
 #endif

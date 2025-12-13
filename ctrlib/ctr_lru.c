@@ -62,7 +62,6 @@ _bnode_wrap* make_bnode_wrap(bnode_map _map, bnode *_bn) {
 int __elem_bnode_wrap_cmp(elem_t e0, elem_t e1) {
     _bnode_wrap *w0 = (_bnode_wrap*)get_elem_ptr(e0);
     _bnode_wrap *w1 = (_bnode_wrap*)get_elem_ptr(e1);
-    // DEBUGF("cmp=%p, e0=%p, e1=%p", w0->_cmp, w0->_nd ,w1->_nd);
     return w0->_cmp(w0->_nd->_data, w1->_nd->_data);
 }
 
