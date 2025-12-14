@@ -10,28 +10,28 @@ barray makeBArray(size_t _siz, size_t _cap) {
     _ba._arr = _ba._cap > 0 ? 
         (elem_t*)calloc(_ba._cap, sizeof(elem_t)) : NULL;
     _ba._cmp = NULL;
-    _ba._free = NULL;
-    _ba._merge = NULL;
     return _ba;
 }
 
+// @attention 
+// freeBArray will not free each _data in the array container
 void freeBArray(barray _ba) {
     free(_ba._arr);
 }
 
 #define __index(_ba, _idx) ((_ba._siz+_idx)%(_ba._siz))
 
-// _siz=10
-// _idx=0 -> 0; _idx=-10 -> 0
-// _idx=1 -> 1; _idx=-9 -> 1
-// ...
-// _idx=8 -> 8; _idx=-2 -> 8
-// _idx=9 -> 9; _idx=-1 -> 9
-elem_t bArrayAt(barray _ba, size_t _idx) {
+// @attention support both positive index and negative index
+// @example [0] and [-_siz] refer to [0]
+// @example [_siz-1] and [-1] refer to [_siz-1]
+elem_t bArrayAt(barray _ba, ssize_t _idx) {
     return _ba._arr[__index(_ba,_idx)];
 }
 
-void bArraySet(barray _ba, size_t _idx, elem_t _dt) {
+// @attention support both positive index and negative index
+// @example [0] and [-_siz] refer to [0]
+// @example [_siz-1] and [-1] refer to [_siz-1]
+void bArraySet(barray _ba, ssize_t _idx, elem_t _dt) {
     _ba._arr[__index(_ba,_idx)] = _dt;
 }
 
@@ -63,6 +63,9 @@ void bArraySet(barray _ba, size_t _idx, elem_t _dt) {
         _ba._cap = newcap; \
     }while(0)
 
+// @attention
+// ba = bArrayAppend(ba, em); ✅
+// bArrayAppend(ba, em); ❌
 barray bArrayAppend(barray _ba, elem_t _dt) {
     size_t _pos = _ba._siz;
     __barray_grow(_ba, 1);
@@ -70,26 +73,35 @@ barray bArrayAppend(barray _ba, elem_t _dt) {
     return _ba;
 }
 
-barray bArrayInsert(barray _ba, size_t _idx, elem_t _dt) {
-    size_t _pos = _ba._siz;
+// @attention
+// ba = bArrayInsert(ba, idx, em); ✅
+// bArrayInsert(ba, idx, em); ❌
+barray bArrayInsert(barray _ba, ssize_t _idx, elem_t _dt) {
+    ssize_t _pos = _ba._siz;
     __barray_grow(_ba, 1);
-    size_t _ati = __index(_ba, _idx);
-    for(size_t _i=_pos;_i>_ati;_i--){
+    ssize_t _ati = __index(_ba, _idx);
+    for(ssize_t _i=_pos;_i>_ati;_i--){
         _ba._arr[_i] = _ba._arr[_i-1];
     }
     _ba._arr[_ati] = _dt;
     return _ba;
 }
 
-barray bArrayDeleteIndex(barray _ba, size_t _idx) {
-    size_t _ati = __index(_ba, _idx);
-    for(size_t _i=_ati;_i<_ba._siz-1;_i++){
+// @attention
+// ba = bArrayDeleteIndex(ba, idx); ✅
+// bArrayDeleteIndex(ba, idx); ❌
+barray bArrayDeleteIndex(barray _ba, ssize_t _idx) {
+    ssize_t _ati = __index(_ba, _idx);
+    for(ssize_t _i=_ati;_i<_ba._siz-1;_i++){
         _ba._arr[_i] = _ba._arr[_i+1];
     }   
     _ba._siz--;
     return _ba;
 }
 
+// @attention
+// ba = bArrayExtend(ba, ba2); ✅
+// bArrayExtend(ba, ba2); ❌
 barray bArrayExtend(barray _dst, barray _src) {
     size_t oldsiz = _dst._siz;
     __barray_grow(_dst, _src._siz);
@@ -128,8 +140,8 @@ void bArrayIter(barray _ba, bArrayIterFunc _fn) {
 
 // _idx >= 0, forward
 // _idx < 0, backward
-size_t bArrayIndexOf(barray _ba, elem_t _dt, size_t _idx) {
-    for(size_t _iat = __index(_ba, _idx);
+size_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx) {
+    for(ssize_t _iat = __index(_ba, _idx);
         _idx>=0?(_iat<_ba._siz):(_iat>=0);
         _iat += (_idx>=0? +1 : -1)    
     ) {
@@ -139,19 +151,3 @@ size_t bArrayIndexOf(barray _ba, elem_t _dt, size_t _idx) {
     }
     return -1;
 }
-
-barray bArrayDeleteValue(barray _ba, elem_t _dt, size_t _idx) {
-    // todo: 
-    return _ba;
-}
-
-// can use elem_t<elem_t,_cmp> to make a new elem, but cost too much
-// int __compar_fn_elem(const void *_e0, const void *_e1) {
-//     elem_t *__e0 = (elem_t*)(_e0);
-//     elem_t *__e1 = (elem_t*)(_e1);
-//     return 0;
-// }
-
-// void bArraySort(barray _ba) {
-//     qsort(_ba._arr, _ba._siz, sizeof(elem_t), __compar_fn_elem);
-// }

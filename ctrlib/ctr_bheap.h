@@ -4,7 +4,7 @@
 #include "ctr_barray.h"
 
 // bheap use value receiver
-// currently BUGs
+// functions: `bHeapPush`, `bHeapPop`, `bHeapRemove` must receive to itself
 typedef struct bheap {
 	barray _ll;
 
@@ -23,6 +23,9 @@ bheap bHeapPop(bheap _bh);
 bool bHeapEmpty(bheap _bh);
 elem_t bHeapAt(bheap _bh, size_t _idx);
 bheap bHeapRemove(bheap _bh, size_t _idx);
+
+#ifdef IDEBUG
 bool bHeapCheck(bheap _bh);
+#endif
 
 #endif

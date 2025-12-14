@@ -127,7 +127,6 @@ void test_avl_tree(int *arr, int arr_sz) {
 }
 
 void test_avl_sorted(int tot_cnt) {
-    srand(time(NULL));
     elem_t _em;
     rb_tree *rb = makeRBTree(elem_int_cmp);
     setRBTreeNodeType(rb, TREE_TYPE);
@@ -319,6 +318,7 @@ void test_rnk() {
 }
 
 int main(int argc, char **argv) {
+    srand(time(NULL));
     int t_sz = 10;
     if(argc>=2){
         t_sz = strtol(argv[1], NULL, 10);

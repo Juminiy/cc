@@ -230,6 +230,7 @@ bnode *bListInsertBefore(blist *_bl, bnode *_bn, bnode *_next) {
     bnode *_nextprev = _next->_prev;
     __link_bnode(_nextprev, _bn);
     __link_bnode(_bn, _next);
+    _bl->_size++;
     return _bn;
 }
 
@@ -240,6 +241,7 @@ bnode *bListInsertAfter(blist *_bl, bnode *_bn, bnode *_prev) {
     bnode *_prevnext = _prev->_next;
     __link_bnode(_prev, _bn);
     __link_bnode(_bn, _prevnext);
+    _bl->_size++;
     return _bn;
 }
 

@@ -4,6 +4,12 @@
 #include <time.h>
 #include <assert.h>
 
+void assertBHeapCheck(bheap bh) {
+	#ifdef IDEBUG
+	assert(bHeapCheck(bh));
+	#endif
+}
+
 void print_intarr(barray arr) {
     printf("[ ");
     for(size_t i=0;i<bArrayLen(arr);i++){
@@ -22,17 +28,17 @@ void test_bheap_print(int idx) {
 	int arr[14]={-1, 9, 6, 4, 3, 2, 5, 1, 18, 22, 3, 75, 99, -2};
 	for(int i=0;i<14;i++){
 		setup_elem_i64(em, arr[i]); bh = bHeapPush(bh, em);
-		assert(bHeapCheck(bh));
+		assertBHeapCheck(bh);
 	}
 
 	print_intarr(bh._ll);
-	bh = bHeapRemove(bh, idx); assert(bHeapCheck(bh)); 
+	bh = bHeapRemove(bh, idx); assertBHeapCheck(bh);
 	print_intarr(bh._ll);
 
 	// while(!bHeapEmpty(bh)){
 	// 	printf("%ld ", get_elem_i64(bHeapTop(bh)));
 	// 	bh = bHeapPop(bh);
-	// 	assert(bHeapCheck(bh));
+	// 	assertBHeapCheck(bh);
 	// }
 	printf("\n");
 	freeBHeap(bh);
@@ -44,7 +50,7 @@ void test_bheap(int tot, int inc) {
 	// int arr[14]={-1, 9, 6, 4, 3, 2, 5, 1, 18, 22, 3, 75, 99, -2};
 	for(int i=0;i<tot;i++){
 		setup_elem_i64(em, rand()); bh = bHeapPush(bh, em);
-		assert(bHeapCheck(bh));
+		assertBHeapCheck(bh);
 	}
 
 	int prev=inc>0?0x7fffffff:0x80000000 ,cnt=0;
@@ -59,7 +65,7 @@ void test_bheap(int tot, int inc) {
 		}
 		prev = cur;
 		bh = bHeapPop(bh);
-		assert(bHeapCheck(bh));
+		assertBHeapCheck(bh);
 	}
 
 	freeBHeap(bh);
@@ -74,6 +80,8 @@ void test_rm() {
 	}
 
 	bh = bHeapRemove(bh, 5);
+
+	freeBHeap(bh);
 }	
 
 int main(int argc, char **argv){
@@ -86,7 +94,8 @@ int main(int argc, char **argv){
 		inc = strtol(argv[2], NULL, 10);
 	}
 
-	// test_bheap(tot, inc);
+	test_rm();
+	test_bheap(tot, inc);
 	for(int i=0;i<14;i++)
 		test_bheap_print(i);
 

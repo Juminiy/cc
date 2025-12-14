@@ -44,6 +44,8 @@ void bHeapAdjustDown2Top(bheap _bh, size_t _idx) {
 	}
 }
 
+// bh = bHeapPush(bh, em); ✅
+// bHeapPush(bh, em); ❌
 bheap bHeapPush(bheap _bh, elem_t _em) {
 	_bh._ll = bArrayAppend(_bh._ll, _em);
 	bHeapAdjustDown2Top(_bh, bHeapLen(_bh)-1);
@@ -78,6 +80,8 @@ bool bHeapAdjustTop2Down(bheap _bh, size_t _idx, size_t _n) {
 	return _p > _idx;
 }
 
+// bh = bHeapPop(bh); ✅
+// bHeapPop(bh); ❌
 bheap bHeapPop(bheap _bh) {
 	size_t _hsz = bHeapLen(_bh);
 	if(_hsz > 0) {
@@ -100,6 +104,8 @@ elem_t bHeapAt(bheap _bh, size_t _idx) {
 	return em;
 }
 
+// bh = bHeapRemove(bh, idx); ✅
+// bHeapRemove(bh, idx); ❌
 bheap bHeapRemove(bheap _bh, size_t _idx) {
 	size_t _hsz = bHeapLen(_bh);
 	if(_hsz > 0 ) {
@@ -114,6 +120,7 @@ bheap bHeapRemove(bheap _bh, size_t _idx) {
 	return _bh;
 }
 
+#ifdef IDEBUG
 bool bHeapCheck(bheap _bh) {
 	for(size_t p=0;p<bHeapLen(_bh);p++){
 		size_t pl = (p<<1)+1, pr = (p<<1)+2;
@@ -130,3 +137,4 @@ bool bHeapCheck(bheap _bh) {
 	}
 	return true;
 }
+#endif

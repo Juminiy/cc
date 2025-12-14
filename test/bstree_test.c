@@ -247,7 +247,6 @@ void check_order(blist *bl){
 }
 
 void test_bstree_delete(int tot_sz) {
-	srand(time(NULL));
 	elem_t elem_val; 
 	rb_tree *rb = makeRBTree(elem_int_cmp);
 	setRBTreeNodeType(rb, TREE_NODE_TYPE_BS);
@@ -276,6 +275,7 @@ void test_del_trav_mem_bug() {
 }
 
 int main(int argc, char **argv) {	
+	srand(time(NULL));
 	int tot_sz = 10;
 	if(argc>=2){
 		tot_sz = strtol(argv[1], NULL, 10);

@@ -3,7 +3,6 @@
 #define freekv(kvp) do { free(kvp.k), free(kvp.v); } while(0)
 
 char* rand_str(size_t _sz) {
-    // srand(time(NULL));
     char *_ss = (char*)malloc(sizeof(char)*(_sz+1));
     for(size_t _i=0;_i<_sz;_i++)
         _ss[_i] = '0' + rand()%72;
