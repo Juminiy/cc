@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include <sys/queue.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 typedef struct ll_i32 {
     int val;

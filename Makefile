@@ -1,6 +1,5 @@
 optargs=-Wunused-result -O2 -std=c99
-debugargs=-g -O0 -lm -std=c99 -DIDEBUG
-memsant=-fsanitize=address
+debugargs=-g -O0 -std=c99 -DIDEBUG
 cplargs=$(debugargs)
 
 VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test
@@ -14,9 +13,6 @@ vpath %.o
 
 %.d: %.cpp
 	g++ -std=c++11 -o $@ $^
-
-%.d: %.o
-	$(CC) -o $@ $^ $(cplargs)
 
 all: tcp_srv.d tcp_cli.d
 
@@ -63,8 +59,11 @@ net_test.d: test/net_test.c net_util.o ctr_blist.o
 blist_test.d: test/blist_test.c ctr_blist.o
 bdeque_test.d: test/bdeque_test.c ctr_seq.a
 bstree_test.d: test/bstree_test.c ctr_tree.a ctr_seq.a 
+	$(CC) -o $@ $^ $(cplargs) -lm
 rbtree_test.d: test/rbtree_test.c ctr_tree.a ctr_seq.a
+	$(CC) -o $@ $^ $(cplargs) -lm
 avltree_test.d: test/avltree_test.c ctr_tree.a ctr_seq.a 
+	$(CC) -o $@ $^ $(cplargs) -lm
 map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
 map_std_test.d: test/map_std_test.cpp strstrpair.o
 map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a

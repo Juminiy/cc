@@ -90,4 +90,5 @@ int optfdset_minmax_reset(optfdset *_fdset) {
             optfdset_minmax_set(_fdset, _fdset->arr[idx]);
         }
     }
+    return FD_OPT_OK;
 }

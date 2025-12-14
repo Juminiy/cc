@@ -170,7 +170,7 @@ void test_array_insert_delete(int n) {
     barray ba = makeBArray(0,0);
     elem_t em; 
     for(int i=0;i<n;i++){
-        setup_elem_ptr(em, i);
+        setup_elem_i64(em, i);
         ba = bArrayInsert(ba, 0, em);
         // 2 1 0 1 2 0
         // ba = bArrayInsert(ba, bArrayLen(ba)-1, em);
@@ -184,7 +184,7 @@ void test_array_insert_delete(int n) {
 
     barray ba2 = makeBArray(0,0);
     for(int i=0;i<n;i++){
-        setup_elem_ptr(em, i);
+        setup_elem_i64(em, i);
         ba2 = bArrayAppend(ba2, em);
     }
     ba = bArrayExtend(ba, ba2);

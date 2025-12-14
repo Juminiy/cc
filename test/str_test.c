@@ -6,7 +6,11 @@
 
 size_t __i_strlen (const char *__s) {
     size_t _l=0;
-    for(char *_p=__s;_p&&(*_p!='\0');_l++,_p++);
+    // for(char *_p=__s;_p&&(*_p!='\0');_l++,_p++);
+    // return _l;
+    while(__s && __s[_l]!='\0') {
+        _l++;
+    }
     return _l;
 }
 

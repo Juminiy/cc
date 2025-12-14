@@ -206,6 +206,36 @@ void test_range() {
     freeBList(l1);
 }
 
+void test_linka(int i, int j, bool _after) {
+    elem_t em;
+    printf("tot=%d, insert %d, %s %d\n", j, j+i, _after?"after":"before",i);
+    blist *bl = makeBList();
+    bListSetElemCmp(bl, __elem_cmp_int);
+
+    range_add_blist(bl, 0, j);
+    print_blist(bl);
+
+    setup_elem_i64(em, i+j); bnode *bn=makeBNode(NULL,em,NULL); 
+    if (_after)
+        bListInsertAfter(bl, bn, bListIndex(bl, i));
+    else
+        bListInsertBefore(bl, bn, bListIndex(bl, i));
+    print_blist(bl);
+
+    printf("-----------\n");
+
+    freeBList(bl);
+}
+
+void test_link() {
+    for(int j=1;j<=3;j++){
+        for(int i=0;i<j;i++){
+            test_linka(i, j, true);
+            test_linka(i, j, false);
+        }
+    }
+}
+
 int main() {
 
     test_tail();
@@ -215,6 +245,8 @@ int main() {
 
     test_search_index();
     test_range();
+
+    test_link();
 
     return 0;
 }

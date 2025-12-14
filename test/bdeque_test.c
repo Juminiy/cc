@@ -8,15 +8,15 @@ void test_bstack() {
     bstack bstk=makeBStack();
 
     setup_elem_t(elem_val,1,i64,10); bStackPush(bstk,elem_val);
-    elem_val = bStackTop(bstk); printf("top=(%ld,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackTop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
     
     setup_elem_t(elem_val,1,i64,12); bStackPush(bstk,elem_val);
-    elem_val = bStackTop(bstk); printf("top=(%ld,%ld)\n", elem_val.tag, elem_val.uni.i64);
-    elem_val = bStackTop(bstk); printf("top=(%ld,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackTop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackTop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
 
-    elem_val = bStackPop(bstk); printf("top=(%ld,%ld)\n", elem_val.tag, elem_val.uni.i64);
-    elem_val = bStackPop(bstk); printf("top=(%ld,%ld)\n", elem_val.tag, elem_val.uni.i64);
-    elem_val = bStackPop(bstk); printf("top=(%ld,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackPop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackPop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackPop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
 
     freeBStack(bstk);
 }
