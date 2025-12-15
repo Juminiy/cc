@@ -35,6 +35,6 @@ barray bArraySlice(barray _ba, size_t _lrg, size_t _rrg, size_t _cap);
 typedef bool(*bArrayIterFunc)(size_t _idx, elem_t _dt);
 void bArrayIter(barray _ba, bArrayIterFunc _fn);
 
-size_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx);
+ssize_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx);
 
 #endif

@@ -140,7 +140,7 @@ void bArrayIter(barray _ba, bArrayIterFunc _fn) {
 
 // _idx >= 0, forward
 // _idx < 0, backward
-size_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx) {
+ssize_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx) {
     for(ssize_t _iat = __index(_ba, _idx);
         _idx>=0?(_iat<_ba._siz):(_iat>=0);
         _iat += (_idx>=0? +1 : -1)    

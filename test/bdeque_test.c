@@ -4,19 +4,19 @@
 #include <stdio.h>
 
 void test_bstack() {
-    elem_t elem_val = {.tag=1};
+    elem_t elem_val = {.tag=ELEM_T_INVALID};
     bstack bstk=makeBStack();
 
     setup_elem_t(elem_val,1,i64,10); bStackPush(bstk,elem_val);
-    elem_val = bStackTop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackTop(bstk); printf("top=(%d,%d)\n", valid_elem_t(elem_val), cast_elem_typ(elem_val, int));
     
     setup_elem_t(elem_val,1,i64,12); bStackPush(bstk,elem_val);
-    elem_val = bStackTop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
-    elem_val = bStackTop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackTop(bstk); printf("top=(%d,%d)\n", valid_elem_t(elem_val), cast_elem_typ(elem_val, int));
+    elem_val = bStackTop(bstk); printf("top=(%d,%d)\n", valid_elem_t(elem_val), cast_elem_typ(elem_val, int));
 
-    elem_val = bStackPop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
-    elem_val = bStackPop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
-    elem_val = bStackPop(bstk); printf("top=(%llu,%ld)\n", elem_val.tag, elem_val.uni.i64);
+    elem_val = bStackPop(bstk); printf("top=(%d,%d)\n", valid_elem_t(elem_val), cast_elem_typ(elem_val, int));
+    elem_val = bStackPop(bstk); printf("top=(%d,%d)\n", valid_elem_t(elem_val), cast_elem_typ(elem_val, int));
+    elem_val = bStackPop(bstk); printf("top=(%d,%d)\n", valid_elem_t(elem_val), cast_elem_typ(elem_val, int));
 
     freeBStack(bstk);
 }

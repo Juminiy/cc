@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #define DEBUGF(__content_template__, ...) \
     do { fprintf(stdout, "[DEBUG] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
@@ -24,13 +25,13 @@
 		__auto_type _r=(r); \
 		_l<=_x && _x<=_r; })
 #else
-	static inline size_t __max_(size_t _a, size_t _b){
+	static inline int64_t __max_(int64_t _a, int64_t _b){
 		return _a > _b ? _a : _b;
 	}
-	static inline size_t __min_(size_t _a, size_t _b){
+	static inline int64_t __min_(int64_t _a, int64_t _b){
 		return _a < _b ? _a : _b;
 	}
-	static inline bool __in_range_(size_t _l, size_t _x, size_t _r) {
+	static inline bool __in_range_(int64_t _l, int64_t _x, int64_t _r) {
 		return _l <= _x && _x <= _r;
 	}
 #endif

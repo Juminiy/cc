@@ -140,7 +140,7 @@ void test_array_index(int n) {
     for(int i=-1;i>=-n;i--){
         elem_t _iem = bArrayAt(ba, i);
         elem_t iem = bArrayAt(ba, bArrayLen(ba)+i); 
-        printf("at:[%d]: %ld; at:[%d]: %ld\n", 
+        printf("at:[%d]: %ld; at:[%zu]: %ld\n", 
             i, get_elem_i64(_iem), 
             bArrayLen(ba)+i, get_elem_i64(iem)
         );
@@ -154,7 +154,7 @@ void test_array_index(int n) {
     for(int i=-1;i>=-n;i--){
         elem_t _iem = bArrayAt(ba, i);
         elem_t iem = bArrayAt(ba, bArrayLen(ba)+i); 
-        printf("at:[%d]: %ld; at:[%d]: %ld\n", 
+        printf("at:[%d]: %ld; at:[%zu]: %ld\n", 
             i, get_elem_i64(_iem), 
             bArrayLen(ba)+i, get_elem_i64(iem)
         );

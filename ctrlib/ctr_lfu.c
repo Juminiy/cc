@@ -44,7 +44,7 @@ void freeLFUT(lfu_t *_t) {
 elem_t lfuTGet(lfu_t *_t, elem_t _dt) {
     _t->_ts++;
 
-    elem_t em = {.tag=ELEM_T_INVALID};
+    elem_t em={.tag=ELEM_T_INVALID};
     lfu_node *nd = lfuMapGetNode(_t->_map, _dt);
     if(nd) {
         _t->_hp = bHeapRemove(_t->_hp, nd->_idx);
@@ -119,22 +119,19 @@ void freeLFUMap(lfu_map _map) {
 }
 
 void lfuMapPut(lfu_map _map, lfu_node *_nd) {
-    elem_t em; 
-    setup_elem_ptr(em, _nd);
+    elem_t em; setup_elem_ptr(em, _nd);
     rbTreeInsertData(_map._tr, em);
 }
 
 void lfuMapDel(lfu_map _map, elem_t _dt) {
-    elem_t em;
     lfu_node nd={._cmp=_map._cmp,._data=_dt};
-    setup_elem_ptr(em, &nd);
+    elem_t em; setup_elem_ptr(em, &nd);
     rbTreeDeleteData(_map._tr, em);
 }
 
 lfu_node* lfuMapGetNode(lfu_map _map, elem_t _dt) {
-    elem_t em;
     lfu_node nd={._cmp=_map._cmp,._data=_dt};
-    setup_elem_ptr(em, &nd);
+    elem_t em; setup_elem_ptr(em, &nd);
     em = rbTreeGetData(_map._tr, em);
     if(valid_elem_t(em)) {
         return (lfu_node*)get_elem_ptr(em);

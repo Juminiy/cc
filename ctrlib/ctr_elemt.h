@@ -8,20 +8,22 @@
 
 #include "ctr_util.h"
 
+// arch/os: x86_64 GNU/Linux 
+// glibc:   ldd (Ubuntu GLIBC 2.35-0ubuntu3.11) 2.35
 typedef union elem_uni {
     // 1B: bool, unsigned char
     // 2B: unsigned short, unsigned short int
     // 4B: unsigned, unsigned int
-    // 4B: unsigned long, unsigned long int
+    // 8B: unsigned long, unsigned long int
     // 8B: unsigned long long, unsigned long long int
     uint64_t u64;
     // 1B: char, signed char, 
     // 2B: short, short int, signed short, signed short int
     // 4B: int, signed, signed int
-    // 4B: long, long int, signed long, signed long int
+    // 8B: long, long int, signed long, signed long int
     // 8B: long long, long long int, signed long long, signed long long int
     int64_t  i64; 
-    // 4B: float, 8B: double
+    // 4B: float, 8B: double, 16B: long double
     double   f64; 
     // 8B: any pointer
     void    *ptr;
@@ -40,7 +42,6 @@ typedef struct elem_t {
 
 #define setup_elem_t(elem, elem_tag, uni_field, elem_val) \
     do { elem.tag = elem_tag; elem.uni.uni_field = elem_val; } while(0)
-
 #define setup_elem_u64(_elem, _u64) \
     setup_elem_t(_elem, ELEM_T_VALID, u64, _u64)
 #define setup_elem_i64(_elem, _i64) \
@@ -54,8 +55,9 @@ typedef struct elem_t {
 #define get_elem_i64(_elem) (_elem.uni.i64)
 #define get_elem_f64(_elem) (_elem.uni.f64)
 #define get_elem_ptr(_elem) (_elem.uni.ptr)
+#define cast_elem_typ(_elem,_type) ((_type)get_elem_u64(_elem))
 
-// func must return `val`:
+// func must return `int val`:
 // _e0 = _e1: val===0
 // _e0 < _e1: any val<0
 // _e0 > _e1: any val>0

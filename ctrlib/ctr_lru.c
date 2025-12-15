@@ -84,8 +84,7 @@ void freeBNodeMap(bnode_map _map) {
 }
 
 void bNodeMapPut(bnode_map _map, bnode* _nd) {
-    elem_t em; 
-    setup_elem_ptr(em, make_bnode_wrap(_map, _nd));
+    elem_t em; setup_elem_ptr(em, make_bnode_wrap(_map, _nd));
     rbTreeInsertData(_map._tr, em);
 }
 

@@ -53,7 +53,7 @@ bheap bHeapPush(bheap _bh, elem_t _em) {
 }
 
 elem_t bHeapTop(bheap _bh) {
-	elem_t em = {.tag=ELEM_T_INVALID};
+	elem_t em={.tag=ELEM_T_INVALID};
 	if(!bHeapEmpty(_bh)) {
 		em = bArrayAt(_bh._ll, 0);
 	}

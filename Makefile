@@ -74,6 +74,7 @@ bheap_test.d: test/bheap_test.c ctr_seq.a
 skiplist_test.d: test/skiplist_test.c ctr_skiplist.o ctr_tree.a ctr_seq.a
 lru_test.d: test/lru_test.c ctr_lru.o ctr_tree.a ctr_seq.a
 lfu_test.d: test/lfu_test.c ctr_lfu.o ctr_tree.a ctr_seq.a
+size_test.d: test/size_test.c
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM
