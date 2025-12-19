@@ -31,10 +31,9 @@ barray bArrayExtend(barray _dst, barray _src);
 void bArrayReverse(barray _ba);
 barray bArrayCopy(barray _ba);
 barray bArraySlice(barray _ba, size_t _lrg, size_t _rrg, size_t _cap);
+ssize_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx);
 
 typedef bool(*bArrayIterFunc)(size_t _idx, elem_t _dt);
 void bArrayIter(barray _ba, bArrayIterFunc _fn);
-
-ssize_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx);
 
 #endif

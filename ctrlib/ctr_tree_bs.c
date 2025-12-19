@@ -553,3 +553,24 @@ barray rbTree2Array(rb_tree* _tr) {
 	freeBStack(bstk);
 	return barr;
 }
+
+void rbTreeIter(rb_tree *_tr, elem_t_vis _fn) {
+	elem_t _el = {.tag=ELEM_T_INVALID}; // <*rb_node>
+	bstack bstk = makeBStack();			// bstack<*rb_node>
+	rb_node *nd = _tr->_root;
+
+	while(!bStackEmpty(bstk) || nd) {
+		while(nd) {
+			setup_elem_ptr(_el, nd); bStackPush(bstk, _el);
+			nd = nd->_left;
+		}
+		if(!bStackEmpty(bstk)) {
+			_el = bStackPop(bstk); 
+			nd = (rb_node*)get_elem_ptr(_el);
+			_fn(nd->_data);
+			nd = nd->_right;
+		}
+	}
+
+	freeBStack(bstk);
+}

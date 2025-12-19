@@ -136,6 +136,7 @@ blist* rbTreeLelTravData(rb_tree* _tr);
 blist* rbTreeMidTrav(rb_tree *_tr);
 blist* rbTreeLelTrav(rb_tree *_tr);
 barray rbTree2Array(rb_tree* _tr);
+void rbTreeIter(rb_tree *_tr, elem_t_vis _fn);
 
 // TreeNode API
 rb_node* makeRBNode(rb_node *_left, rb_node *_right, elem_t _data);

@@ -102,7 +102,6 @@ lfu_map makeLFUMap(elem_t_cmp _cmp) {
     _map._cmp = _cmp;
     _map._free = NULL;
     setRBTreeNodeType(_map._tr, TREE_NODE_TYPE_AVL);
-    // setRBTreeDataFree(_map._tr, __elem_free_lfunode);
     return _map;
 }
 
@@ -115,6 +114,7 @@ void freeLFUMap(lfu_map _map) {
         free(nd);
     }
     freeBArray(nds);
+    // setRBTreeDataFree(_map._tr, freeLFUNode);
     freeRBTree(_map._tr);
 }
 

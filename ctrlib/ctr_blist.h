@@ -42,6 +42,7 @@ blist *bListRange(blist *_bl, size_t _lr, size_t _rr);
 // via _elem_cmp
 bnode *bListSearch(blist *_bl, elem_t _dt);
 bnode *bListIndex(blist *_bl, int _idx);
+int bListDelete(blist *_bl, elem_t _dt);
 
 // safe api
 bnode *bListAddHead(blist *_bl, elem_t _dt);
@@ -71,6 +72,7 @@ typedef struct biter{
 biter *makeBIter(blist *_bl, int _dire);
 void freeBIter(biter *_bi);
 bnode *bListNext(biter *_bi);
+void bListIter(blist *_bl, elem_t_vis _fn);
 
 #define BLIST_ITER_FORWARD +1
 #define BLIST_ITER_BAKWARD -1

@@ -65,19 +65,18 @@ typedef int(*elem_t_cmp)(elem_t _e0, elem_t _e1);
 typedef void(*elem_t_free)(elem_t _e0);
 typedef elem_t(*elem_t_merge)(elem_t _dest, elem_t _src);
 typedef void(*elem_t_swap)(elem_t *_e0, elem_t *_e1);
+typedef int(*elem_t_hash)(elem_t _e);
+typedef bool(*elem_t_vis)(elem_t _e);
 
 static inline int __elem_cmp_int(elem_t _e0, elem_t _e1) {
 	return get_elem_i64(_e0) - get_elem_i64(_e1);
 }
-
 static inline int __elem_cmp_uint(elem_t _e0, elem_t _e1) {
 	return get_elem_u64(_e0) - get_elem_u64(_e1);
 }
-
 static inline int __elem_cmp_double(elem_t _e0, elem_t _e1) {
 	return get_elem_f64(_e0) - get_elem_f64(_e1);
 }
-
 static inline int __elem_cmp_none(elem_t _e0, elem_t _e1) {
     return 0;
 }

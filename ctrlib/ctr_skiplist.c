@@ -206,3 +206,14 @@ barray skipList2Array(skiplist *_sl) {
     }
     return _ems;
 }
+
+void skipListIter(skiplist *_sl, elem_t_vis _fn) {
+    for(skipnode *cur=_sl->_head;
+        ;
+    ) { 
+        skipnode *l0_nxt = __next_(cur, 0);
+        if(l0_nxt==_sl->_tail) break;
+        _fn(l0_nxt->_data);
+        cur = l0_nxt;
+    }
+}

@@ -32,6 +32,9 @@ typedef struct skiplist {
 #define SKIP_NODE_GET_SUCCESS     ELEM_GET_SUCCESS
 #define SKIP_NODE_GET_NOTFOUND    ELEM_GET_NOTFOUND
 
+#define skipListSetElemFree(_sl, _fn) (_sl->_free=_fn)
+#define skipListSetElemMerge(_sl, _fn) (_sl->_merge=_fn)
+
 #define __sl_len(sl) (sl->_size)
 #define __sl_level(sl) (sl->_level)
 #define __sl_data_free(sl, _dt) \
@@ -39,19 +42,22 @@ typedef struct skiplist {
 #define __sl_data_merge(sl, _dest, _src) \
     do { if(sl->_merge) {_dest = sl->_merge(_dest, _src);} } while(0)
 
+// SkipList API
 skiplist* makeSkipList(elem_t_cmp _cmp);
 void freeSkipList(skiplist *_sl);
 int skipListInsertData(skiplist *_sl, elem_t _dt);
 int skipListDeleteData(skiplist *_sl, elem_t _dt);
 elem_t skipListGetData(skiplist *_sl, elem_t _dt);
 
+// skiplist node low level api
 void skipListInsertNode(skiplist *_sl, _node_value *_val);
 void skipListDeleteNode(skiplist *_sl, _node_value *_val);
 skipnode* skipListGetNode(skiplist *_sl, _node_value *_val);
-
 skipnode* makeSkipNode(elem_t _dt, size_t _level);
 void freeSkipNode(skipnode *_sn, skiplist *_sl);
 
+// SkipList Iterator API
 barray skipList2Array(skiplist *_sl);
+void skipListIter(skiplist *_sl, elem_t_vis _fn);
 
 #endif

@@ -259,3 +259,24 @@ bnode *bListDeleteNode(blist *_bl, bnode *_bn) {
     _bl->_size--;
     return _bn;
 }
+
+int bListDelete(blist *_bl, elem_t _dt) {
+    bnode *nd = bListSearch(_bl, _dt);
+    if (nd) {
+        nd = bListDeleteNode(_bl, nd);
+        freeBNode(nd, _bl);
+        return ELEM_DELETE_REMOVED;
+    }
+    return ELEM_DELETE_NOTFOUND;
+}
+
+void bListIter(blist *_bl, elem_t_vis _fn) {
+    biter *bi = makeBIter(_bl, BLIST_ITER_FORWARD);
+    for(bnode *bn=bListNext(bi);
+        bn;
+        bn = bListNext(bi)
+    ) {
+        _fn(bn->_data);
+    }
+    freeBIter(bi);
+}
