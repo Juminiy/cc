@@ -8,27 +8,38 @@ hashtable* makeHash(elem_t_cmp _cmp, elem_t_hash _hash) {
     ht->_bkt_cap = HASHTABLE_BUKT_INITSZ;
     ht->_bkt_ll = (hashbucket*)calloc(ht->_bkt_cap, sizeof(hashbucket));
 
-    ht->_hash = _hash;
     ht->_load = HASHTABLE_LOAD_FACTOR;
     ht->_size = 0;
+
+    ht->_hash = _hash;
+    ht->_cmp = _cmp;
+    ht->_free = NULL;
+    ht->_merge = NULL;
     return ht;
 }
 
-void freeHash(hashtable *_ht) {
-    for(size_t idx=0;idx<_ht->_bkt_cap;idx++){
-        hashbucket bkt=_ht->_bkt_ll[idx];
+void __free_hash(hashbucket *_bkts, size_t _cap, hashtable *_ht) {
+    for(size_t idx=0;idx<_cap;idx++){
+        hashbucket bkt=_bkts[idx];
         switch (bkt._typ) {
             case HASHBUCKET_TYPE_TREE:
                 rb_tree *_tr = (rb_tree*)bkt._ptr;
                 setRBTreeDataFree(_tr, _ht->_free);
                 freeRBTree(_tr);
+            break;
+
             case HASHBUCKET_TYPE_LIST:
                 blist *_bl = (blist*)bkt._ptr;
                 bListSetElemFree(_bl, _ht->_free);
                 freeBList(_bl);
+            break;
         }
     }
-    free(_ht->_bkt_ll);
+    free(_bkts);
+}
+
+void freeHash(hashtable *_ht) {
+    __free_hash(_ht->_bkt_ll, _ht->_bkt_cap, _ht);
     free(_ht);
 }
 
@@ -42,13 +53,20 @@ rb_tree* __blist2_rbtree(blist *_bl, hashtable *_ht) {
     rb_tree *tr = makeRBTree(_ht->_cmp);
     setRBTreeNodeType(tr, TREE_NODE_TYPE_AVL);
 
-    for(rb_node *nd=bListNext(bi);nd;nd=bListNext(bi)) {
+    for(bnode *nd=bListNext(bi);nd;nd=bListNext(bi)) {
         rbTreeInsertData(tr, nd->_data);
     }
 
     freeBIter(bi);
     freeBList(_bl);
     return tr;
+}
+
+blist* __rbtree2_blist(rb_tree *_tr, hashtable *_ht) {
+    blist *_bl = rbTreeMidTravData(_tr);
+    bListSetElemCmp(_bl, _ht->_cmp);
+    freeRBTree(_tr);
+    return _bl;
 }
 
 elem_t hashGet(hashtable *_ht, elem_t _dt) {
@@ -59,13 +77,13 @@ elem_t hashGet(hashtable *_ht, elem_t _dt) {
         case HASHBUCKET_TYPE_TREE:
             rb_tree *_tr = (rb_tree*)(_bkt._ptr);
             _em = rbTreeGetData(_tr, _dt);
+        break;
 
         case HASHBUCKET_TYPE_LIST:
             blist *_bl = (blist*)(_bkt._ptr);
             bnode *_bn = bListSearch(_bl, _dt);
             _em = _bn ? _bn->_data : _em;
-        
-        default: // none
+        break;
     }
     return _em;
 }
@@ -75,17 +93,20 @@ int __hashtable_put(hashtable *_ht, elem_t _dt) {
     int bkt_idx = __bktidx(_ht, _dt);
     hashbucket _bkt = _ht->_bkt_ll[bkt_idx]; // read from bucketArray
     switch (_bkt._typ) {
-        case HASHBUCKET_TYPE_TREE:
+        case HASHBUCKET_TYPE_TREE: {
             rb_tree *_tr = (rb_tree*)(_bkt._ptr);
             _ret_code = rbTreeInsertData(_tr, _dt);
+        }
+        break;
 
-        case HASHBUCKET_TYPE_LIST:
+        case HASHBUCKET_TYPE_LIST: {
             blist *_bl = (blist*)(_bkt._ptr);
             bnode *_bn = bListSearch(_bl, _dt);
             if(!_bn) {
                 _ret_code = ELEM_INSERT_CREATED;
                 bListAddHead(_bl, _dt);
             } else {
+                _ret_code = ELEM_INSERT_REPLACED;
                 __hash_free(_ht, _bn->_data);
                 _bn->_data = _dt;
             }
@@ -94,8 +115,10 @@ int __hashtable_put(hashtable *_ht, elem_t _dt) {
                 _bkt._typ = HASHBUCKET_TYPE_TREE;
                 _bkt._ptr = __blist2_rbtree(_bl, _ht);
             }
+        }
+        break;
         
-        default: // none
+        default: { // none
             blist *_bl = makeBList();
             bListSetElemCmp(_bl, _ht->_cmp);
             
@@ -104,16 +127,24 @@ int __hashtable_put(hashtable *_ht, elem_t _dt) {
             _ret_code = ELEM_INSERT_CREATED;
             _bkt._typ = HASHBUCKET_TYPE_LIST;
             _bkt._ptr = _bl;
+        }
+        break;
     }
     _ht->_bkt_ll[bkt_idx] = _bkt; // write back to bucketArray
     return _ret_code;
 }
 
 void __hashtable_enlarge_rehash(hashtable *_ht) {
+    bool __elem_put_closure(elem_t em) { 
+        __hashtable_put(_ht, em); 
+        return true; 
+    };
+
     // buckets enlarge
     hashbucket *old_bkts = _ht->_bkt_ll;
     size_t old_cap = _ht->_bkt_cap;
 
+    _ht->_bkt_siz = 0;
     _ht->_bkt_cap <<= 1;
     _ht->_bkt_ll = (hashbucket*)calloc(_ht->_bkt_cap, sizeof(hashbucket));
 
@@ -121,25 +152,51 @@ void __hashtable_enlarge_rehash(hashtable *_ht) {
     for(size_t idx=0;idx<old_cap;idx++) {
         hashbucket old_bkt=old_bkts[idx];
         switch (old_bkt._typ) {
-            // case HASHBUCKET_TYPE_TREE:
-            //     rbTreeIter((rb_tree*)old_bkt._ptr, _fn);
-            // case HASHBUCKET_TYPE_LIST:
-            //     bListIter((blist*)old_bkt._ptr, _fn);
+            case HASHBUCKET_TYPE_TREE:
+                rbTreeIter((rb_tree*)old_bkt._ptr, __elem_put_closure);
+            break;
+
+            case HASHBUCKET_TYPE_LIST:
+                bListIter((blist*)old_bkt._ptr, __elem_put_closure);
+            break;
         }
     }
+
+    __free_hash(old_bkts, old_cap, _ht);
 }
 
 void hashPut(hashtable *_ht, elem_t _dt) {
-    if(_ht->_bkt_siz > (size_t)(_ht->_bkt_cap * _ht->_load)) {
+    if(_ht->_size > (size_t)(_ht->_bkt_cap * _ht->_load)) {
         __hashtable_enlarge_rehash(_ht);
     }
 
-    _ht->_size = __hashtable_put(_ht, _dt) == ELEM_INSERT_CREATED ? 
-        _ht->_size : _ht->_size + 1;
+    _ht->_size += __hashtable_put(_ht, _dt) == ELEM_INSERT_CREATED ? 
+        +1 : 0;
 }
 
 void hashDel(hashtable *_ht, elem_t _dt) {
+    int _ret_code = ELEM_OPT_NONE;
+    int bkt_idx = __bktidx(_ht, _dt);
+    hashbucket _bkt = _ht->_bkt_ll[bkt_idx]; // read from bucketArray
+    switch(_bkt._typ) {
+        case HASHBUCKET_TYPE_LIST:
+            blist *_bl = (blist*)(_bkt._ptr);
+            _ret_code = bListDelete(_bl, _dt);
+        break;
 
+        case HASHBUCKET_TYPE_TREE:
+            rb_tree *_tr = (rb_tree*)(_bkt._ptr);
+            _ret_code = rbTreeDeleteData(_tr, _dt);
+
+            if(__tree_size(_tr) <= HASHBUCKET_TREE_MINSZ) {
+                _bkt._ptr = __rbtree2_blist(_tr, _ht);
+                _bkt._typ = HASHBUCKET_TYPE_LIST;
+            }
+        break;
+    }
+    _ht->_bkt_ll[bkt_idx] = _bkt;
+    _ht->_size += _ret_code == ELEM_DELETE_REMOVED ?
+        -1 : 0;
 }
 
 void hashIter(hashtable *_ht, elem_t_vis _fn) {
@@ -148,8 +205,46 @@ void hashIter(hashtable *_ht, elem_t_vis _fn) {
         switch (bkt._typ) {
             case HASHBUCKET_TYPE_TREE:
                 rbTreeIter((rb_tree*)bkt._ptr, _fn);
+            break;
+
             case HASHBUCKET_TYPE_LIST:
                 bListIter((blist*)bkt._ptr, _fn);
+            break;
         }
     }
 }
+
+#ifdef IDEBUG
+#include "ctr_util.h"
+hash_inspect hashInspect(hashtable *_ht) {
+    hash_inspect hi;
+    hi._size = _ht->_size;
+    hi._bkt_siz = _ht->_bkt_siz;
+    hi._bkt_cap = _ht->_bkt_cap;
+    hi._bkt_ll = 0;
+    hi._bkt_tr = 0;
+    memset(hi._bkt_ll_siz, 0, sizeof(size_t)*HASHBUCKET_LIST_MAXSZ);
+    hi._bkt_tr_max_sz = 0;
+    for(size_t idx=0;idx<_ht->_bkt_cap;idx++){
+        hashbucket bkt=_ht->_bkt_ll[idx];
+        switch (bkt._typ) {
+            case HASHBUCKET_TYPE_TREE:
+                hi._bkt_tr++;
+                rb_tree *_tr = (rb_tree*)(bkt._ptr);
+                hi._bkt_tr_max_sz = __max_(hi._bkt_tr_max_sz, __tree_size(_tr));
+            break;
+
+            case HASHBUCKET_TYPE_LIST:
+                hi._bkt_ll++;
+                blist *_bl = (blist*)(bkt._ptr);
+                hi._bkt_ll_siz[bListSize(_bl)]++;
+            break;
+
+            default:
+                hi._bkt_ll_siz[0]++;
+            break;
+        }
+    }
+    return hi;
+}
+#endif

@@ -81,7 +81,7 @@ static inline int __elem_cmp_none(elem_t _e0, elem_t _e1) {
     return 0;
 }
 
-static void __elem_swap_normalized(elem_t *_e0, elem_t *_e1) {
+static inline void __elem_swap_normalized(elem_t *_e0, elem_t *_e1) {
     elem_t _em = *_e0;
     *_e0 = *_e1;
     *_e1 = _em;

@@ -212,8 +212,10 @@ void skipListIter(skiplist *_sl, elem_t_vis _fn) {
         ;
     ) { 
         skipnode *l0_nxt = __next_(cur, 0);
-        if(l0_nxt==_sl->_tail) break;
-        _fn(l0_nxt->_data);
+        if(l0_nxt==_sl->_tail) 
+            break;
+        if(!_fn(l0_nxt->_data))
+            break;
         cur = l0_nxt;
     }
 }

@@ -276,7 +276,8 @@ void bListIter(blist *_bl, elem_t_vis _fn) {
         bn;
         bn = bListNext(bi)
     ) {
-        _fn(bn->_data);
+        if(!_fn(bn->_data))
+            break;
     }
     freeBIter(bi);
 }

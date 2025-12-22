@@ -59,12 +59,8 @@ static inline char* __strdup(const char *__s) {
 static inline int __strcmp(const char *__s1, const char *__s2) {
 	if(__s1 && __s2){
 		return strcmp(__s1, __s2);
-	} else if(__s1){
-		return __strlen(__s1);
-	} else if(__s2){
-		return __strlen(__s2);
 	} else {
-		return 0;
+		return __strlen(__s1) - __strlen(__s2);
 	}
 }
 

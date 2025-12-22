@@ -567,7 +567,8 @@ void rbTreeIter(rb_tree *_tr, elem_t_vis _fn) {
 		if(!bStackEmpty(bstk)) {
 			_el = bStackPop(bstk); 
 			nd = (rb_node*)get_elem_ptr(_el);
-			_fn(nd->_data);
+			if(!_fn(nd->_data))
+				break;
 			nd = nd->_right;
 		}
 	}

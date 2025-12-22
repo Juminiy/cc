@@ -50,4 +50,17 @@ void hashPut(hashtable *_ht, elem_t _dt);
 void hashDel(hashtable *_ht, elem_t _dt);
 void hashIter(hashtable *_ht, elem_t_vis _fn);
 
+#ifdef IDEBUG
+typedef struct hash_inspect {
+    size_t _size;
+    size_t _bkt_siz;
+    size_t _bkt_cap;
+    size_t _bkt_ll;
+    size_t _bkt_tr;
+    size_t _bkt_ll_siz[HASHBUCKET_LIST_MAXSZ];
+    size_t _bkt_tr_max_sz;
+} hash_inspect;
+hash_inspect hashInspect(hashtable *_ht);
+#endif
+
 #endif
