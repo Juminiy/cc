@@ -32,7 +32,8 @@ static inline int __elem_hash_strstrpair(elem_t em) {
 		hval = (hval + ppow * (*_key)) % m;
 		ppow = (ppow * p) % m;
 	}
-	return hval;
+	// DEBUGF("%s: %u", cast_elem_typ(em, kv*)->k, hval);
+	return hval >= 0 ? hval : -hval;
 }
 
 #ifdef __cplusplus
