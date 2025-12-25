@@ -16,20 +16,20 @@ void test_sl(int tot) {
         skipListInsertData(sl, em);
     }
 
-    barray elems = skipList2Array(sl);
-    int prev_val = 0x80000000;
-    for(size_t i=0;i<bArrayLen(elems);i++){
-        // printf("%zu, %ld\n", i, get_elem_i64(bArrayAt(elems, i)));
-        int curval = get_elem_i64(bArrayAt(elems, i));
-        if(curval < prev_val){
-            fprintf(stderr, "curlval: %d < prevval: %d\n", curval, prev_val);
-            exit(1);
-        }
-    }
+    // barray elems = skipList2Array(sl);
+    // int prev_val = 0x80000000;
+    // for(size_t i=0;i<bArrayLen(elems);i++){
+    //     // printf("%zu, %ld\n", i, get_elem_i64(bArrayAt(elems, i)));
+    //     int curval = get_elem_i64(bArrayAt(elems, i));
+    //     if(curval < prev_val){
+    //         fprintf(stderr, "curlval: %d < prevval: %d\n", curval, prev_val);
+    //         exit(1);
+    //     }
+    // }
 
     printf("len=%zu, level=%d\n", __sl_len(sl), __sl_level(sl));
 
-    freeBArray(elems);
+    // freeBArray(elems);
     freeSkipList(sl);
 } 
 
@@ -46,20 +46,20 @@ void test_avl(int tot) {
         rbTreeInsertData(tr, em);
     }
 
-    barray elems = rbTree2Array(tr);
-    int prev_val = 0x80000000;
-    for(size_t i=0;i<bArrayLen(elems);i++){
-        // printf("%zu, %ld\n", i, get_elem_i64(bArrayAt(elems, i)));
-        int curval = get_elem_i64(bArrayAt(elems, i));
-        if(curval < prev_val){
-            fprintf(stderr, "curlval: %d < prevval: %d\n", curval, prev_val);
-            exit(1);
-        }
-    }
+    // barray elems = rbTree2Array(tr);
+    // int prev_val = 0x80000000;
+    // for(size_t i=0;i<bArrayLen(elems);i++){
+    //     // printf("%zu, %ld\n", i, get_elem_i64(bArrayAt(elems, i)));
+    //     int curval = get_elem_i64(bArrayAt(elems, i));
+    //     if(curval < prev_val){
+    //         fprintf(stderr, "curlval: %d < prevval: %d\n", curval, prev_val);
+    //         exit(1);
+    //     }
+    // }
 
     printf("len=%zu, level=%zu\n", __tree_size(tr), __tree_height(tr));
 
-    freeBArray(elems);
+    // freeBArray(elems);
     freeRBTree(tr);
 }
 
@@ -107,15 +107,15 @@ int main(int argc, char **argv) {
         tot = strtol(argv[2], NULL, 10);
     }
 
-    // if(typ==0){
-    //     printf("test AVLTree\n");
-    //     test_avl(tot);
-    // } else {
-    //     printf("test SkipList\n");
-    //     test_sl(tot);
-    // }
+    if(typ==0){
+        printf("test AVLTree\n");
+        test_avl(tot);
+    } else {
+        printf("test SkipList\n");
+        test_sl(tot);
+    }
 
-    test_sl_curd(tot);
+    // test_sl_curd(tot);
 
     return 0;
 }

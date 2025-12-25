@@ -3,11 +3,11 @@
 
 #include <stddef.h>
 #include "ctr_elemt.h"
+#include "ctr_barray.h"
 
 typedef struct btree_node {
-    btree_node **_child;
-    elem_t       *_data;
-    size_t       _dt_sz;
+    btree_node **_child; // []<btree_node*>
+    barray        _data; // barray<elem>
 } btree_node;
 
 typedef struct btree {
@@ -18,7 +18,14 @@ typedef struct btree {
 
     elem_t_cmp _cmp;
     elem_t_free _free;
+
+    int __opt_tag;
 } btree;
+
+typedef struct btree_node_split {
+    btree_node *lnd, *rnd;
+    elem_t     mnd_data;
+} btree_node_split;
 
 #define bTreeSetFree(tr, f) (tr->_free=f)
 #define bTreeHeight(tr) (tr->_height)
@@ -27,11 +34,15 @@ typedef struct btree {
 #define __btree_data_free(tr, dt) \
     do { if(tr->_free) { tr->_free(dt); } } while(0)
 
-btree* makeBTree(elem_t_cmp _cmp);
+#define bNodeElemLen(nd) (bArrayLen(nd->_data))
+#define bNodeChildLen(nd) (bArrayLen(nd->data)+1)
+
+btree* makeBTree(size_t _d, elem_t_cmp _cmp);
 void freeBTree(btree *_tr);
 
 int bTreeInsert(btree *_tr, elem_t _dt);
 int bTreeDelete(btree *_tr, elem_t _dt);
 elem_t bTreeGet(btree *_tr, elem_t _dt);
+void bTreeIter(btree *_tr, elem_t_vis _f);
 
 #endif
