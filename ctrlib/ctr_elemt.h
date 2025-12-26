@@ -50,6 +50,16 @@ typedef struct elem_t {
     setup_elem_t(_elem, ELEM_T_VALID, f64, _f64)
 #define setup_elem_ptr(_elem, _ptr) \
     setup_elem_t(_elem, ELEM_T_VALID, ptr, _ptr)
+#define varElemU64(_var) \
+    ({ elem_t em; setup_elem_u64(em, _var); em; })
+#define varElemI64(_var) \
+    ({ elem_t em; setup_elem_i64(em, _var); em; })
+#define varElemF64(_var) \
+    ({ elem_t em; setup_elem_f64(em, _var); em; })
+#define varElemPtr(_var) \
+    ({ elem_t em; setup_elem_ptr(em, _var); em; })
+#define varElemNone() \
+    ({ elem_t em={.tag=ELEM_T_INVALID}; em; })
 
 #define get_elem_u64(_elem) (_elem.uni.u64)
 #define get_elem_i64(_elem) (_elem.uni.i64)
@@ -80,7 +90,6 @@ static inline int __elem_cmp_double(elem_t _e0, elem_t _e1) {
 static inline int __elem_cmp_none(elem_t _e0, elem_t _e1) {
     return 0;
 }
-
 static inline void __elem_swap_normalized(elem_t *_e0, elem_t *_e1) {
     elem_t _em = *_e0;
     *_e0 = *_e1;

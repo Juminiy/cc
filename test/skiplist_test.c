@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 // 1,000,000 * int
-// 1,999,557 allocs, 1,999,557 frees, 58,651,072 bytes allocated
+// 1,999,557 allocs, 1,999,557 frees, 58,651,072 bytes allocated == 55MB
 void test_sl(int tot) {
     skiplist *sl=makeSkipList(__elem_cmp_int);
     elem_t em;
@@ -34,7 +34,7 @@ void test_sl(int tot) {
 } 
 
 // 1,000,000 * int
-// 1,999,550 allocs, 1,999,550 frees, 119,973,864 bytes allocated
+// 1,999,550 allocs, 1,999,550 frees, 119,973,864 bytes allocated == 115MB
 void test_avl(int tot) {
     rb_tree *tr=makeRBTree(__elem_cmp_int);
     setRBTreeNodeType(tr, TREE_NODE_TYPE_AVL);

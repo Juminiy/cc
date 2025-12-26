@@ -41,6 +41,7 @@ ctr_lfu.o: ctrlib/ctr_lfu.c
 ctr_hash.o: ctrlib/ctr_hash.c
 ctr_bitmap.o: ctrlib/ctr_bitmap.c
 ctr_bloom.o: ctrlib/ctr_bloom.c
+ctr_btree.o: ctrlib/ctr_btree.c
 ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o ctr_barray.o ctr_bheap.o
 	ar rcs $@ $^
 ctr_tree.a: ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
@@ -82,6 +83,8 @@ gcc_test.d: test/gcc_test.c
 hash_test.d: test/hash_test.c ctr_hash.o ctr_tree.a ctr_seq.a strstrpair.o
 bitmap_test.d: test/bitmap_test.c ctr_bitmap.o
 bloom_test.d: test/bloom_test.c ctr_bloom.o ctr_bitmap.o strstrpair.o
+pair_test.d: test/pair_test.c
+btree_test.d: test/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM
