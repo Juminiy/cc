@@ -64,4 +64,19 @@ static inline int __strcmp(const char *__s1, const char *__s2) {
 	}
 }
 
+static inline char* __char2str(char __ch) {
+	char* __s = (char*)malloc(sizeof(char)*2);
+	__s[0] = __ch;
+	__s[1] = '\0';
+	return __s;
+}
+
+static inline char* __strcat(char *dst, const char *src) {
+	size_t dstsz=__strlen(dst), srcsz=__strlen(src);
+	dst = (char*)realloc(dst, sizeof(char)*(dstsz+srcsz+1));
+	strncpy(dst+dstsz,src,srcsz);
+	dst[dstsz+srcsz]='\0';
+	return dst;
+}
+
 #endif
