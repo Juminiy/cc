@@ -35,12 +35,35 @@ int main() {
 
     // 4. test cpy
     char *s0=__strdup(NULL),*s1=__strdup(""),*s2=__strdup("hachimi");
-    printf("s0=%s,size=%zu\n", s0?s0:"NULL", __strlen(s0));
-    printf("s1=%s,size=%zu\n", s1?s1:"NULL", __strlen(s1));
-    printf("s2=%s,size=%zu\n", s2?s2:"NULL", __strlen(s2));
-    printf("glibc:%zu, i:%zu\n", __strlen(s0), __i_strlen(s0));
-    printf("glibc:%zu, i:%zu\n", __strlen(s1), __i_strlen(s1));
-    printf("glibc:%zu, i:%zu\n", __strlen(s2), __i_strlen(s2));
+    // printf("s0=%s,size=%zu\n", s0?s0:"NULL", __strlen(s0));
+    // printf("s1=%s,size=%zu\n", s1?s1:"NULL", __strlen(s1));
+    // printf("s2=%s,size=%zu\n", s2?s2:"NULL", __strlen(s2));
+    // printf("glibc:%zu, i:%zu\n", __strlen(s0), __i_strlen(s0));
+    // printf("glibc:%zu, i:%zu\n", __strlen(s1), __i_strlen(s1));
+    // printf("glibc:%zu, i:%zu\n", __strlen(s2), __i_strlen(s2));
+
+    // 5. test strcat
+    s0 = __strcat(s0, NULL); puts(s0);  // ""
+    s0 = __strcat(s0, ""); puts(s0);    // ""
+    s0 = __strcat(s0, "arc"); puts(s0); // "arc"
+    s0 = __strcat(s0, "arq"); puts(s0); // "arcarq"
+    s0 = __strcat(s0, "bbc"); puts(s0); // "arcarqbbc"
+    s0 = __strcat(s0, "ggb"); puts(s0); // "arcarqbbcggb"
+
+    // Aborted: not in heap
+    // s0 = __strcat(NULL, s0); puts(s0);
+    // s0 = __strcat("", s0); puts(s0);
+    // s0 = __strcat("ccb", s0); puts(s0);
+    // s0 = __strcat("rsw", s0); puts(s0);
+
+    s1 = __strcat(s1, "iow"); puts(s1); // "iow"
+    s2 = __strcat(s2, "cws"); puts(s2); // "hachimicws"
+
+    char *s3=__stradd(s0, "0101");      
+    puts(s3);                           // s0+"0101"
+    puts(s0);                           // s0
+    free(s3);
+
     free(s0),free(s1),free(s2);
 
     return 0;

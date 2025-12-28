@@ -71,12 +71,19 @@ static inline char* __char2str(char __ch) {
 	return __s;
 }
 
+// @return dst = dst+src, self
+// @param dst must not `const char*`, must in heap
 static inline char* __strcat(char *dst, const char *src) {
 	size_t dstsz=__strlen(dst), srcsz=__strlen(src);
 	dst = (char*)realloc(dst, sizeof(char)*(dstsz+srcsz+1));
 	strncpy(dst+dstsz,src,srcsz);
 	dst[dstsz+srcsz]='\0';
 	return dst;
+}
+
+// @return dst = dst+src, deepcopy
+static inline char* __stradd(char *dst, const char *src) {
+	return __strcat(__strdup(dst), src);
 }
 
 #endif
