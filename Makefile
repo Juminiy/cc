@@ -2,7 +2,7 @@ optargs=-Wunused-result -O2 -std=c99
 debugargs=-g -O0 -std=c99 -DIDEBUG
 cplargs=$(debugargs)
 
-VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test
+VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test:ai
 vpath %.o
 
 %.o: %.c
@@ -87,6 +87,8 @@ bloom_test.d: test/bloom_test.c ctr_bloom.o ctr_bitmap.o strstrpair.o
 pair_test.d: test/pair_test.c
 btree_test.d: test/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
 huffman_test.d: test/huffman_test.c ctr_huffman.o ctr_map.o ctr_tree.a ctr_seq.a 
+
+hanoi.d: ai/hanoi.c
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM
