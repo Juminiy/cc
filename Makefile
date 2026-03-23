@@ -2,7 +2,7 @@ optargs=-Wunused-result -O2 -std=c99
 debugargs=-g -O0 -std=c99 -DIDEBUG
 cplargs=$(debugargs)
 
-VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test:ai
+VPATH = tcpcli:tcplib:tcpsrv:ctrlib:test:ai:libjson
 vpath %.o
 
 %.o: %.c
@@ -49,6 +49,8 @@ ctr_tree.a: ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
 	ar rcs $@ $^
 strstrpair.o: test/strstrpair.c
 
+json.o: libjson/json.c
+
 test: 
 
 fdset_test.d: test/fdset_test.c skt_fdset.o
@@ -87,6 +89,7 @@ bloom_test.d: test/bloom_test.c ctr_bloom.o ctr_bitmap.o strstrpair.o
 pair_test.d: test/pair_test.c
 btree_test.d: test/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
 huffman_test.d: test/huffman_test.c ctr_huffman.o ctr_map.o ctr_tree.a ctr_seq.a 
+json_test.d: test/json_test.c json.o ctr_map.o ctr_tree.a ctr_seq.a
 
 hanoi.d: ai/hanoi.c
 

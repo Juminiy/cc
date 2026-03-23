@@ -26,6 +26,10 @@
 3. multiple-associative: m-bst, m-avl, m-rb
 4. ring, skiplist
 
+## LIBJSON (Zero dependency JSON Library)
+1. json encode
+2. json decode
+
 ## Debug
 1. `gdb ./a.out -x a.gdbinit`
 2. `valgrind --tool=memcheck --leak-check=full a.out`
