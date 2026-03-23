@@ -73,6 +73,7 @@ void free_json_value(json_value *_val) {
             free_json_array((json_array*)(_val->val.ptr));
         break;
     }
+    free(_val);
 }
 
 /*
@@ -219,10 +220,6 @@ char* json_array_encode(const json_array *_arr) {
 /*
  * JSON API
  */
-json_value* json_parse(const char *_str) {
-    return NULL;
-}
-
 char* json_stringify(const json_value *_val) {
     
     char * buf = NULL;

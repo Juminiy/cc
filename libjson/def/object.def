@@ -1,0 +1,3 @@
+{ws}
+{ws string ws : value}
+{ws string ws : value, ws string ws : value}

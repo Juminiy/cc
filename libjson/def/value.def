@@ -1,0 +1,7 @@
+ws string ws
+ws number ws
+ws object ws
+ws array ws
+ws true ws
+ws false ws
+ws null ws

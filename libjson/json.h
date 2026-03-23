@@ -39,8 +39,8 @@ typedef struct json_array {
 extern const json_value json_value_true;
 extern const json_value json_value_false;
 extern const json_value json_value_null;
-extern const json_value json_value_null_object;
-extern const json_value json_value_null_array;
+extern const json_value json_value_null_object; // {}
+extern const json_value json_value_null_array;  // []
 json_value *new_json_value_str(const char *_str);
 json_value *new_json_value_int(const int64_t _int);
 json_value *new_json_value_num(const double _num);

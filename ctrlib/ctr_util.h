@@ -86,4 +86,14 @@ static inline char* __stradd(char *dst, const char *src) {
 	return __strcat(__strdup(dst), src);
 }
 
+// todo: test and fix
+static inline char* __substr(const char *__s, size_t __pos, size_t __len) {
+	size_t __sz = __strlen(__s);
+	if(__pos>=__sz||__pos+__len>__sz){
+		return NULL;
+	}
+	char *__dst = (char*)malloc(sizeof(char)*__len);
+	return strncpy(__dst, __s+__pos, __len);
+}
+
 #endif
