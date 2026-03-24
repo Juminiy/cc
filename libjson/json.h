@@ -75,7 +75,7 @@ void json_unmarshal(const char *_str, void *_elem);
 char* json_marshal(void *_elem);
 
 typedef struct ch_state {
-	const char * _raw;
+	char * _raw;
 	int rcur,rsiz;
 	// char *_clean;
 	// int ccur,csiz;

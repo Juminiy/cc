@@ -1,5 +1,8 @@
 #include "json.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 /*
  * JSON DECODE API
@@ -11,6 +14,10 @@
 // ' '=40
 bool is_ws(char _ch) {
 	return _ch==' '||_ch=='\t'||_ch=='\n'||_ch=='\r';
+}
+
+bool is_num(char _ch) {
+	return isxdigit(_ch) || _ch=='.';
 }
 
 char next_token(ch_state *_stt) {
@@ -82,7 +89,7 @@ json_value* read_json_object(ch_state *_stt) {
 		json_object_put(obj, obj_pair_name, obj_pair_val);
 		ch = next_token(_stt);
 		if (ch==',') {
-			continue;
+			
 		} else if (ch=='}'){
 			break;
 		} else {
@@ -133,12 +140,13 @@ json_value* read_json_array(ch_state *_stt) {
 	return new_json_value_arr(arr);
 }
 
-// ""
+// name\"
 char* read_json_string(ch_state *_stt) {
 	// find next \"
-	char *endptr = strchr(_stt->_raw, '\"');
-	size_t siz = endptr-_stt->_raw;
-	char *_ss = __substr(_stt->_raw, _stt->rcur, siz);
+	char *curptr = _stt->_raw+_stt->rcur;
+	char *endptr = strchr(curptr, '\"');
+	size_t siz = endptr-curptr;
+	char *_ss = __substr(curptr, 0, siz);
 	// todo: test and fix
 	for(int i=0;i<__strlen(_ss);i++){
 		if((_ss[i]>=0&&_ss[i]<=31)||(_ss[i]=='\\'||_ss[i]=='\"')){
@@ -147,6 +155,7 @@ char* read_json_string(ch_state *_stt) {
 			break;
 		}
 	}
+	_stt->rcur += (siz+1);
 	return _ss;
 }
 
@@ -161,12 +170,14 @@ int64_t read_json_int(ch_state *_stt) {
 double read_json_num(ch_state *_stt) {
 	int cur = _stt->rcur-1, siz = 0;
 	for(;cur<_stt->rsiz;cur++){
-		if(is_ws(_stt->_raw[cur])){
+		if(is_num(_stt->_raw[cur])){
+			siz++;
+		} else {
 			break;
 		}
-		siz++;
 	}
-	char *_ss = __substr(_stt->_raw, cur, siz);
+	_stt->rcur = cur;
+	char *_ss = __substr(_stt->_raw, _stt->rcur-1, siz);
 	double val;
 	sscanf(_ss, "%lf", &val);
 	return val;

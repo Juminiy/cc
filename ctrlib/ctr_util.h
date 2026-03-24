@@ -92,8 +92,10 @@ static inline char* __substr(const char *__s, size_t __pos, size_t __len) {
 	if(__pos>=__sz||__pos+__len>__sz){
 		return NULL;
 	}
-	char *__dst = (char*)malloc(sizeof(char)*__len);
-	return strncpy(__dst, __s+__pos, __len);
+	char *__dst = (char*)malloc(sizeof(char)*(__len+1));
+	strncpy(__dst, __s+__pos, __len);
+	__dst[__len] = '\0';
+	return __dst;
 }
 
 static inline char* __readfile(const char *__path) {
