@@ -1,6 +1,10 @@
 #include "json.h"
 #include <stdio.h>
 
+/*
+ * JSON DECODE API
+ */
+
 // '\t'=11
 // '\n'=12
 // '\r'=15
@@ -9,27 +13,10 @@ bool is_ws(char _ch) {
 	return _ch==' '||_ch=='\t'||_ch=='\n'||_ch=='\r';
 }
 
-typedef struct ch_state {
-	const char * _raw;
-	int rcur,rsiz;
-	// char *_clean;
-	// int ccur,csiz;
-	char *_err_msg;
-} ch_state;
-
-char next_token(ch_state *_stt);
-json_value* read_json_value(ch_state *_stt);
-json_object* read_json_object(ch_state *_stt);
-json_array* read_json_array(ch_state *_stt);
-char* read_json_string(ch_state *_stt);
-int64_t read_json_int(ch_state *_stt);
-double read_json_num(ch_state *_stt);
-json_value* read_json_literal(char prv,ch_state *_stt);
-
 char next_token(ch_state *_stt) {
 	for(int cur=_stt->rcur;cur<_stt->rsiz;cur++) {
 		if(!is_ws(_stt->_raw[cur])){
-			_stt->rcur = cur;
+			_stt->rcur = cur+1;
 			return _stt->_raw[cur];
 		}
 	}
@@ -51,10 +38,10 @@ json_value* read_json_value(ch_state *_stt) {
 		return new_json_value_num(read_json_num(_stt));
 
 		case '{':
-		return new_json_value_obj(read_json_object(_stt));
+		return read_json_object(_stt);
 
 		case '[':
-		return new_json_value_arr(read_json_array(_stt));
+		return read_json_array(_stt);
 
 		case 't':case'f':case'n':
 		return read_json_literal(ch,_stt);
@@ -67,14 +54,13 @@ json_value* read_json_value(ch_state *_stt) {
 // {}
 // { "" : value}
 // { "" : value, "" : value}
-json_object* read_json_object(ch_state *_stt) {
+json_value* read_json_object(ch_state *_stt) {
 	char ch = next_token(_stt);
 	if (ch=='}'){
-		return &json_value_null_object;
+		return json_value_null_object;
 	}
 	json_object *obj = make_json_object();
 	for(;;){
-		ch = next_token(_stt);
 		if (ch!='"'){
 			_stt->_err_msg = "json_object token '{' next is not '}' or '\"'";
 			break;
@@ -103,21 +89,22 @@ json_object* read_json_object(ch_state *_stt) {
 			_stt->_err_msg = "json_object pair next token is not ',' or '}'";
 			break;
 		}
+		ch = next_token(_stt);
 	}
 	if (_stt->_err_msg){
 		free_json_object(obj);
 		return NULL;
 	}
-	return obj;
+	return new_json_value_obj(obj);
 }
 
 // []
 // [value]
 // [value,value]
-json_array* read_json_array(ch_state *_stt) {
+json_value* read_json_array(ch_state *_stt) {
 	char ch = next_token(_stt);
 	if (ch==']'){
-		return &json_value_null_array;
+		return json_value_null_array;
 	}
 	json_array *arr = make_json_array();
 
@@ -143,7 +130,7 @@ json_array* read_json_array(ch_state *_stt) {
 		free_json_array(arr);
 		return NULL;
 	}
-	return arr;
+	return new_json_value_arr(arr);
 }
 
 // ""
@@ -181,7 +168,7 @@ double read_json_num(ch_state *_stt) {
 	}
 	char *_ss = __substr(_stt->_raw, cur, siz);
 	double val;
-	sscanf(_ss, "%f", &val);
+	sscanf(_ss, "%lf", &val);
 	return val;
 }
 
@@ -190,7 +177,7 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 		case 't':
 		{
 			if(__strcmp("rue",__substr(_stt->_raw,_stt->rcur,3))==0) {
-				return &json_value_true;
+				return json_value_true;
 			}
 		}
 		break;
@@ -198,7 +185,7 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 		case 'f':
 		{
 			if(__strcmp("alse",__substr(_stt->_raw,_stt->rcur,4))==0) {
-				return &json_value_false;
+				return json_value_false;
 			}
 		}
 		break;
@@ -206,7 +193,7 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 		case 'n':
 		{
 			if(__strcmp("ull",__substr(_stt->_raw,_stt->rcur,3))==0) {
-				return &json_value_null;
+				return json_value_null;
 			}
 		}
 		break;

@@ -6,23 +6,28 @@
 /*
  * JSON VALUE API
  */
-const json_value json_value_true = {
+json_value __json_value_true = {
     .typ = JSON_TRUE,
 };
-const json_value json_value_false = {
+json_value __json_value_false = {
     .typ = JSON_FALSE,
 };
-const json_value json_value_null = {
+json_value __json_value_null = {
     .typ = JSON_NULL,
 };
-const json_value json_value_null_object = {
+json_value __json_value_null_object = {
     .typ = JSON_OBJECT,
     .val = {.ptr=0},
 };
-const json_value json_value_null_array = {
+json_value __json_value_null_array = {
     .typ = JSON_ARRAY,
     .val = {.ptr=0},
 };
+json_value* const json_value_true = &__json_value_true;
+json_value* const json_value_false = &__json_value_false;
+json_value* const json_value_null = &__json_value_null;
+json_value* const json_value_null_object = &__json_value_null_object;
+json_value* const json_value_null_array = &__json_value_null_array;
 
 json_value *new_json_value_str(const char *_str) {
     MALLOC_TYPE(json_value,val);
@@ -45,35 +50,45 @@ json_value *new_json_value_num(const double _num) {
     return val;
 }
 
-json_value *new_json_value_obj(const json_object* _obj) {
+json_value *new_json_value_obj(json_object* _obj) {
     MALLOC_TYPE(json_value,val);
     val->typ = _obj?JSON_OBJECT:JSON_NULL;
     val->val.ptr = _obj;
     return val;
 }
 
-json_value *new_json_value_arr(const json_array* _arr) {
+json_value *new_json_value_arr(json_array* _arr) {
     MALLOC_TYPE(json_value,val);
     val->typ = _arr?JSON_ARRAY:JSON_NULL;
     val->val.ptr = _arr;
     return val;
 }
 
-void free_json_value(json_value *_val) {
+void free_json_value(json_value* _val) {
     switch (_val->typ) {
         case JSON_STRING:
             free(_val->val.ptr);
+            free(_val);
+        break;
+
+        case JSON_INTEGER:case JSON_NUMBER:
+            free(_val);
         break;
 
         case JSON_OBJECT:
-            free_json_object((json_object*)(_val->val.ptr));
+            if(_val!=json_value_null_object){
+                free_json_object((json_object*)(_val->val.ptr));
+                free(_val);
+            }
         break;
 
         case JSON_ARRAY:
-            free_json_array((json_array*)(_val->val.ptr));
+            if(_val!=json_value_null_array){
+                free_json_array((json_array*)(_val->val.ptr));
+                free(_val);
+            }
         break;
     }
-    free(_val);
 }
 
 /*
@@ -121,13 +136,13 @@ void json_object_put(json_object *_obj, const char *_name, json_value *_value) {
     rbTreeInsertData(_obj->_tr, _em);
 }
 
-void json_object_del(json_object *_obj, const char *_name) {
+void json_object_del(json_object *_obj, char *_name) {
     json_object_pair _pr; json_object_pair_setup(_pr, _name, NULL);
     elem_t _em; setup_elem_ptr(_em, &_pr);
     rbTreeDeleteData(_obj->_tr, _em);
 }
 
-json_value* json_object_get(json_object *_obj, const char *_name) {
+json_value* json_object_get(json_object *_obj, char *_name) {
     json_object_pair _pr; json_object_pair_setup(_pr, _name, NULL);
     elem_t _em; setup_elem_ptr(_em, &_pr);
     _em = rbTreeGetData(_obj->_tr, _em);
@@ -160,24 +175,6 @@ int json_object_size(const json_object *_obj) {
     return __tree_size(_obj->_tr);
 }
 
-char* json_object_encode(const json_object *_obj) {
-    char *buf = NULL;
-    int cnt = 0, siz = json_object_size(_obj);
-    bool encode_obj_fn(char *_name, json_value *_value) {
-        cnt++;
-        buf = __strcat(buf, "\"");
-        buf = __strcat(buf, _name);
-        buf = __strcat(buf, "\":");
-        buf = __strcat(buf, json_stringify(_value));
-        if (cnt<siz) {
-            buf = __strcat(buf, ",");
-        }
-        return true;
-    };
-    json_object_iter(_obj, encode_obj_fn);
-    return buf;
-}
-
 /*
  * JSON ARRAY
  */
@@ -192,7 +189,12 @@ void json_array_append(json_array *_arr, json_value *_val) {
     _arr->_arr = bArrayAppend(_arr->_arr, _em);
 }
 
+bool free_json_array_elem(size_t _idx, elem_t _dt){
+    json_value *val = cast_elem_typ(_dt, json_value*);
+    free_json_value(val);
+}
 void free_json_array(json_array *_arr) {
+    bArrayIter(_arr->_arr, free_json_array_elem);
     freeBArray(_arr->_arr);
     free(_arr);
 }
@@ -200,76 +202,3 @@ void free_json_array(json_array *_arr) {
 int json_array_size(const json_array *_arr) {
     return bArrayLen(_arr->_arr);
 }
-
-char* json_array_encode(const json_array *_arr) {
-    char *buf = NULL;
-    int cnt = 0, siz = json_array_size(_arr);
-    bool encode_arr_fn(size_t _idx, elem_t _dt) {
-        cnt++;
-        json_value *val = cast_elem_typ(_dt, json_value*);
-        buf = __strcat(buf, json_stringify(val));
-        if (cnt<siz) {
-            buf = __strcat(buf, ",");
-        }
-        return true;
-    };
-    bArrayIter(_arr->_arr, encode_arr_fn);
-    return buf;
-}
-
-/*
- * JSON API
- */
-char* json_stringify(const json_value *_val) {
-    
-    char * buf = NULL;
-    switch (_val->typ) {
-        case JSON_TRUE:
-        buf = __strcat(buf,"true");
-        break;
-
-        case JSON_FALSE:
-        buf = __strcat(buf,"false");
-        break;
-
-        case JSON_NULL:
-        buf = __strcat(buf,"null");
-        break;
-
-        case JSON_STRING:
-        buf = __strcat(buf, "\"");
-        buf = __strcat(buf,(char*)(_val->val.ptr));
-        buf = __strcat(buf, "\"");
-        break;
-
-        case JSON_INTEGER:
-        char ibuf[256];
-        sprintf(ibuf,"%ld\0",_val->val.i64);
-        buf = __strcat(buf,ibuf);
-        break;
-
-        case JSON_NUMBER:
-        char fbuf[256];
-        sprintf(fbuf,"%.6f\0",_val->val.f64);
-        buf = __strcat(buf,fbuf);
-        break;
-
-        case JSON_OBJECT:
-        buf = __strcat(buf, "{");
-        if (_val->val.ptr!=0){
-            buf = __strcat(buf,json_object_encode((json_object*)(_val->val.ptr)));
-        }
-        buf = __strcat(buf, "}");
-        break;
-
-        case JSON_ARRAY:
-        buf = __strcat(buf, "[");
-        if(_val->val.ptr!=0){
-            buf = __strcat(buf,json_array_encode((json_array*)(_val->val.ptr)));
-        }
-        buf = __strcat(buf, "]");
-        break;
-    }
-    return buf;
-}
-

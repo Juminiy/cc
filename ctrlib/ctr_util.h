@@ -96,4 +96,23 @@ static inline char* __substr(const char *__s, size_t __pos, size_t __len) {
 	return strncpy(__dst, __s+__pos, __len);
 }
 
+static inline char* __readfile(const char *__path) {
+	FILE *_pf = fopen(__path,"r");
+	if(_pf==NULL){
+		return NULL;
+	}
+
+	fseek(_pf, 0, SEEK_END);
+	long fsiz = ftell(_pf);
+	rewind(_pf);
+
+	char *buf = (char*)malloc(sizeof(char)*fsiz);
+	fread(buf, 1, fsiz, _pf);
+	fclose(_pf);
+
+	return buf;
+}
+
+#define MALLOC_TYPE(_typ,_val) _typ *_val = (_typ*)malloc(sizeof(_typ))
+
 #endif

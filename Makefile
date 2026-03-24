@@ -48,10 +48,12 @@ ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o ctr_barray.o ctr_bheap.o
 ctr_tree.a: ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
 	ar rcs $@ $^
 strstrpair.o: test/strstrpair.c
+ctr_sbuf.o: ctrlib/ctr_sbuf.c
 
 json.o: libjson/json.c
+json_encode.o: libjson/json_encode.c
 json_decode.o: libjson/json_decode.c
-json.a: json.o json_decode.o
+json.a: json.o json_encode.o json_decode.o
 	ar rcs $@ $^
 
 test: 
@@ -59,7 +61,7 @@ test:
 fdset_test.d: test/fdset_test.c skt_fdset.o
 poll_test.d: test/poll_test.c
 args_test.d: test/args_test.c
-str_test.d: test/str_test.c
+str_test.d: test/str_test.c ctr_sbuf.o
 klist_test.d: test/klist_test.c
 select_test.d: test/select_test.c
 logf_test.d: test/logf_test.c
@@ -92,7 +94,7 @@ bloom_test.d: test/bloom_test.c ctr_bloom.o ctr_bitmap.o strstrpair.o
 pair_test.d: test/pair_test.c
 btree_test.d: test/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
 huffman_test.d: test/huffman_test.c ctr_huffman.o ctr_map.o ctr_tree.a ctr_seq.a 
-json_test.d: test/json_test.c json.a ctr_map.o ctr_tree.a ctr_seq.a
+json_test.d: test/json_test.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
 
 hanoi.d: ai/hanoi.c
 

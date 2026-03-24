@@ -29,10 +29,11 @@
 ## LIBJSON (Zero dependency JSON Library)
 1. json encode
 2. json decode
+3. ctrlib/sbuf: safe string buffer
 
 ## Debug
 1. `gdb ./a.out -x a.gdbinit`
-2. `valgrind --tool=memcheck --leak-check=full a.out`
+2. `valgrind --tool=memcheck --leak-check=full ./a.out`
 
 ## Test
 ```bash

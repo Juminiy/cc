@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../ctrlib/ctr_util.h"
+#include "../ctrlib/ctr_sbuf.h"
 
 size_t __i_strlen (const char *__s) {
     size_t _l=0;
@@ -14,8 +15,7 @@ size_t __i_strlen (const char *__s) {
     return _l;
 }
 
-int main() {
-
+void test_test1(){
     // // 1. test '\0' truncated str's strlen
     // char chls[10] = {'\0'};
     // printf("chrs: %s, size: %ld", chls, strlen(chls));
@@ -65,6 +65,53 @@ int main() {
     free(s3);
 
     free(s0),free(s1),free(s2);
+}
 
+void test_test2() {
+    // test buf
+    // char buf[256];
+    // sprintf(buf,"%ld",(int64_t)4294962807);
+    // printf("%s\n",buf);
+
+    // test substr
+    // #define prf(_ss) \
+    //     do { if(_ss) {printf("%s\n",_ss);} else {printf("NULL\n");} } while(0)
+    // prf(__substr("abcde", 0, 3));
+    // prf(__substr("abcde", 1, 3));
+    // prf(__substr("abcde", 2, 3));
+    // prf(__substr("abcde", 3, 2));
+    // prf(__substr("abcde", 4, 3));
+
+    // prf(__substr("abcde", 2,0));
+
+    // test readfile
+    // printf("%s\n",__readfile("data/test/object_0.json"));
+}
+
+
+int main(int argc, char **argv) {
+
+    int ts = 1;
+    if(argc>1){
+        ts = strtol(argv[1],NULL,10);
+    }
+
+    sbuf *bf = makeSBuf(100);
+
+    // for(int i=0;i<ts;i++){
+    //     sBufWriteFmt(bf, "%d-%s-%f", 11, "ok", 6.66);
+    //     fprintf(stdout, "size=%ld, cap=%ld\n", sBufSize(bf), sBufCap(bf));
+    // }
+
+    sBufWrite(bf, "mycode");
+    sBufWrite(bf, "rrmy");
+    sBufWriteChar(bf, 'c');
+    sBufWriteI64(bf, 10);
+    sBufWriteF64(bf, 6.55);
+
+    fprintf(stdout, "str=%s, size=%ld, cap=%ld \n", sBufStr(bf),sBufSize(bf),sBufCap(bf));
+
+    freeSBuf(bf);
+    
     return 0;
 }
