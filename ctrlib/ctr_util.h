@@ -86,13 +86,22 @@ static inline char* __stradd(char *dst, const char *src) {
 	return __strcat(__strdup(dst), src);
 }
 
-// todo: test and fix
 static inline char* __substr(const char *__s, size_t __pos, size_t __len) {
 	size_t __sz = __strlen(__s);
 	if(__pos>=__sz||__pos+__len>__sz){
 		return NULL;
 	}
 	char *__dst = (char*)malloc(sizeof(char)*(__len+1));
+	strncpy(__dst, __s+__pos, __len);
+	__dst[__len] = '\0';
+	return __dst;
+}
+
+static inline char* __substr_2(char * __dst, const char *__s, size_t __pos, size_t __len) {
+	size_t __sz = __strlen(__s);
+	if(__pos>=__sz||__pos+__len>__sz){
+		return NULL;
+	}
 	strncpy(__dst, __s+__pos, __len);
 	__dst[__len] = '\0';
 	return __dst;
@@ -108,8 +117,9 @@ static inline char* __readfile(const char *__path) {
 	long fsiz = ftell(_pf);
 	rewind(_pf);
 
-	char *buf = (char*)malloc(sizeof(char)*fsiz);
+	char *buf = (char*)malloc(sizeof(char)*(fsiz+1));
 	fread(buf, 1, fsiz, _pf);
+	buf[fsiz]='\0';
 	fclose(_pf);
 
 	return buf;

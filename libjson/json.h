@@ -7,14 +7,23 @@
 #include "../ctrlib/ctr_util.h"
 #include "../ctrlib/ctr_elemt.h"
 
+// JSON TYPE
 #define JSON_TRUE    (int64_t)(1<<0)
 #define JSON_FALSE   (int64_t)(1<<1)
 #define JSON_NULL    (int64_t)(1<<2)
 #define JSON_STRING  (int64_t)(1<<3)
 #define JSON_INTEGER (int64_t)(1<<4)
+#define JSON_INTEGER_SINT JSON_INTEGER
+#define JSON_INTEGER_UINT (int64_t)((1<<4)|(1<<1))
 #define JSON_NUMBER  (int64_t)(1<<5)
 #define JSON_OBJECT  (int64_t)(1<<6)
 #define JSON_ARRAY   (int64_t)(1<<7)
+
+// JSON NUM
+#define JSON_INT_MAX  (double)INT64_MAX
+#define JSON_INT_MIN  (double)INT64_MIN
+#define JSON_UINT_MAX (double)UINT64_MAX
+#define JSON_NUM_MAX_SIZE (size_t)10000
 
 typedef struct json_value {
     int64_t  typ;
@@ -40,7 +49,9 @@ extern json_value* const json_value_null;        // null
 extern json_value* const json_value_null_object; // {}
 extern json_value* const json_value_null_array;  // []
 json_value* new_json_value_str(const char *_str);
+json_value *new_json_value_str_shallow(char *_str);
 json_value* new_json_value_int(const int64_t _int);
+json_value *new_json_value_uint(const uint64_t _uint);
 json_value* new_json_value_num(const double _num);
 json_value* new_json_value_obj(json_object* _obj);
 json_value* new_json_value_arr(json_array* _arr);
@@ -50,6 +61,7 @@ void free_json_value(json_value* _val);
 json_object* make_json_object();
 void free_json_object(json_object *_obj);
 void json_object_put(json_object *_obj, const char *_name, json_value *_value);
+void json_object_put_shallow_name(json_object *_obj, char *_name, json_value *_value);
 void json_object_del(json_object *_obj, char *_name);
 json_value* json_object_get(json_object *_obj, char *_name);
 typedef bool(*json_object_iter_func)(char *_name, json_value *_value);
@@ -68,27 +80,10 @@ bool json_valid(const char * _str);
 json_value* json_parse(const char *_str);
 char* json_stringify(const json_value *_val);
 // python_like API
-json_value* json_loads(const char *_str);
+void* json_loads(const char *_str);
 char* json_dumps(void *_obj);
 // golang_like API
-void json_unmarshal(const char *_str, void *_elem);
+char* json_unmarshal(const char *_str, void *_elem);
 char* json_marshal(void *_elem);
-
-typedef struct ch_state {
-	char * _raw;
-	int rcur,rsiz;
-	// char *_clean;
-	// int ccur,csiz;
-	char *_err_msg;
-} ch_state;
-
-char next_token(ch_state *_stt);
-json_value* read_json_value(ch_state *_stt);
-json_value* read_json_object(ch_state *_stt);
-json_value* read_json_array(ch_state *_stt);
-char* read_json_string(ch_state *_stt);
-int64_t read_json_int(ch_state *_stt);
-double read_json_num(ch_state *_stt);
-json_value* read_json_literal(char prv,ch_state *_stt);
 
 #endif

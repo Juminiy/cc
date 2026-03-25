@@ -35,11 +35,24 @@ json_value *new_json_value_str(const char *_str) {
     val->val.ptr = __strdup(_str);
     return val;
 }
+json_value *new_json_value_str_shallow(char *_str) {
+    MALLOC_TYPE(json_value,val);
+    val->typ = _str?JSON_STRING:JSON_NULL;
+    val->val.ptr = _str;
+    return val;
+}
 
 json_value *new_json_value_int(const int64_t _int) {
     MALLOC_TYPE(json_value,val);
     val->typ = JSON_INTEGER;
     val->val.i64 = _int;
+    return val;
+}
+
+json_value *new_json_value_uint(const uint64_t _uint) {
+    MALLOC_TYPE(json_value,val);
+    val->typ = JSON_INTEGER_UINT;
+    val->val.u64 = _uint;
     return val;
 }
 
@@ -109,6 +122,12 @@ json_object_pair* make_json_object_pair(const char *_name, json_value *_value) {
     _pr->value = _value;
     return _pr;
 }
+json_object_pair* make_json_object_pair_shallow_name(char *_name, json_value *_value) {
+    MALLOC_TYPE(json_object_pair, _pr);
+    _pr->name = _name;
+    _pr->value = _value;
+    return _pr;
+}
 
 void free_json_object_pair(elem_t _e) {
     json_object_pair *_pr = cast_elem_typ(_e, json_object_pair*);
@@ -132,6 +151,12 @@ void free_json_object(json_object *_obj) {
 
 void json_object_put(json_object *_obj, const char *_name, json_value *_value) {
     json_object_pair *_pr = make_json_object_pair(_name, _value);
+    elem_t _em; setup_elem_ptr(_em, _pr);
+    rbTreeInsertData(_obj->_tr, _em);
+}
+
+void json_object_put_shallow_name(json_object *_obj, char *_name, json_value *_value) {
+    json_object_pair *_pr = make_json_object_pair_shallow_name(_name, _value);
     elem_t _em; setup_elem_ptr(_em, _pr);
     rbTreeInsertData(_obj->_tr, _em);
 }
@@ -201,4 +226,11 @@ void free_json_array(json_array *_arr) {
 
 int json_array_size(const json_array *_arr) {
     return bArrayLen(_arr->_arr);
+}
+
+bool json_valid(const char * _str) {
+    json_value *val = json_parse(_str);
+    bool ok = val?true:false;
+    free_json_value(val);
+    return ok;
 }

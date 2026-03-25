@@ -58,6 +58,10 @@ void json_value_encode(const json_value *_val, sbuf *buf) {
         sBufWriteFmt(buf,"%ld",_val->val.i64);
         break;
 
+        case JSON_INTEGER_UINT:
+        sBufWriteFmt(buf,"%lu",_val->val.u64);
+        break;
+
         case JSON_NUMBER:
         sBufWriteFmt(buf,"%.6f",_val->val.f64);
         break;

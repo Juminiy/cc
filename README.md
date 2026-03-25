@@ -30,12 +30,22 @@
 1. json encode
 2. json decode
 3. ctrlib/sbuf: safe string buffer
+### weak performance decode optimization
+#### weak dimension
+1. memory huge
+2. decode time 300' slower than gostd 
+#### todo
+1. json_object use array, not rb_tree
+2. use pperf to opt core function
+3. yyjson/test data to test correctness
+4. analyse the profiling
 
 ## Debug
 1. `gdb ./a.out -x a.gdbinit`
 2. `valgrind --tool=memcheck --leak-check=full ./a.out`
 
 ## Test
+### AVLTree VS SkipList
 ```bash
 u@me:~/cc/cc$ time ./skiplist_test.d avl 10000000
 test AVLTree
@@ -51,4 +61,16 @@ len=9976776, level=12
 real    0m27.256s
 user    0m26.703s
 sys     0m0.552s
+```
+
+### Golang Std code.json
+performance is weak:
+```
+# ts
+bssize = 7238262B
+json decode time: 9262.6630ms
+json encode time: 13.3800ms
+
+# mem
+total heap usage: 689,401 allocs, 689,401 frees, 6,294,328,569 bytes 
 ```
