@@ -104,6 +104,11 @@ void free_json_value(json_value* _val) {
     }
 }
 
+json_value* new_json_value() {
+    MALLOC_TYPE(json_value,val);
+    return val;
+}
+
 /*
  * JSON OBJECT API 
  */

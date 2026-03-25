@@ -56,6 +56,7 @@ json_value* new_json_value_num(const double _num);
 json_value* new_json_value_obj(json_object* _obj);
 json_value* new_json_value_arr(json_array* _arr);
 void free_json_value(json_value* _val);
+json_value* new_json_value();
 
 // JSON OBJECT API
 json_object* make_json_object();
