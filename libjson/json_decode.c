@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#define CH_STATE_MAX_DEEPTH 10000
 /*
  * JSON DECODE API
  */
@@ -13,6 +14,7 @@ typedef struct ch_state {
 	// char *_clean;
 	// int ccur,csiz;
 	char *_err_msg;
+	int depth;
 } ch_state;
 
 char next_token(ch_state *_stt);
@@ -38,7 +40,11 @@ json_value* read_json_value(ch_state *_stt) {
 	char ch = next_token(_stt);
 	switch(ch) {
 		case '"':
-		return new_json_value_str_shallow(read_json_string(_stt));
+		char *_str = read_json_string(_stt);
+		if(_str==NULL){
+			return NULL;
+		}
+		return new_json_value_str_shallow(_str);
 		
 		case '-':case'0':case'1':
 		case'2':case'3':
@@ -57,6 +63,7 @@ json_value* read_json_value(ch_state *_stt) {
 		return read_json_literal(ch,_stt);
 
 		default:
+		_stt->_err_msg = "read illegal token, could not know what to do next";
 		return NULL;
 	}
 }
@@ -65,6 +72,11 @@ json_value* read_json_value(ch_state *_stt) {
 // { "" : value}
 // { "" : value, "" : value}
 json_value* read_json_object(ch_state *_stt) {
+	_stt->depth++;
+	if(_stt->depth>=CH_STATE_MAX_DEEPTH){
+		_stt->_err_msg = "'{' exceeded max depth";
+		return NULL;
+	}
 	char ch = next_token(_stt);
 	if (ch=='}'){
 		return json_value_null_object;
@@ -105,6 +117,7 @@ json_value* read_json_object(ch_state *_stt) {
 		free_json_object(obj);
 		return NULL;
 	}
+	_stt->depth--;
 	return new_json_value_obj(obj);
 }
 
@@ -112,6 +125,11 @@ json_value* read_json_object(ch_state *_stt) {
 // [value]
 // [value,value]
 json_value* read_json_array(ch_state *_stt) {
+	_stt->depth++;
+	if(_stt->depth>=CH_STATE_MAX_DEEPTH){
+		_stt->_err_msg = "'[' exceeded max depth";
+		return NULL;
+	}
 	char ch = next_token(_stt);
 	if (ch==']'){
 		return json_value_null_array;
@@ -140,76 +158,36 @@ json_value* read_json_array(ch_state *_stt) {
 		free_json_array(arr);
 		return NULL;
 	}
+	_stt->depth--;
 	return new_json_value_arr(arr);
 }
 
 // name\"
 char* read_json_string(ch_state *_stt) {
-	// find next \"
-	char *curptr = _stt->_raw+_stt->rcur;
-	char *endptr = strchr(curptr, '\"');
-	size_t siz = endptr-curptr;
-	char *_ss = __substr(curptr, 0, siz);
-	// todo: test and fix
-	for(int i=0;i<__strlen(_ss);i++){
-		if((_ss[i]>=0&&_ss[i]<=31)||(_ss[i]=='\\'||_ss[i]=='\"')){
-			free(_ss);
-			_ss = NULL;
-			_stt->_err_msg = "json_string include control character 0~31 or '\' or '\"'";
-			break;
-		}
+	json_value _val;
+	int read_sz = parse_json_string(_stt->_raw+_stt->rcur-1,&_val);
+	if(read_sz<0){ // allow 0
+		_stt->_err_msg = "json_string read error";
+		return NULL;
 	}
-	_stt->rcur += (siz+1);
-	return _ss;
+
+	_stt->rcur+=(read_sz+1);
+	return (char*)(_val.val.ptr);
 }
 
 // todo:
 // float/double: ieee754
 // int64 border
 json_value* read_json_num(ch_state *_stt) {
-	int cur = _stt->rcur-1, siz = 0;
-	bool only_digit = true;
-	for(;cur<_stt->rsiz;cur++){
-		if(isxdigit(_stt->_raw[cur])){
-			siz++;
-		} else {
-			break;
-		}
-		if(!isdigit(_stt->_raw[cur])){
-			only_digit=false;
-		}
-	}
-	if (siz>JSON_NUM_MAX_SIZE){
-		_stt->_err_msg = "json_number size overflow";
+	json_value _val;
+	int read_sz = parse_json_number(_stt->_raw+_stt->rcur-1,&_val);
+	if(read_sz<=0){
+		_stt->_err_msg = "json_number read error";
 		return NULL;
 	}
-	
-	char *_ss = __substr(_stt->_raw, _stt->rcur-1, siz);
-	_stt->rcur = cur;
-	double f64;
-	sscanf(_ss, "%lf", &f64);
 
-	json_value *val = NULL;
-	if(only_digit){
-		if(__strcmp(_ss,"0")==0) {
-			val = new_json_value_int(0);
-		} else if (siz>1&&_ss[0]=='0'){
-			_stt->_err_msg = "json_number integer include leading zero";
-		} else if (f64>=JSON_INT_MIN&&f64<=JSON_INT_MAX){
-			int64_t i64;
-			sscanf(_ss, "%ld", &i64);
-			val = new_json_value_int(i64);
-		} else if (f64>0.0&&f64<=JSON_UINT_MAX){
-			uint64_t u64;
-			sscanf(_ss, "%lu", &u64);
-			val = new_json_value_uint(u64);
-		}
-	}
-	free(_ss);
-	if(val==NULL&&_stt->_err_msg==NULL){
-		val = new_json_value_num(f64);
-	}
-	return val;
+	_stt->rcur += (read_sz-1);
+	return new_json_value_copy(&_val);
 }
 
 json_value* read_json_literal(char prv,ch_state *_stt) {
@@ -245,8 +223,10 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 		break;
 
 		default:
+		_stt->_err_msg = "json_literal not in true,false,null";
 		return NULL;
 	}
+	_stt->_err_msg = "json_literal not in true,false,null";
 	return NULL;
 }
 
@@ -256,6 +236,17 @@ json_value* json_parse(const char *_str) {
 		.rsiz=__strlen(_str),
 		._raw=_str,
 		._err_msg=NULL,
+		.depth=0,
 	};
-	return read_json_value(&_stt);
+	json_value *_val = read_json_value(&_stt);
+	if(_val==NULL){
+		return NULL;
+	}
+	
+	char ch = next_token(&_stt);
+	if(ch!=EOF){
+		free_json_value(_val);
+		return NULL;
+	}
+	return _val;
 }

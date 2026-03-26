@@ -88,14 +88,14 @@ void test_test2() {
     // printf("%s\n",__readfile("data/test/object_0.json"));
 }
 
+void escaped_char() {
+    char e_0='\"', e_1='"';
+    
+    printf("%d %d %c %c\n", e_0, e_1, e_0, e_1);
+}
 
-int main(int argc, char **argv) {
 
-    int ts = 1;
-    if(argc>1){
-        ts = strtol(argv[1],NULL,10);
-    }
-
+void test_sbuf() {
     sbuf *bf = makeSBuf(100);
 
     // for(int i=0;i<ts;i++){
@@ -112,6 +112,16 @@ int main(int argc, char **argv) {
     fprintf(stdout, "str=%s, size=%ld, cap=%ld \n", sBufStr(bf),sBufSize(bf),sBufCap(bf));
 
     freeSBuf(bf);
+}
+
+int main(int argc, char **argv) {
+
+    // int ts = 1;
+    // if(argc>1){
+    //     ts = strtol(argv[1],NULL,10);
+    // }
+
+    escaped_char();
     
     return 0;
 }

@@ -84,7 +84,7 @@ void free_json_value(json_value* _val) {
             free(_val);
         break;
 
-        case JSON_INTEGER:case JSON_NUMBER:
+        case JSON_NONE:case JSON_INTEGER:case JSON_INTEGER_UINT:case JSON_NUMBER:
             free(_val);
         break;
 
@@ -106,6 +106,14 @@ void free_json_value(json_value* _val) {
 
 json_value* new_json_value() {
     MALLOC_TYPE(json_value,val);
+    val->typ = JSON_NONE;
+    return val;
+}
+
+json_value* new_json_value_copy(const json_value* _val) {
+    MALLOC_TYPE(json_value,val);
+    val->typ = _val->typ;
+    val->val = _val->val;
     return val;
 }
 
@@ -236,6 +244,8 @@ int json_array_size(const json_array *_arr) {
 bool json_valid(const char * _str) {
     json_value *val = json_parse(_str);
     bool ok = val?true:false;
-    free_json_value(val);
+    if(val){
+        free_json_value(val);
+    }
     return ok;
 }

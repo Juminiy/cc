@@ -2,7 +2,7 @@
 #include <ctype.h>
 
 bool __can_endof_value(char _ch) {
-	return isspace(_ch)||_ch==','||_ch==']'||_ch=='}';
+	return isspace(_ch)||_ch==','||_ch==']'||_ch=='}'||_ch=='\0';
 }
 
 bool __can_endof_number(char _ch) {
@@ -16,7 +16,11 @@ bool __can_endof_number(char _ch) {
 #define IEEE754_INT_MINVSIZ 324
 
 
-size_t parse_json_number(char *_s, json_value *_val) {
+int parse_json_number(char *_s, json_value *_val) {
+	while(_s&&isspace(*_s)){
+		_s++;
+	}
+
 	char *_ssave = _s;
 
 	bool neg = false;
@@ -53,6 +57,10 @@ size_t parse_json_number(char *_s, json_value *_val) {
 			}
 		}
 	}
+	// if(_isz==0){
+	// 	// json_number integer section not found
+	// 	return -1;
+	// }
 
 	// fraction section
 	size_t _fsz = 0;
@@ -76,6 +84,9 @@ size_t parse_json_number(char *_s, json_value *_val) {
 		if(_s&&*_s=='-'){
 			_s++;
 			_eneg = true;
+		}else if(_s&&*_s=='+'){
+			_s++;
+			_eneg = false;
 		}
 		while(_s&&isdigit(*_s)){
 			_s++;
@@ -101,22 +112,29 @@ size_t parse_json_number(char *_s, json_value *_val) {
 	sscanf(_ssave, "%lf", &f64);
 	_val->typ = JSON_NUMBER;
 	_val->val.f64 = f64;
-	if(f64>=JSON_INT_MIN&&f64<=JSON_INT_MAX){
-		int64_t i64;
-		sscanf(_ssave, "%lld", &i64);
-		_val->typ = JSON_INTEGER;
-		_val->val.i64 = i64;
-	} else if(f64>0&&f64<=JSON_UINT_MAX){
-		uint64_t u64;
-		sscanf(_ssave, "%llu", &u64);
-		_val->typ = JSON_INTEGER_UINT;
-		_val->val.u64 = u64;
+	if(_fsz==0&&_esz==0){
+		if(f64>=JSON_INT_MIN&&f64<=JSON_INT_MAX){
+			int64_t i64;
+			sscanf(_ssave, "%ld", &i64);
+			_val->typ = JSON_INTEGER;
+			_val->val.i64 = i64;
+		} else if(f64>0&&f64<=JSON_UINT_MAX){
+			uint64_t u64;
+			sscanf(_ssave, "%lu", &u64);
+			_val->typ = JSON_INTEGER_UINT;
+			_val->val.u64 = u64;
+		}
 	}
-
+	
 	return _s-_ssave;
 }
 
-size_t parse_json_string(char *_s, json_value *_val) {
+// "aa\t"
+int parse_json_string(char *_s, json_value *_val) {
+	while(_s&&isspace(*_s)){
+		_s++;
+	}
+
 	if(!_s||*_s!='\"'){
 		return -1;
 	}
@@ -127,17 +145,43 @@ size_t parse_json_string(char *_s, json_value *_val) {
 	}
 	size_t siz = _endp-_s;
 
-	for(size_t _i=0;_i<siz;_i++){
-		
-		if(_s[_i]=='\"'||_s[_i]=='\\'||iscntrl(_s[_i])){
+	for(size_t _i=0;_i<siz;){
+		if(_s[_i]=='\\'){
+			_i++;
+			if(_i==siz){
+				return -1;
+			}
+			if(_s[_i]=='\"'||_s[_i]=='\\'||_s[_i]=='/'||
+				_s[_i]=='b'||_s[_i]=='f'||_s[_i]=='n'||
+				_s[_i]=='r'||_s[_i]=='t'){
+				_i++;
+			} else if(_s[_i]=='u'){
+				_i++;
+				if(_i+3<siz&&
+					isxdigit(_s[_i+1])&&
+					isxdigit(_s[_i+2])&&
+					isxdigit(_s[_i+3])&&
+					isxdigit(_s[_i+0])){
+					_i+=4;
+				} else {
+					return -1;
+				}
+			} else {
+				return -1;
+			}
+		} else if (_s[_i]==127) { // seem as escaped
+			_i++;
+		} else if(iscntrl(_s[_i])){
 			return -1;
+			// _i++;
+		} else {
+			_i++;
 		}
-
 	}
 
 	_val->typ = JSON_STRING;
 	_val->val.ptr = __substr(_s,0,siz);
 
-	return _s;
+	return siz;
 
 }

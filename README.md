@@ -39,6 +39,14 @@
 2. use pperf to opt core function
 3. yyjson/test data to test correctness
 4. analyse the profiling
+#### ASK
+1. how to recognize '\t' with ' ', '\n' with '', '\"' with '"', ...
+2. how to recognize :
+![null_del](libjson/pic/char_null_del.png), 
+![formfeed](libjson/pic/char_formfeed.png),
+![\u2060](libjson/pic/char_u2060.png)
+3. invalid json: ![stackoverflow](libjson/pic/invalid_json_stack_overflow.png)
+4. object or array exceeded maxdepth
 
 ## Debug
 1. `gdb ./a.out -x a.gdbinit`

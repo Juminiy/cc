@@ -1,6 +1,8 @@
 #include "../libjson/json.h"
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
+#include "../ctrlib/ctr_sbuf.h"
 
 #define print_time_ms(__block, __desc) \
     do { \
@@ -96,18 +98,151 @@ void inspect_char(const char *_path){
     free(buf);
 }
 
+char* json_value_strfmt(json_value *val) {
+    sbuf *bf = makeSBuf(100);
+    switch(val->typ) {
+        case JSON_NONE:
+        sBufWrite(bf,"NONE");
+        break;
+
+        case JSON_TRUE:
+        sBufWrite(bf,"true");
+        break;
+
+        case JSON_FALSE:
+        sBufWrite(bf,"false");
+        break;
+
+        case JSON_NULL:
+        sBufWrite(bf,"null");
+        break;
+
+        case JSON_STRING:
+        sBufWriteFmt(bf,"\"%s\"",(char*)val->val.ptr);
+        break;
+
+        case JSON_INTEGER:
+        sBufWriteFmt(bf,"%ld",val->val.i64);
+        break;
+
+        case JSON_INTEGER_UINT:
+        sBufWriteFmt(bf,"%lu",val->val.u64);
+        break;
+
+        case JSON_NUMBER:
+        sBufWriteFmt(bf,"%.6f",val->val.f64);
+        break;
+
+        case JSON_OBJECT:
+        sBufWriteFmt(bf,"OBJECT<%p>",val->val.ptr);
+        break;
+
+        case JSON_ARRAY:
+        sBufWriteFmt(bf,"ARRAY<%p>",val->val.ptr);
+        break;
+
+    }
+
+    return sBufStr(bf);
+}
+
+#define COLOR_RED "\033[0;31"
+#define COLOR_GREEN "\033[0;32"
+#define COLOR_CLEAR "\033[0m"
+
+// buf="$number y"
+// buf="$number n"
+void test_parse_num_line(char *buf) {
+    char *_sptr = strrchr(buf, ' ');
+    size_t _off = _sptr-buf;
+    char *_ln = __substr(buf,0,_off);
+    json_value *val = new_json_value();
+    parse_json_number(_ln,val);
+    if((buf[_off+1]=='n'&&val->typ==JSON_NONE)||  // should fail, parse fail
+        (buf[_off+1]=='y'&&val->typ!=JSON_NONE)){ // should sucs, parse sucs
+        printf("OK: src[%s] dst[%s]\n",
+            _ln,json_value_strfmt(val));
+    } else {
+        printf("ERROR: src[%s] dst[%s]\n",
+            _ln,json_value_strfmt(val));
+    }
+    json_value_strfmt(val);
+    free_json_value(val);
+}
+
+void test_parse_num1(){
+    FILE *fd = fopen("data/json/num_test_parsing.txt", "r");
+    if(fd==NULL){return;}
+    char buf[256];
+    while(fgets(buf, 256, fd)){
+        test_parse_num_line(buf);
+    }
+}
+
+void test_parse_num2() {
+    char *buf[] = {
+        "1 000.0 n",
+    };
+    for(int i=0;i<1;i++){
+        test_parse_num_line(buf[i]);
+    }
+}
+
+// buf="$string y"
+// buf="$string n"
+void test_parse_str_line(char *buf) {
+    char *_sptr = strrchr(buf, ' ');
+    if (_sptr==NULL){
+        // printf("between \" and \" has a '\\000'\n");
+        return;
+    }
+    size_t _off = _sptr-buf;
+    char *_ln = __substr(buf,0,_off);
+    json_value *val = new_json_value();
+    parse_json_string(_ln,val);
+    if((buf[_off+1]=='n'&&val->typ==JSON_NONE)||  // should fail, parse fail
+        (buf[_off+1]=='y'&&val->typ!=JSON_NONE)){ // should sucs, parse sucs
+        // printf("OK: src[%s] dst[%s]\n",
+        //     _ln,json_value_strfmt(val));
+    } else {
+        printf("ERROR: src[%s] dst[%s]\n",
+            _ln,json_value_strfmt(val));
+    }
+    json_value_strfmt(val);
+    free_json_value(val);
+}
+
+void test_parse_str1(){
+    FILE *fd = fopen("data/json/str_test_parsing.txt", "r");
+    if(fd==NULL){return;}
+    char buf[256];
+    while(fgets(buf, 256, fd)){
+        // printf("RUN: %s\n", buf);
+        test_parse_str_line(buf);
+    }
+}
+
+/*
+"\
+"a
+"a
+*/
+void test_parse_str2() {
+    char *buf[] = {
+    };
+    for(int i=0;i<1;i++){
+        test_parse_num_line(buf[i]);
+    }
+}
+
 int main(int argc, char **argv){
-
-    // test_json_encode();
-
     if (argc<2){
         fprintf(stderr, "path: argv[1] not found\n");
         return 0;
     }
     // test_json_decode(argv[1]);
-    // output_valid(argv[1]);
 
-    inspect_char(argv[1]);
-    
+    output_valid(argv[1]);
+
     return 0;
 }

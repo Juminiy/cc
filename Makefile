@@ -53,7 +53,8 @@ ctr_sbuf.o: ctrlib/ctr_sbuf.c
 json.o: libjson/json.c
 json_encode.o: libjson/json_encode.c
 json_decode.o: libjson/json_decode.c
-json.a: json.o json_encode.o json_decode.o
+json_parse.o: libjson/json_parse.c
+json.a: json.o json_encode.o json_decode.o json_parse.o
 	ar rcs $@ $^
 
 test: 

@@ -8,13 +8,14 @@
 #include "../ctrlib/ctr_elemt.h"
 
 // JSON TYPE
+#define JSON_NONE    (int64_t)(0)
 #define JSON_TRUE    (int64_t)(1<<0)
 #define JSON_FALSE   (int64_t)(1<<1)
 #define JSON_NULL    (int64_t)(1<<2)
 #define JSON_STRING  (int64_t)(1<<3)
 #define JSON_INTEGER (int64_t)(1<<4)
 #define JSON_INTEGER_SINT JSON_INTEGER
-#define JSON_INTEGER_UINT (int64_t)((1<<4)|(1<<1))
+#define JSON_INTEGER_UINT (int64_t)(JSON_INTEGER|(1<<1))
 #define JSON_NUMBER  (int64_t)(1<<5)
 #define JSON_OBJECT  (int64_t)(1<<6)
 #define JSON_ARRAY   (int64_t)(1<<7)
@@ -57,6 +58,7 @@ json_value* new_json_value_obj(json_object* _obj);
 json_value* new_json_value_arr(json_array* _arr);
 void free_json_value(json_value* _val);
 json_value* new_json_value();
+json_value* new_json_value_copy(const json_value* _val);
 
 // JSON OBJECT API
 json_object* make_json_object();
@@ -87,7 +89,7 @@ char* json_dumps(void *_obj);
 char* json_unmarshal(const char *_str, void *_elem);
 char* json_marshal(void *_elem);
 
-size_t parse_json_number(char *_s, json_value *_val);
-size_t parse_json_string(char *_s, json_value *_val);
+int parse_json_number(char *_s, json_value *_val);
+int parse_json_string(char *_s, json_value *_val);
 
 #endif
