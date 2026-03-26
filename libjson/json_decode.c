@@ -170,7 +170,7 @@ json_value* read_json_num(ch_state *_stt) {
 	int cur = _stt->rcur-1, siz = 0;
 	bool only_digit = true;
 	for(;cur<_stt->rsiz;cur++){
-		if(is_num(_stt->_raw[cur])){
+		if(isxdigit(_stt->_raw[cur])){
 			siz++;
 		} else {
 			break;

@@ -115,3 +115,29 @@ size_t parse_json_number(char *_s, json_value *_val) {
 
 	return _s-_ssave;
 }
+
+size_t parse_json_string(char *_s, json_value *_val) {
+	if(!_s||*_s!='\"'){
+		return -1;
+	}
+	_s++;
+	char *_endp = strchr(_s,'\"');
+	if(_endp==NULL){
+		return -1;
+	}
+	size_t siz = _endp-_s;
+
+	for(size_t _i=0;_i<siz;_i++){
+		
+		if(_s[_i]=='\"'||_s[_i]=='\\'||iscntrl(_s[_i])){
+			return -1;
+		}
+
+	}
+
+	_val->typ = JSON_STRING;
+	_val->val.ptr = __substr(_s,0,siz);
+
+	return _s;
+
+}

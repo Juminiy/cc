@@ -32,7 +32,7 @@ void opt_json_value(json_value* value,
 void test_json_encode(){
     json_object *obj = make_json_object();
     json_object_put(obj,"age",new_json_value_int(11));
-    json_object_put(obj,"name",new_json_value_str("hachimi"));
+    json_object_put(obj,"name",new_json_value_str("和意为"));
     json_object_put(obj,"height",new_json_value_num(180.22));
     json_object_put(obj,"norm",json_value_true);
     json_object_put(obj,"var",json_value_false);
@@ -84,6 +84,18 @@ void output_valid(const char *_path) {
     free(buf);
 }
 
+void inspect_char(const char *_path){
+    char *buf = __readfile(_path);
+
+    printf("%s\n", buf);
+
+    for(int i =0;i<__strlen(buf);i++){
+        printf("%c\n",buf[i]);
+    }
+
+    free(buf);
+}
+
 int main(int argc, char **argv){
 
     // test_json_encode();
@@ -93,7 +105,9 @@ int main(int argc, char **argv){
         return 0;
     }
     // test_json_decode(argv[1]);
-    output_valid(argv[1]);
+    // output_valid(argv[1]);
+
+    inspect_char(argv[1]);
     
     return 0;
 }

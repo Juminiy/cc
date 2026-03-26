@@ -87,4 +87,7 @@ char* json_dumps(void *_obj);
 char* json_unmarshal(const char *_str, void *_elem);
 char* json_marshal(void *_elem);
 
+size_t parse_json_number(char *_s, json_value *_val);
+size_t parse_json_string(char *_s, json_value *_val);
+
 #endif
