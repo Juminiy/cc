@@ -1,13 +1,11 @@
 #include "json.h"
 #include <ctype.h>
 
-bool __can_endof_value(char _ch) {
-	return isspace(_ch)||_ch==','||_ch==']'||_ch=='}'||_ch=='\0';
-}
+#define __can_endof_value(_ch) \
+	(isspace(_ch)||_ch==','||_ch==']'||_ch=='}'||_ch=='\0') // todo: add or del ||_ch=='\0'
 
-bool __can_endof_number(char _ch) {
-	return __can_endof_value(_ch);
-}
+#define __can_endof_number(_ch) \
+	(__can_endof_value(_ch))
 
 // 1.7976931348623157 × 10³⁰⁸
 #define IEEE754_INT_MAXVSIZ 308

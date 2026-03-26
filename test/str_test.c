@@ -92,6 +92,9 @@ void escaped_char() {
     char e_0='\"', e_1='"';
     
     printf("%d %d %c %c\n", e_0, e_1, e_0, e_1);
+
+    char n_0='\000', n_1='\0';
+    printf("%d, %d, %c, %c\n", n_0,n_1,n_0,n_1);
 }
 
 

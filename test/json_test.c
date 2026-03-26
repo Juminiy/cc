@@ -240,9 +240,9 @@ int main(int argc, char **argv){
         fprintf(stderr, "path: argv[1] not found\n");
         return 0;
     }
-    test_json_decode(argv[1]);
+    // test_json_decode(argv[1]);
 
-    // output_valid(argv[1]);
+    output_valid(argv[1]);
 
     return 0;
 }
