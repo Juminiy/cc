@@ -68,7 +68,7 @@ void test_json_decode(const char *_path){
             "json decode time"
         );
 
-        opt_json_value(val,true,false,true);
+        opt_json_value(val,true,true,true);
     } else {
         printf("path:%s no buffer\n",_path);
     }
@@ -240,9 +240,9 @@ int main(int argc, char **argv){
         fprintf(stderr, "path: argv[1] not found\n");
         return 0;
     }
-    // test_json_decode(argv[1]);
+    test_json_decode(argv[1]);
 
-    output_valid(argv[1]);
+    // output_valid(argv[1]);
 
     return 0;
 }

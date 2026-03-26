@@ -129,35 +129,36 @@ int parse_json_number(char *_s, json_value *_val) {
 	return _s-_ssave;
 }
 
+#define __sptr_null(__s) (!(__s)||*(__s)=='\0')
+
 // "aa\t"
 int parse_json_string(char *_s, json_value *_val) {
 	while(_s&&isspace(*_s)){
 		_s++;
 	}
 
-	if(!_s||*_s!='\"'){
+	if(!_s||*_s!='"'){
 		return -1;
 	}
 	_s++;
-	char *_endp = strchr(_s,'\"');
-	if(_endp==NULL){
-		return -1;
-	}
-	size_t siz = _endp-_s;
 
-	for(size_t _i=0;_i<siz;){
-		if(_s[_i]=='\\'){
+	size_t siz = 0;
+	for(size_t _i=0;;){
+		if(_s[_i]=='"'){
+			siz=_i;
+			break;
+		} else if(_s[_i]=='\\'){ // start escape
 			_i++;
-			if(_i==siz){
+			if(__sptr_null(_s+_i)){
 				return -1;
 			}
-			if(_s[_i]=='\"'||_s[_i]=='\\'||_s[_i]=='/'||
+			if(_s[_i]=='"'||_s[_i]=='\\'||_s[_i]=='/'||
 				_s[_i]=='b'||_s[_i]=='f'||_s[_i]=='n'||
 				_s[_i]=='r'||_s[_i]=='t'){
 				_i++;
 			} else if(_s[_i]=='u'){
 				_i++;
-				if(_i+3<siz&&
+				if(!__sptr_null(_s+_i+4)&&
 					isxdigit(_s[_i+1])&&
 					isxdigit(_s[_i+2])&&
 					isxdigit(_s[_i+3])&&
