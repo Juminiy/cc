@@ -10,8 +10,8 @@
 
 #include <getopt.h>
 
-#include "../tcplib/tcp_lib.h"
-#include "../tcplib/net_util.h"
+#include "../tcp/tcp_lib.h"
+#include "../tcp/net_util.h"
 
 // int glb_skt_fd = -1;
 // void __attribute__((destructor)) __inexit() {

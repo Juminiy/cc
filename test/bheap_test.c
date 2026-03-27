@@ -1,4 +1,4 @@
-#include "../ctrlib/ctr_bheap.h"
+#include "../libctr/ctr_bheap.h"
 
 #include <stdlib.h>
 #include <time.h>

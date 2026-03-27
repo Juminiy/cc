@@ -1,4 +1,4 @@
-#include "../ctrlib/ctr_rbtree.h"
+#include "../libctr/ctr_rbtree.h"
 
 int int_cmp(elem_t e0, elem_t e1){
 	return e0.uni.i64 - e1.uni.i64;

@@ -2,10 +2,10 @@
 #define LIB_JSON_H
 
 #include <stdint.h>
-#include "../ctrlib/ctr_rbtree.h"
-#include "../ctrlib/ctr_barray.h"
-#include "../ctrlib/ctr_util.h"
-#include "../ctrlib/ctr_elemt.h"
+#include "../libctr/ctr_rbtree.h"
+#include "../libctr/ctr_barray.h"
+#include "../libctr/ctr_util.h"
+#include "../libctr/ctr_elemt.h"
 
 // JSON TYPE
 #define JSON_NONE    (int64_t)(0)
@@ -74,8 +74,13 @@ int json_object_size(const json_object *_obj);
 // JSON ARRAY API
 json_array* make_json_array();
 void json_array_append(json_array *_arr, json_value *_val);
+json_value* json_array_get(json_array *_arr, int _idx);
 void free_json_array(json_array *_arr);
 int json_array_size(const json_array *_arr);
+
+// JSON NUMBER AND STRING API
+int parse_json_number(char *_s, json_value *_val);
+int parse_json_string(char *_s, json_value *_val);
 
 // JSON API
 bool json_valid(const char * _str);
@@ -89,7 +94,16 @@ char* json_dumps(void *_obj);
 char* json_unmarshal(const char *_str, void *_elem);
 char* json_marshal(void *_elem);
 
-int parse_json_number(char *_s, json_value *_val);
-int parse_json_string(char *_s, json_value *_val);
+// JSON PATH API
+json_value* json_get_value(json_value *_val, char *_path[], size_t _n);
+bool json_get_true(json_value *_val, char *_path[], size_t _n);
+bool json_get_false(json_value *_val, char *_path[], size_t _n);
+bool json_get_null(json_value *_val, char *_path[], size_t _n);
+char* json_get_str(json_value *_val, char *_path[], size_t _n);
+int64_t json_get_int(json_value *_val, char *_path[], size_t _n);
+uint64_t json_get_uint(json_value *_val, char *_path[], size_t _n);
+double json_get_num(json_value *_val, char *_path[], size_t _n);
+json_object* json_get_object(json_value *_val, char *_path[], size_t _n);
+json_array* json_get_array(json_value *_val, char *_path[], size_t _n);
 
 #endif

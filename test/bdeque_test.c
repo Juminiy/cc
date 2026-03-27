@@ -1,5 +1,5 @@
-#include "../ctrlib/ctr_bstack.h"
-#include "../ctrlib/ctr_bqueue.h"
+#include "../libctr/ctr_bstack.h"
+#include "../libctr/ctr_bqueue.h"
 
 #include <stdio.h>
 

@@ -1,6 +1,6 @@
 // #include <stdio.h>
 
-// #include "../ctrlib/ctr_map.h"
+// #include "../libctr/ctr_map.h"
 
 // bool print_sspair(char *_key, char *_val){
 //     printf("<%s:%s>\n", _key, _val);
@@ -87,7 +87,7 @@
 // }
 
 
-#include "../ctrlib/ctr_map.h"
+#include "../libctr/ctr_map.h"
 #include "strstrpair.h"
 
 #include <stdlib.h>

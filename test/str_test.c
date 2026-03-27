@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../ctrlib/ctr_util.h"
-#include "../ctrlib/ctr_sbuf.h"
+#include "../libctr/ctr_util.h"
+#include "../libctr/ctr_sbuf.h"
 
 size_t __i_strlen (const char *__s) {
     size_t _l=0;
@@ -124,7 +124,13 @@ int main(int argc, char **argv) {
     //     ts = strtol(argv[1],NULL,10);
     // }
 
-    escaped_char();
+    // escaped_char();
+
+    int i32 = strtol("-113",NULL,10);
+    int64_t i64 = strtoll("-114444",NULL,10);
+    uint64_t u64 = strtoull("333",NULL,10);
+    double f64 = strtof("1e+4", NULL);
+    printf("%d, %ld, %lu, %.6lf",i32,i64,u64,f64);
     
     return 0;
 }

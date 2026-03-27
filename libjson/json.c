@@ -227,6 +227,14 @@ void json_array_append(json_array *_arr, json_value *_val) {
     _arr->_arr = bArrayAppend(_arr->_arr, _em);
 }
 
+json_value* json_array_get(json_array *_arr, int _idx) {
+    elem_t _em = bArrayAt(_arr->_arr,_idx);
+    if(valid_elem_t(_em)){
+        return cast_elem_typ(_em, json_value*);
+    }
+    return NULL;
+}
+
 bool free_json_array_elem(size_t _idx, elem_t _dt){
     json_value *val = cast_elem_typ(_dt, json_value*);
     free_json_value(val);

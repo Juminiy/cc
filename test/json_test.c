@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "../ctrlib/ctr_sbuf.h"
+#include "../libctr/ctr_sbuf.h"
 
 #define print_time_ms(__block, __desc) \
     do { \
@@ -235,6 +235,40 @@ void test_parse_str2() {
     }
 }
 
+void test_json_pathv(json_value *_val){
+    char *path1[] = {"0","key","k2","0"};
+    printf("%s\n", json_get_str(_val, path1, 4));
+    char *path2[] = {"0","key","k2","1","k3"};
+    printf("%s\n", json_get_str(_val, path2, 5));
+    char *path3[] = {"0","key","k2","1","k4","0","k5","k6","0"};
+    printf("%s\n", json_get_str(_val, path3, 9));
+}
+
+void test_json_path(char * _fpath) {
+    char * buf = __readfile(_fpath);
+
+    json_value *val = json_parse(buf);
+    if(val){
+        // printf("array = %p\n", json_get_array(val,NULL,0));
+        // printf("object = %p\n", json_get_object(val,NULL,0));
+        // printf("null = %d\n", json_get_null(val,NULL,0));
+        // printf("true = %d\n", json_get_true(val,NULL,0));
+        // printf("false = %d\n", json_get_false(val,NULL,0));
+        // printf("int = %ld\n", json_get_int(val,NULL,0));
+        // printf("uint = %lu\n", json_get_uint(val,NULL,0));
+        // printf("num = %.6f\n", json_get_num(val,NULL,0));
+        // printf("str = %s\n", json_get_str(val,NULL,0));
+
+        // puts("");
+
+        test_json_pathv(val);
+    }
+
+
+    free_json_value(val);
+    free(buf);
+}
+
 int main(int argc, char **argv){
     if (argc<2){
         fprintf(stderr, "path: argv[1] not found\n");
@@ -242,7 +276,7 @@ int main(int argc, char **argv){
     }
     // test_json_decode(argv[1]);
 
-    output_valid(argv[1]);
+    test_json_path(argv[1]);
 
     return 0;
 }

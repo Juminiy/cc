@@ -6,62 +6,83 @@ import json
 import pathlib
 
 basedir="data/json"
-test0="test_parsing"
+input_dir="test_parsing"
+output_dir="test_parsing_output"
 
-c_binname="json_test.d"
+c_binname="json_valid.d"
 
 
 def run_json_test_d():
-    yfile,nfile,efile = [],[],[]
+    yfile,nfile,efile,ifile = [],[],[],{"n":[],"y":[]}
     subprocess.run(["make", c_binname])
     tot,cnt = 0,0
-    for pfile in os.listdir(f'{basedir}/{test0}'):
+    for pfile in os.listdir(f'{basedir}/{input_dir}'):
         tot+=1
         should_res = pfile[0]
-        pfile_full = f'{basedir}/{test0}/{pfile}'
+        pfile_full = f'{basedir}/{input_dir}/{pfile}'
         exec_res = subprocess.run([f"./{c_binname}", pfile_full], 
                     capture_output=True, text=True)
+
+        py_res = ''
+        try:
+            json.loads(open(pfile_full).read())
+            py_res = 'y'
+        except Exception:
+            py_res = 'n'
+
         if should_res != exec_res.stdout:
             if len(exec_res.stdout) == 0:
                 efile.append({
                     "src_file": pfile_full,
                     "should_res": should_res,
-                    "exec_res": exec_res.stdout,
+                    "python_res": py_res,
+                    "myc_res": exec_res.stdout,
                 })
                 cnt+=1
             elif should_res=='y':
                 yfile.append({
                     "src_file": pfile_full,
                     "should_res": should_res,
-                    "exec_res": exec_res.stdout,
+                    "python_res": py_res,
+                    "myc_res": exec_res.stdout,
                 })
                 cnt+=1
             elif should_res=='n':
                 nfile.append({
                     "src_file": pfile_full,
                     "should_res": should_res,
-                    "exec_res": exec_res.stdout,
+                    "python_res": py_res,
+                    "myc_res": exec_res.stdout,
                 })
                 cnt+=1
-            
+            elif should_res=='i':
+                if py_res!=exec_res.stdout:
+                    ifile[exec_res.stdout].append({
+                        "src_file": pfile_full,
+                        "should_res": should_res,
+                        "python_res": py_res,
+                        "exec_res": exec_res.stdout,
+                    })
     
-    with open(f'{basedir}/y_{test0}.json', 'w') as fp:
+    with open(f'{basedir}/{output_dir}/y.json', 'w') as fp:
         fp.write(json.dumps(yfile))
-    with open(f'{basedir}/n_{test0}.json', 'w') as fp:
+    with open(f'{basedir}/{output_dir}/n.json', 'w') as fp:
         fp.write(json.dumps(nfile))
-    with open(f'{basedir}/e_{test0}.json', 'w') as fp:
+    with open(f'{basedir}/{output_dir}/e.json', 'w') as fp:
         fp.write(json.dumps(efile))
+    with open(f'{basedir}/{output_dir}/i.json', 'w') as fp:
+        fp.write(json.dumps(ifile))
     
     print(f'fail: {cnt}/{tot}, y: {len(yfile)}, n: {len(nfile)}, e: {len(efile)}')
 
 def generate_pretest_file():
-    numf = open(f'{basedir}/num_{test0}.txt','w')
-    strf = open(f'{basedir}/str_{test0}.txt','w')
-    for pfile in os.listdir(f'{basedir}/{test0}'):
+    numf = open(f'{basedir}/{output_dir}/num.txt','w')
+    strf = open(f'{basedir}/{output_dir}/str.txt','w')
+    for pfile in os.listdir(f'{basedir}/{input_dir}'):
         if pfile[:8]=='y_number' or pfile[:8]=='n_number' or \
             pfile[:8]=='y_string' or pfile[:8]=='n_string':
             try:
-                bs = open(f'{basedir}/{test0}/{pfile}', 'r').readline()
+                bs = open(f'{basedir}/{input_dir}/{pfile}', 'r').readline()
                 bsstr = str(bs).removesuffix('\n')
                 target = bsstr
                 if bsstr.startswith("[") and bsstr.endswith("]"):
@@ -73,7 +94,12 @@ def generate_pretest_file():
                 if pfile[:8]=='y_string' or pfile[:8]=='n_string':
                     strf.write(f'{target} {pfile[0]}\n')
             except Exception as e:
-                print(f'file: {pfile}')
+                print(f'file: {pfile}, read exception: {e}')
 
 if __name__ == "__main__":
+    if not pathlib.Path(f'{basedir}/{input_dir}').exists():
+        print(f'{basedir}/{input_dir} not found, please copy test/data from yyjson')
+        exit()
+    os.makedirs(f'{basedir}/{output_dir}',exist_ok=True)
+    generate_pretest_file()
     run_json_test_d()

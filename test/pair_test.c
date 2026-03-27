@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../ctrlib/ctr_pair.h"
+#include "../libctr/ctr_pair.h"
 
 int main() {
 

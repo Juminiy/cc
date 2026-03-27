@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../ctrlib/ctr_bloom.h"
+#include "../libctr/ctr_bloom.h"
 #include "strstrpair.h"
 
 int main(int argc, char **argv) {

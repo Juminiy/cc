@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../ctrlib/ctr_elemt.h"
+#include "../libctr/ctr_elemt.h"
 
 void print_size() {
     #define ptsz(typ) printf("%22s %ld\n", #typ, sizeof(typ))

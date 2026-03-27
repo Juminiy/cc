@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../ctrlib/ctr_btree.h"
+#include "../libctr/ctr_btree.h"
 #include "strstrpair.h"
 
 // 1,000,000 * int

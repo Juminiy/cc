@@ -1,4 +1,4 @@
-#include "../ctrlib/ctr_lfu.h"
+#include "../libctr/ctr_lfu.h"
 
 #include <stdlib.h>
 #include <stdio.h>

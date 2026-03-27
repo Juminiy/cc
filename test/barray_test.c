@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <time.h>
 
-#include "../ctrlib/ctr_barray.h"
+#include "../libctr/ctr_barray.h"
 
 void print_intarr(barray arr) {
     printf("[ ");

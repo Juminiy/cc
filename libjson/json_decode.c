@@ -22,7 +22,7 @@ json_value* read_json_value(ch_state *_stt);
 json_value* read_json_object(ch_state *_stt);
 json_value* read_json_array(ch_state *_stt);
 char* read_json_string(ch_state *_stt);
-json_value* read_json_num(ch_state *_stt);
+json_value* read_json_number(ch_state *_stt);
 json_value* read_json_literal(char prv,ch_state *_stt);
 
 char next_token(ch_state *_stt) {
@@ -51,7 +51,7 @@ json_value* read_json_value(ch_state *_stt) {
 		case'4':case'5':
 		case'6':case'7':
 		case'8':case'9':
-		return read_json_num(_stt);
+		return read_json_number(_stt);
 
 		case '{':
 		return read_json_object(_stt);
@@ -90,6 +90,10 @@ json_value* read_json_object(ch_state *_stt) {
 		char *obj_pair_name = read_json_string(_stt);
 		if (obj_pair_name==NULL){
 			_stt->_err_msg = "json_object pair name string scanned invalid";
+			break;
+		}
+		if(json_object_get(obj,obj_pair_name)){
+			_stt->_err_msg = "json_object name duplicated";
 			break;
 		}
 		ch = next_token(_stt);
@@ -175,10 +179,9 @@ char* read_json_string(ch_state *_stt) {
 	return (char*)(_val.val.ptr);
 }
 
-// todo:
 // float/double: ieee754
-// int64 border
-json_value* read_json_num(ch_state *_stt) {
+// int64/uint64: border
+json_value* read_json_number(ch_state *_stt) {
 	json_value _val;
 	int read_sz = parse_json_number(_stt->_raw+_stt->rcur-1,&_val);
 	if(read_sz<=0){

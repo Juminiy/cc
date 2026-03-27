@@ -1,5 +1,6 @@
 #!/bin/bash
 
-python3 script/test_json.py
-make json_test.d
-./json_test.d
+for fpy in json_test_checker.py  json_test_encoding.py  json_test_parsing.py  json_test_roundtrip.py  json_test_transform.py json_test_yyjson.py
+do
+    python3 python/$fpy
+done

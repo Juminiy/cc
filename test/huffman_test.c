@@ -1,4 +1,4 @@
-#include "../ctrlib/ctr_huffman.h"
+#include "../libctr/ctr_huffman.h"
 
 #include <stdio.h>
 

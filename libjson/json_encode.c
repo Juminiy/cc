@@ -1,5 +1,5 @@
 #include "json.h"
-#include "../ctrlib/ctr_sbuf.h"
+#include "../libctr/ctr_sbuf.h"
 
 /*
  * JSON Encode API

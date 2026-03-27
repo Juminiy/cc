@@ -1,7 +1,7 @@
 #ifndef NET_UTIL_H
 #define NET_UTIL_H
 
-#include "../ctrlib/ctr_blist.h"
+#include "../../libctr/ctr_blist.h"
 
 typedef struct intfip {
     char _ip[135]; // size = IPv4:12+3, IPv6:128+7

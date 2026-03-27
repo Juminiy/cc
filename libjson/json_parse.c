@@ -11,8 +11,7 @@
 #define IEEE754_INT_MAXVSIZ 308
 // 2.2250738585072014 × 10⁻³⁰⁸
 // 4.9406564584124654 × 10⁻³²⁴
-#define IEEE754_INT_MINVSIZ 324
-
+#define IEEE754_EXP_MAXVAL 324
 
 int parse_json_number(char *_s, json_value *_val) {
 	while(_s&&isspace(*_s)){
@@ -86,10 +85,12 @@ int parse_json_number(char *_s, json_value *_val) {
 			_s++;
 			_eneg = false;
 		}
+		int expv=0;
 		while(_s&&isdigit(*_s)){
+			expv = expv*10+(*_s-'0');
 			_s++;
 			_esz++;
-			if (_esz>IEEE754_INT_MINVSIZ) {
+			if (expv>IEEE754_EXP_MAXVAL) {
 				// json_number exponent overflow IEEE754 double floating point
 				return -1;
 			}
