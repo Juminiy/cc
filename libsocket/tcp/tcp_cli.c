@@ -6,8 +6,8 @@
 
 #include <sys/socket.h>
 
-#include "../tcp/tcp_lib.h"
-#include "../tcp/net_util.h"
+#include "tcp_lib.h"
+#include "net_util.h"
 
 #include <time.h>
 #include <unistd.h>

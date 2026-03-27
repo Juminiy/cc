@@ -2,7 +2,7 @@
 #include <ctype.h>
 
 #define __can_endof_value(_ch) \
-	(isspace(_ch)||_ch==','||_ch==']'||_ch=='}'||_ch=='\0') // todo: add or del ||_ch=='\0'
+	(isspace(_ch)||_ch==','||_ch==']'||_ch=='}') // json file in any position, character can not be '\0'
 
 #define __can_endof_number(_ch) \
 	(__can_endof_value(_ch))

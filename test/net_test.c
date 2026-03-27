@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../tcplib/net_util.h"
+#include "../libsocket/tcp/net_util.h"
 
 int main() {
 
