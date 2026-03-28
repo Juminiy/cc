@@ -51,7 +51,9 @@ void json_value_encode(const json_value *_val, sbuf *buf) {
         break;
 
         case JSON_STRING:
-        sBufWriteFmt(buf,"\"%s\"",(char*)(_val->val.ptr));
+        if(_val->val.ptr!=0){
+            sBufWriteFmt(buf,"\"%s\"",(char*)(_val->val.ptr));
+        }
         break;
 
         case JSON_INTEGER:

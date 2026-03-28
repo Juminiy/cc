@@ -23,21 +23,36 @@ json_value __json_value_null_array = {
     .typ = JSON_ARRAY,
     .val = {.ptr=0},
 };
+json_value __json_value_null_str = {
+    .typ = JSON_STRING,
+    .val = {.ptr=0},
+};
 json_value* const json_value_true = &__json_value_true;
 json_value* const json_value_false = &__json_value_false;
 json_value* const json_value_null = &__json_value_null;
 json_value* const json_value_null_object = &__json_value_null_object;
 json_value* const json_value_null_array = &__json_value_null_array;
+json_value* const json_value_null_str = &__json_value_null_str;
 
 json_value *new_json_value_str(const char *_str) {
+    if(_str==NULL){
+        return json_value_null;
+    } else if(__strlen(_str)==0){
+        return json_value_null_str;
+    }
     MALLOC_TYPE(json_value,val);
-    val->typ = _str?JSON_STRING:JSON_NULL;
+    val->typ = JSON_STRING;
     val->val.ptr = __strdup(_str);
     return val;
 }
 json_value *new_json_value_str_shallow(char *_str) {
+    if(_str==NULL){
+        return json_value_null;
+    } else if(__strlen(_str)==0){
+        return json_value_null_str;
+    }
     MALLOC_TYPE(json_value,val);
-    val->typ = _str?JSON_STRING:JSON_NULL;
+    val->typ = JSON_STRING;
     val->val.ptr = _str;
     return val;
 }
@@ -64,15 +79,25 @@ json_value *new_json_value_num(const double _num) {
 }
 
 json_value *new_json_value_obj(json_object* _obj) {
+    if(_obj==NULL){
+        return json_value_null;
+    } else if(json_object_size(_obj)==0){
+        return json_value_null_object;
+    }
     MALLOC_TYPE(json_value,val);
-    val->typ = _obj?JSON_OBJECT:JSON_NULL;
+    val->typ = JSON_OBJECT;
     val->val.ptr = _obj;
     return val;
 }
 
 json_value *new_json_value_arr(json_array* _arr) {
+    if(_arr==NULL){
+        return json_value_null;
+    } else if(json_array_size(_arr)==0){
+        return json_value_null_array;
+    }
     MALLOC_TYPE(json_value,val);
-    val->typ = _arr?JSON_ARRAY:JSON_NULL;
+    val->typ = JSON_ARRAY;
     val->val.ptr = _arr;
     return val;
 }
@@ -80,9 +105,16 @@ json_value *new_json_value_arr(json_array* _arr) {
 void free_json_value(json_value* _val) {
     switch (_val->typ) {
         case JSON_STRING:
-            free(_val->val.ptr);
-            free(_val);
+            if(_val!=json_value_null_str){
+                free(_val->val.ptr);
+                free(_val);
+            }
         break;
+
+        case JSON_NULL:
+            if(_val!=json_value_null){
+                free(_val);
+            }
 
         case JSON_NONE:case JSON_INTEGER:case JSON_INTEGER_UINT:case JSON_NUMBER:
             free(_val);
@@ -251,6 +283,15 @@ int json_array_size(const json_array *_arr) {
 
 bool json_valid(const char * _str) {
     json_value *val = json_parse(_str);
+    bool ok = val?true:false;
+    if(val){
+        free_json_value(val);
+    }
+    return ok;
+}
+
+bool json_nvalid(const char *_str, size_t _n) {
+    json_value *val = json_nparse(_str,_n);
     bool ok = val?true:false;
     if(val){
         free_json_value(val);

@@ -57,33 +57,25 @@ void test_json_encode(){
 }
 
 void test_json_decode(const char *_path){
-    char * buf = __readfile(_path);
+    roSBuf buf = readFileAll(_path);
     
-    printf("bssize = %ldB\n", __strlen(buf));
+    printf("bssize = %ldB\n", roSBufSiz(buf));
 
-    if (buf!=NULL){
+    if (roSBufStr(buf)){
         json_value *val;
         print_time_ms(
-            val = json_parse(buf);,
+            val = json_nparse(roSBufStr(buf),roSBufSiz(buf));,
             "json decode time"
         );
-
-        opt_json_value(val,true,true,true);
+        
+        if(val){
+            opt_json_value(val,true,false,true);
+        }
     } else {
         printf("path:%s no buffer\n",_path);
     }
     
-    free(buf);
-}
-
-void output_valid(const char *_path) {
-    char *buf = __readfile(_path);
-
-    bool ok = json_valid(buf);
-
-    printf("%s", ok?"y":"n");
-
-    free(buf);
+    freeROSBuf(buf);
 }
 
 void inspect_char(const char *_path){
@@ -274,9 +266,9 @@ int main(int argc, char **argv){
         fprintf(stderr, "path: argv[1] not found\n");
         return 0;
     }
-    // test_json_decode(argv[1]);
+    test_json_decode(argv[1]);
 
-    test_json_path(argv[1]);
+    // test_json_path(argv[1]);
 
     return 0;
 }

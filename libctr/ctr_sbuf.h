@@ -51,5 +51,19 @@ void sBufMergeFree(sbuf* _dst, sbuf* _src);
         _s->_siz += sz; \
     } while(0)
 
+// read only safe string buffer
+#define ROSBUF_INIT_NONE 0
+#define ROSBUF_INIT_ALLOC 1
+#define ROSBUF_INIT_LITERAL 2
+#define ROSBUF_INIT_SHALLOW_COPY 3
+typedef struct roSBuf {
+    char *_p;
+    size_t _siz;
+    int _init_type;
+} roSBuf;
+#define roSBufStr(_buf) (_buf._p)
+#define roSBufSiz(_buf) (_buf._siz)
+roSBuf readFileAll(const char *_fpath);
+void freeROSBuf(roSBuf _buf);
 
 #endif

@@ -6,6 +6,7 @@
 #include "../libctr/ctr_barray.h"
 #include "../libctr/ctr_util.h"
 #include "../libctr/ctr_elemt.h"
+#include "../libctr/ctr_sbuf.h"
 
 // JSON TYPE
 #define JSON_NONE    (int64_t)(0)
@@ -25,6 +26,8 @@
 #define JSON_INT_MIN  (double)INT64_MIN
 #define JSON_UINT_MAX (double)UINT64_MAX
 #define JSON_NUM_MAX_SIZE (size_t)10000
+
+#define JSON_SPACE(_ch) ((_ch)==9||(_ch)==10||(_ch)==13||(_ch)==32)
 
 typedef struct json_value {
     int64_t  typ;
@@ -49,10 +52,11 @@ extern json_value* const json_value_false;       // false
 extern json_value* const json_value_null;        // null
 extern json_value* const json_value_null_object; // {}
 extern json_value* const json_value_null_array;  // []
+extern json_value* const json_value_null_str;    // ""
 json_value* new_json_value_str(const char *_str);
-json_value *new_json_value_str_shallow(char *_str);
+json_value* new_json_value_str_shallow(char *_str);
 json_value* new_json_value_int(const int64_t _int);
-json_value *new_json_value_uint(const uint64_t _uint);
+json_value* new_json_value_uint(const uint64_t _uint);
 json_value* new_json_value_num(const double _num);
 json_value* new_json_value_obj(json_object* _obj);
 json_value* new_json_value_arr(json_array* _arr);
@@ -81,11 +85,15 @@ int json_array_size(const json_array *_arr);
 // JSON NUMBER AND STRING API
 int parse_json_number(char *_s, json_value *_val);
 int parse_json_string(char *_s, json_value *_val);
+int parse_json_number_v2(roSBuf _buf, json_value *_val);
+int parse_json_string_v2(roSBuf _buf, json_value *_val);
 
 // JSON API
 bool json_valid(const char * _str);
+bool json_nvalid(const char *_str, size_t _n);
 // javasript_like API
 json_value* json_parse(const char *_str);
+json_value* json_nparse(const char *_str, size_t _n);
 char* json_stringify(const json_value *_val);
 // python_like API
 void* json_loads(const char *_str);

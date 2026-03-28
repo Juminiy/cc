@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define CH_STATE_MAX_DEEPTH 10000
+#define CH_STATE_MAX_DEEPTH 100000
 /*
  * JSON DECODE API
  */
@@ -14,7 +14,8 @@ typedef struct ch_state {
 	// char *_clean;
 	// int ccur,csiz;
 	char *_err_msg;
-	int depth;
+	int _d0; // [
+	int _d1; // {
 } ch_state;
 
 char next_token(ch_state *_stt);
@@ -27,7 +28,7 @@ json_value* read_json_literal(char prv,ch_state *_stt);
 
 char next_token(ch_state *_stt) {
 	for(int cur=_stt->rcur;cur<_stt->rsiz;cur++) {
-		if(!isspace(_stt->_raw[cur])){
+		if(!JSON_SPACE(_stt->_raw[cur])){
 			_stt->rcur = cur+1;
 			return _stt->_raw[cur];
 		}
@@ -72,8 +73,8 @@ json_value* read_json_value(ch_state *_stt) {
 // { "" : value}
 // { "" : value, "" : value}
 json_value* read_json_object(ch_state *_stt) {
-	_stt->depth++;
-	if(_stt->depth>=CH_STATE_MAX_DEEPTH){
+	_stt->_d0++;
+	if(_stt->_d0>=CH_STATE_MAX_DEEPTH){
 		_stt->_err_msg = "'{' exceeded max depth";
 		return NULL;
 	}
@@ -121,7 +122,7 @@ json_value* read_json_object(ch_state *_stt) {
 		free_json_object(obj);
 		return NULL;
 	}
-	_stt->depth--;
+	_stt->_d0--;
 	return new_json_value_obj(obj);
 }
 
@@ -129,8 +130,8 @@ json_value* read_json_object(ch_state *_stt) {
 // [value]
 // [value,value]
 json_value* read_json_array(ch_state *_stt) {
-	_stt->depth++;
-	if(_stt->depth>=CH_STATE_MAX_DEEPTH){
+	_stt->_d1++;
+	if(_stt->_d1>=CH_STATE_MAX_DEEPTH){
 		_stt->_err_msg = "'[' exceeded max depth";
 		return NULL;
 	}
@@ -162,14 +163,15 @@ json_value* read_json_array(ch_state *_stt) {
 		free_json_array(arr);
 		return NULL;
 	}
-	_stt->depth--;
+	_stt->_d1--;
 	return new_json_value_arr(arr);
 }
 
 // name\"
 char* read_json_string(ch_state *_stt) {
 	json_value _val;
-	int read_sz = parse_json_string(_stt->_raw+_stt->rcur-1,&_val);
+	roSBuf _sbuf = {._p=_stt->_raw+_stt->rcur-1,._siz=_stt->rsiz-_stt->rcur+1,._init_type=ROSBUF_INIT_SHALLOW_COPY};
+	int read_sz = parse_json_string_v2(_sbuf,&_val);
 	if(read_sz<0){ // allow 0
 		_stt->_err_msg = "json_string read error";
 		return NULL;
@@ -183,7 +185,8 @@ char* read_json_string(ch_state *_stt) {
 // int64/uint64: border
 json_value* read_json_number(ch_state *_stt) {
 	json_value _val;
-	int read_sz = parse_json_number(_stt->_raw+_stt->rcur-1,&_val);
+	roSBuf _sbuf = {._p=_stt->_raw+_stt->rcur-1,._siz=_stt->rsiz-_stt->rcur+1,._init_type=ROSBUF_INIT_SHALLOW_COPY};
+	int read_sz = parse_json_number_v2(_sbuf,&_val);
 	if(read_sz<=0){
 		_stt->_err_msg = "json_number read error";
 		return NULL;
@@ -224,10 +227,6 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 			}
 		}
 		break;
-
-		default:
-		_stt->_err_msg = "json_literal not in true,false,null";
-		return NULL;
 	}
 	_stt->_err_msg = "json_literal not in true,false,null";
 	return NULL;
@@ -239,9 +238,35 @@ json_value* json_parse(const char *_str) {
 		.rsiz=__strlen(_str),
 		._raw=_str,
 		._err_msg=NULL,
-		.depth=0,
+		._d0=0,
+		._d1=0,
 	};
 	json_value *_val = read_json_value(&_stt);
+	if(_val==NULL){
+		return NULL;
+	}
+	
+	char ch = next_token(&_stt);
+	if(ch!=EOF){
+		free_json_value(_val);
+		return NULL;
+	}
+	return _val;
+}
+
+json_value* json_nparse(const char *_str, size_t _n) {
+	ch_state _stt = {
+		.rcur=0,
+		.rsiz=_n,
+		._raw=_str,
+		._err_msg=NULL,
+		._d0=0,
+		._d1=0,
+	};
+	json_value *_val = read_json_value(&_stt);
+	if(_stt._err_msg){
+		fprintf(stderr, "[JSON parse_error]: %s\n", _stt._err_msg);
+	}
 	if(_val==NULL){
 		return NULL;
 	}

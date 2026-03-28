@@ -1,13 +1,13 @@
 #include "../libjson/json.h"
 
 void output_valid(const char *_path) {
-    char *buf = __readfile(_path);
+    roSBuf buf = readFileAll(_path);
 
-    bool ok = json_valid(buf);
+    bool ok = json_nvalid(roSBufStr(buf), roSBufSiz(buf));
 
     printf("%s", ok?"y":"n");
 
-    free(buf);
+    freeROSBuf(buf);
 }
 
 int main(int argc, char**argv){

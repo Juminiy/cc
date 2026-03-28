@@ -95,3 +95,32 @@ void sBufMergeFree(sbuf* _dst, sbuf* _src) {
     sBufMerge(_dst, _src);
     freeSBuf(_src);
 }
+
+roSBuf readFileAll(const char *_fpath) {
+    roSBuf _buf = {._p=NULL,._siz=0,._init_type=ROSBUF_INIT_NONE};
+    FILE *_pf = fopen(_fpath,"r");
+	if(_pf==NULL){
+		return _buf;
+	}
+
+	fseek(_pf, 0, SEEK_END);
+	long fsiz = ftell(_pf);
+	rewind(_pf);
+
+    char *_content = (char*)malloc(sizeof(char)*fsiz);
+	fread(_content, 1, fsiz, _pf);
+	fclose(_pf);
+
+    _buf._p = _content;
+    _buf._siz = fsiz;
+    _buf._init_type = ROSBUF_INIT_ALLOC;
+
+	return _buf;
+}
+
+void freeROSBuf(roSBuf _buf) {
+    switch (_buf._init_type) {
+        case ROSBUF_INIT_ALLOC:
+        free(_buf._p);
+    }
+}

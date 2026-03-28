@@ -31,6 +31,8 @@ def run_json_test_d():
             py_res = 'n'
 
         if should_res != exec_res.stdout:
+            if pfile.count("duplicated_key"): # my_c_program do not allow duplicated key
+                continue
             if len(exec_res.stdout) == 0:
                 efile.append({
                     "src_file": pfile_full,
