@@ -101,6 +101,7 @@ btree_test.d: test/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
 huffman_test.d: test/huffman_test.c ctr_huffman.o ctr_map.o ctr_tree.a ctr_seq.a 
 json_test.d: test/json_test.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
 json_valid.d: test/json_valid.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
+file_test.d: test/file_test.c
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM
