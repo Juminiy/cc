@@ -34,8 +34,12 @@ typedef struct json_value {
     elem_uni val;
 } json_value;
 
+#define JSON_OBJECT_RBTREE 1
+#define JSON_OBJECT_BARRAY 2
 typedef struct json_object {
+    int _underlying_type;
     rb_tree *_tr; // <json_object_pair*>
+    barray _arr; // <json_object_pair*>
 } json_object;
 typedef struct json_object_pair {
     char        *name;
