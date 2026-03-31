@@ -21,10 +21,9 @@
    4. server give the avaliable ipv4 or ipv6 network addresses.
 
 ## LIBCTR (Container Library)
-1. sequential: blist, bqueue, bstack, barray
-2. associative: bstree, avltree, rbtree, bheap
-3. multiple-associative: m-bst, m-avl, m-rb
-4. ring, skiplist
+1. sequential: barray,blist,bqueue,bstack,pair
+2. associative: bheap,hashtable,btree,map,rbtree,skiplist,avltree,bstree,rbtree,mavltree
+3. huffmantree,lfu,lru,bitmap,bloom
 
 ## LIBJSON (Zero dependency JSON Library)
 1. json encode
