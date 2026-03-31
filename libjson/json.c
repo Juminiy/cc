@@ -115,6 +115,7 @@ void free_json_value(json_value* _val) {
             if(_val!=json_value_null){
                 free(_val);
             }
+        break;
 
         case JSON_NONE:case JSON_INTEGER:case JSON_INTEGER_UINT:case JSON_NUMBER:
             free(_val);
@@ -181,6 +182,7 @@ void free_json_object_pair(elem_t _e) {
     free(_pr);
 }
 
+#ifdef JSON_OBJECT_RBTREE
 json_object* make_json_object() {
     MALLOC_TYPE(json_object, _obj);
     _obj->_tr = makeRBTree(json_object_pair_cmp);
@@ -244,9 +246,62 @@ void json_object_iter(json_object *_obj,json_object_iter_func _fn) {
 int json_object_size(const json_object *_obj) {
     return __tree_size(_obj->_tr);
 }
+#else
+json_object* make_json_object() {
+    MALLOC_TYPE(json_object, _obj);
+    _obj->_arr = makeBArray(0,0);
+    bArraySetElemCmp(_obj->_arr, json_object_pair_cmp);
+    return _obj;
+}
+
+bool free_json_object_pair_iter(size_t _idx, elem_t _dt) {
+    json_object_pair *_pr = cast_elem_typ(_dt, json_object_pair*);
+    free_json_object_pair(_dt);
+    return true;
+}
+
+void free_json_object(json_object *_obj) {
+    bArrayIter(_obj->_arr, free_json_object_pair_iter);
+    freeBArray(_obj->_arr);
+    free(_obj);
+}
+
+void json_object_put(json_object *_obj, const char *_name, json_value *_value) {
+    json_object_pair *_pr = make_json_object_pair(_name, _value);
+    elem_t _em; setup_elem_ptr(_em, _pr);
+    _obj->_arr = bArrayAppend(_obj->_arr, _em);
+}
+
+void json_object_put_shallow_name(json_object *_obj, char *_name, json_value *_value) {
+    json_object_pair *_pr = make_json_object_pair_shallow_name(_name, _value);
+    elem_t _em; setup_elem_ptr(_em, _pr);
+    _obj->_arr = bArrayAppend(_obj->_arr, _em);
+}
+
+void json_object_del(json_object *_obj, char *_name) {
+    // underlying barray does not support delete
+}
+
+json_value* json_object_get(json_object *_obj, char *_name) {
+    // underlying barray does not support delete
+    return NULL;
+}
+
+void json_object_iter(json_object *_obj,json_object_iter_func _fn) {
+    bool json_object_pair_iter(size_t _idx, elem_t _dt){
+        json_object_pair *_pr = cast_elem_typ(_dt, json_object_pair*);
+        return _fn(_pr->name, _pr->value);
+    };
+    bArrayIter(_obj->_arr, json_object_pair_iter);
+}
+
+int json_object_size(const json_object *_obj) {
+    return bArrayLen(_obj->_arr);
+}
+#endif
 
 /*
- * JSON ARRAY
+ * JSON ARRAY API
  */
 json_array* make_json_array() {
     MALLOC_TYPE(json_array, _arr);

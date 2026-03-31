@@ -34,10 +34,10 @@ typedef struct json_value {
     elem_uni val;
 } json_value;
 
-#define JSON_OBJECT_RBTREE 1
-#define JSON_OBJECT_BARRAY 2
+// compile args
+// JSON_OBJECT_RBTREE
+// JSON_OBJECT_BARRAY
 typedef struct json_object {
-    int _underlying_type;
     rb_tree *_tr; // <json_object_pair*>
     barray _arr; // <json_object_pair*>
 } json_object;
@@ -95,16 +95,9 @@ int parse_json_string_v2(roSBuf _buf, json_value *_val);
 // JSON API
 bool json_valid(const char * _str);
 bool json_nvalid(const char *_str, size_t _n);
-// javasript_like API
 json_value* json_parse(const char *_str);
 json_value* json_nparse(const char *_str, size_t _n);
 char* json_stringify(const json_value *_val);
-// python_like API
-void* json_loads(const char *_str);
-char* json_dumps(void *_obj);
-// golang_like API
-char* json_unmarshal(const char *_str, void *_elem);
-char* json_marshal(void *_elem);
 
 // JSON PATH API
 json_value* json_get_value(json_value *_val, char *_path[], size_t _n);

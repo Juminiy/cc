@@ -53,6 +53,7 @@ ctr_sbuf.o: libctr/ctr_sbuf.c
 
 # libjson
 json.o: libjson/json.c
+	$(CC) -c -o $@ $< $(cplargs) -DJSON_OBJECT_RBTREE
 json_encode.o: libjson/json_encode.c
 json_decode.o: libjson/json_decode.c
 json_parse.o: libjson/json_parse.c

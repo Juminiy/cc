@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define CH_STATE_MAX_DEEPTH 100000
+#define CH_STATE_MAX_DEEPTH 10000
 /*
  * JSON DECODE API
  */
@@ -182,7 +182,7 @@ char* read_json_string(ch_state *_stt) {
 }
 
 // float/double: ieee754
-// int64/uint64: border
+// int64/uint64: only [2^63,2^64-1] can be uint64, others are int64
 json_value* read_json_number(ch_state *_stt) {
 	json_value _val;
 	roSBuf _sbuf = {._p=_stt->_raw+_stt->rcur-1,._siz=_stt->rsiz-_stt->rcur+1,._init_type=ROSBUF_INIT_SHALLOW_COPY};
@@ -197,11 +197,14 @@ json_value* read_json_number(ch_state *_stt) {
 }
 
 json_value* read_json_literal(char prv,ch_state *_stt) {
+	int cur = _stt->rcur;
 	switch (prv){
 		case 't':
 		{
-			char buf[4];
-			if(__strcmp("rue",__substr_2(buf,_stt->_raw,_stt->rcur,3))==0) {
+			if(cur+3<=_stt->rsiz&&
+				_stt->_raw[cur]=='r'&&
+				_stt->_raw[cur+1]=='u'&&
+				_stt->_raw[cur+2]=='e') {
 				_stt->rcur+=3;
 				return json_value_true;
 			}
@@ -210,8 +213,11 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 
 		case 'f':
 		{
-			char buf[5];
-			if(__strcmp("alse",__substr_2(buf,_stt->_raw,_stt->rcur,4))==0) {
+			if(cur+4<=_stt->rsiz&&
+				_stt->_raw[cur]=='a'&&
+				_stt->_raw[cur+1]=='l'&&
+				_stt->_raw[cur+2]=='s'&&
+				_stt->_raw[cur+3]=='e') {
 				_stt->rcur+=4;
 				return json_value_false;
 			}
@@ -219,9 +225,11 @@ json_value* read_json_literal(char prv,ch_state *_stt) {
 		break;
 
 		case 'n':
-		{	
-			char buf[4];
-			if(__strcmp("ull",__substr_2(buf,_stt->_raw,_stt->rcur,3))==0) {
+		{
+			if(cur+3<=_stt->rsiz&&
+				_stt->_raw[cur]=='u'&&
+				_stt->_raw[cur+1]=='l'&&
+				_stt->_raw[cur+2]=='l') {
 				_stt->rcur+=3;
 				return json_value_null;
 			}

@@ -107,7 +107,8 @@ roSBuf readFileAll(const char *_fpath) {
 	long fsiz = ftell(_pf);
 	rewind(_pf);
 
-    char *_content = (char*)malloc(sizeof(char)*fsiz);
+    char *_content = (char*)malloc(sizeof(char)*(fsiz+1));
+    _content[fsiz] = '\0';
 	fread(_content, 1, fsiz, _pf);
 	fclose(_pf);
 
@@ -121,6 +122,7 @@ roSBuf readFileAll(const char *_fpath) {
 void freeROSBuf(roSBuf _buf) {
     switch (_buf._init_type) {
         case ROSBUF_INIT_ALLOC:
-        free(_buf._p);
+            free(_buf._p);
+        break;
     }
 }
