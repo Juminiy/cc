@@ -11,6 +11,18 @@ output_dir="test_parsing_output"
 
 c_binname="json_valid.d"
 
+def json_parse(filename:str):
+    py_res = ''
+    try:
+        json.loads(open(filename).read())
+        py_res = 'y'
+    except Exception:
+        try:
+            json.loads(open(filename,'rb').read())
+            py_res = 'y'
+        except Exception:
+            py_res = 'n'
+    return py_res
 
 def run_json_test_d():
     yfile,nfile,efile,ifile = [],[],[],{"n":[],"y":[]}
@@ -23,12 +35,7 @@ def run_json_test_d():
         exec_res = subprocess.run([f"./{c_binname}", pfile_full], 
                     capture_output=True, text=True)
 
-        py_res = ''
-        try:
-            json.loads(open(pfile_full).read())
-            py_res = 'y'
-        except Exception:
-            py_res = 'n'
+        py_res = json_parse(pfile_full)
 
         if should_res != exec_res.stdout:
             if pfile.count("duplicated_key"): # my_c_program do not allow duplicated key
@@ -103,5 +110,5 @@ if __name__ == "__main__":
         print(f'{basedir}/{input_dir} not found, please copy test/data from yyjson')
         exit()
     os.makedirs(f'{basedir}/{output_dir}',exist_ok=True)
-    generate_pretest_file()
+    # generate_pretest_file()
     run_json_test_d()

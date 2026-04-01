@@ -9,6 +9,19 @@ outputdir="test_yyjson_output"
 
 c_binname="./json_valid.d"
 
+def json_parse(filename:str):
+    py_res = ''
+    try:
+        json.loads(open(filename).read())
+        py_res = 'y'
+    except Exception:
+        try:
+            json.loads(open(filename,'rb').read())
+            py_res = 'y'
+        except Exception:
+            py_res = 'n'
+    return py_res
+
 if __name__ == "__main__":
     os.makedirs(f'{basedir}/{outputdir}',exist_ok=True)
     subprocess.run(["make", c_binname])
@@ -19,12 +32,7 @@ if __name__ == "__main__":
             capture_output=True, text=True
         )
 
-        py_res = ''
-        try:
-            json.loads(open(full_fname).read())
-            py_res = 'y'
-        except Exception:
-            py_res = 'n'
+        py_res = json_parse(full_fname)
 
         if py_res!=res.stdout:
             ress.append({

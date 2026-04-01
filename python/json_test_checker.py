@@ -1,3 +1,4 @@
+from fileinput import filename
 import pathlib
 import os
 import subprocess
@@ -8,6 +9,19 @@ inputdir="test_checker"
 outputdir="test_checker_output"
 
 c_binname="./json_valid.d"
+
+def json_parse(filename:str):
+    py_res = ''
+    try:
+        json.loads(open(filename).read())
+        py_res = 'y'
+    except Exception:
+        try:
+            json.loads(open(filename,'rb').read())
+            py_res = 'y'
+        except Exception:
+            py_res = 'n'
+    return py_res
 
 if __name__ == "__main__":
     os.makedirs(f'{basedir}/{outputdir}',exist_ok=True)
@@ -21,12 +35,7 @@ if __name__ == "__main__":
     
         should_res = 'y' if pfile[0]=='p' else 'n'
 
-        py_res = ''
-        try:
-            json.loads(open(full_name).read())
-            py_res = 'y'
-        except Exception:
-            py_res = 'n'
+        py_res = json_parse(full_name)
         
         if should_res!=res.stdout:
             ress.append({
