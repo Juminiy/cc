@@ -8,7 +8,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("argv[1] not found")
+		fmt.Print("?")
 		return
 	}
 	bs, err := os.ReadFile(os.Args[1])

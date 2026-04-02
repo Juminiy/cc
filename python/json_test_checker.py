@@ -8,9 +8,10 @@ basedir="data/json"
 inputdir="test_checker"
 outputdir="test_checker_output"
 
-c_binname="./json_valid.d"
+c_binname="json_valid.d"
+go_binname="json_valid.go.d"
 
-def json_parse(filename:str):
+def json_valid_py(filename:str):
     py_res = ''
     try:
         json.loads(open(filename).read())
@@ -23,26 +24,35 @@ def json_parse(filename:str):
             py_res = 'n'
     return py_res
 
+def json_valid(filename:str):
+    py_res = json_valid_py(filename)
+    go_res = subprocess.run([f"./{go_binname}", filename],
+        capture_output=True, text=True
+    )
+    myc_res = subprocess.run([f"./{c_binname}", filename],
+        capture_output=True, text=True
+    )
+    return (py_res,go_res.stdout,myc_res.stdout)
+
 if __name__ == "__main__":
     os.makedirs(f'{basedir}/{outputdir}',exist_ok=True)
-    subprocess.run(["make", c_binname])
+    subprocess.run(["make", c_binname, go_binname])
     ress = []
     for pfile in os.listdir(f'{basedir}/{inputdir}'):
         full_name = f'{basedir}/{inputdir}/{pfile}'
-        res = subprocess.run([f"./{c_binname}", full_name],
-            capture_output=True, text=True
-        )
-    
         should_res = 'y' if pfile[0]=='p' else 'n'
 
-        py_res = json_parse(full_name)
+        py_res,go_res,myc_res = json_valid(full_name)
         
-        if should_res!=res.stdout:
+        if not (should_res==go_res==myc_res):
+            if full_name.count("EXCLUDE") > 0:
+                continue
             ress.append({
                 "src_file": full_name,
                 "should_res": should_res,
                 "python_res": py_res,
-                "myc_res": res.stdout,
+                "go_res": go_res,
+                "myc_res": myc_res,
             })
 
     with open(f'{basedir}/{outputdir}/r.json','w') as ressf:

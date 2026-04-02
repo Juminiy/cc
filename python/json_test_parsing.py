@@ -10,8 +10,9 @@ input_dir="test_parsing"
 output_dir="test_parsing_output"
 
 c_binname="json_valid.d"
+go_binname="json_valid.go.d"
 
-def json_parse(filename:str):
+def json_valid_py(filename:str):
     py_res = ''
     try:
         json.loads(open(filename).read())
@@ -24,28 +25,37 @@ def json_parse(filename:str):
             py_res = 'n'
     return py_res
 
+def json_valid(filename:str):
+    py_res = json_valid_py(filename)
+    go_res = subprocess.run([f"./{go_binname}", filename],
+        capture_output=True, text=True
+    )
+    myc_res = subprocess.run([f"./{c_binname}", filename],
+        capture_output=True, text=True
+    )
+    return (py_res,go_res.stdout,myc_res.stdout)
+
 def run_json_test_d():
     yfile,nfile,efile,ifile = [],[],[],{"n":[],"y":[]}
-    subprocess.run(["make", c_binname])
+    subprocess.run(["make", c_binname, go_binname])
     tot,cnt = 0,0
     for pfile in os.listdir(f'{basedir}/{input_dir}'):
         tot+=1
         should_res = pfile[0]
         pfile_full = f'{basedir}/{input_dir}/{pfile}'
-        exec_res = subprocess.run([f"./{c_binname}", pfile_full], 
-                    capture_output=True, text=True)
 
-        py_res = json_parse(pfile_full)
+        py_res,go_res,myc_res = json_valid(pfile_full)
 
-        if should_res != exec_res.stdout:
+        if not (should_res==go_res==myc_res):
             if pfile.count("duplicated_key"): # my_c_program do not allow duplicated key
                 continue
-            if len(exec_res.stdout) == 0:
+            if myc_res == "":
                 efile.append({
                     "src_file": pfile_full,
                     "should_res": should_res,
                     "python_res": py_res,
-                    "myc_res": exec_res.stdout,
+                    "go_res": go_res,
+                    "myc_res": myc_res,
                 })
                 cnt+=1
             elif should_res=='y':
@@ -53,7 +63,8 @@ def run_json_test_d():
                     "src_file": pfile_full,
                     "should_res": should_res,
                     "python_res": py_res,
-                    "myc_res": exec_res.stdout,
+                    "go_res": go_res,
+                    "myc_res": myc_res,
                 })
                 cnt+=1
             elif should_res=='n':
@@ -61,16 +72,18 @@ def run_json_test_d():
                     "src_file": pfile_full,
                     "should_res": should_res,
                     "python_res": py_res,
-                    "myc_res": exec_res.stdout,
+                    "go_res": go_res,
+                    "myc_res": myc_res,
                 })
                 cnt+=1
             elif should_res=='i':
-                if py_res!=exec_res.stdout:
-                    ifile[exec_res.stdout].append({
+                if not (go_res==myc_res):
+                    ifile[myc_res].append({
                         "src_file": pfile_full,
                         "should_res": should_res,
                         "python_res": py_res,
-                        "exec_res": exec_res.stdout,
+                        "go_res": go_res,
+                        "myc_res": myc_res,
                     })
     
     with open(f'{basedir}/{output_dir}/y.json', 'w') as fp:

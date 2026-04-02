@@ -25,7 +25,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("json decode time: %dms\n", time.Since(t0).Milliseconds())
-
+	// fmt.Printf("%s, %v\n", bs, val)
 	t0 = time.Now()
 	if _, err := json.Marshal(val); err != nil {
 		panic(err)
