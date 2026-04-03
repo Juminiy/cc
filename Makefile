@@ -2,7 +2,7 @@ optargs=-Wunused-result -O2 -std=c99
 debugargs=-g -O0 -std=c99 -DIDEBUG
 cplargs=$(debugargs)
 
-VPATH = libctr:libjson:libsocket/tcp:test
+VPATH = libctr:libjson:libsocket/tcp:test:jyywiki/os2026
 vpath %.o
 
 %.o: %.c
@@ -50,6 +50,7 @@ ctr_seq.a: ctr_blist.o ctr_bstack.o ctr_bqueue.o ctr_barray.o ctr_bheap.o
 ctr_tree.a: ctr_tree_bs.o ctr_tree_rb.o ctr_tree_avl.o ctr_tree_mavl.o
 	ar rcs $@ $^
 ctr_sbuf.o: libctr/ctr_sbuf.c
+ctr_union.o: libctr/ctr_union.c
 
 # libjson
 json.o: libjson/json.c
@@ -105,6 +106,12 @@ json_valid.d: test/json_valid.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
 json_valid.go.d: go/json_valid.go
 	go build -o $@ $<
 file_test.d: test/file_test.c
+packed_test.d: test/packed_test.c
+union_test.d: test/union_test.c ctr_union.o
+labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
+
+labyrinth_debug: labyrinth.d
+	gdb ./labyrinth.d -x x.gdbinit
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

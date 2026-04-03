@@ -107,12 +107,7 @@ static inline char* __substr_2(char * __dst, const char *__s, size_t __pos, size
 	return __dst;
 }
 
-static inline char* __readfile(const char *__path) {
-	FILE *_pf = fopen(__path,"r");
-	if(_pf==NULL){
-		return NULL;
-	}
-
+static inline char* __readstream(FILE *_pf) {
 	fseek(_pf, 0, SEEK_END);
 	long fsiz = ftell(_pf);
 	rewind(_pf);
@@ -120,8 +115,17 @@ static inline char* __readfile(const char *__path) {
 	char *buf = (char*)malloc(sizeof(char)*(fsiz+1));
 	fread(buf, 1, fsiz, _pf);
 	buf[fsiz]='\0';
-	fclose(_pf);
+	return buf;
+}
 
+static inline char* __readfile(const char *__path) {
+	FILE *_pf = fopen(__path,"r");
+	if(_pf==NULL){
+		return NULL;
+	}
+
+	char *buf = __readstream(_pf);
+	fclose(_pf);
 	return buf;
 }
 
