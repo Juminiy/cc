@@ -38,7 +38,7 @@ bool json_get_true(json_value *_val, char *_path[], size_t _n) {
     bool str_ok = false;
     if(_val->typ==JSON_STRING){
         char *_s = (char*)(_val->val.ptr);
-        str_ok = __strcmp("1",_s)||__strcmp("true",_s)||__strcmp("True",_s);
+        str_ok = !__strcmp("1",_s)||!__strcmp("true",_s)||!__strcmp("True",_s);
     }
 
     return i_ok || str_ok;
@@ -61,7 +61,7 @@ bool json_get_false(json_value *_val, char *_path[], size_t _n) {
     bool str_ok = false;
     if(_val->typ==JSON_STRING){
         char *_s = (char*)(_val->val.ptr);
-        str_ok = __strcmp("0",_s)||__strcmp("false",_s)||__strcmp("False",_s);
+        str_ok = !__strcmp("0",_s)||!__strcmp("false",_s)||!__strcmp("False",_s);
     }
 
     return i_ok || str_ok;

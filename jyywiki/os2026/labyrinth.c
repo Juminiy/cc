@@ -17,20 +17,27 @@
 #define DIR_RIGHT 4
 
 typedef struct lab_map {
+    char  *filename;
     char  *buf;     // raw buf
     size_t buf_siz; // raw buf size
     char  *ch[100]; // map grid
     size_t sz,m,n;  // map_size, map_m, map_n
     int pos[10];    // player position
+
     char *_err_msg; // debug error message
+    bool _err_msg_alloc;
 } lab_map;
 
-int read_map(const char * map_filename, lab_map *_lmap);
+int read_lab_map(const char * map_filename, lab_map *_lmap);
 bool lab_map_valid(lab_map *_lmap);
+void free_lab_map(lab_map _lmap);
+bool move_lab_map(lab_map *_lmap, int player_id, int _dir);
+void write_lab_map(const char * map_filename, lab_map *_lmap);
 
-int read_map(const char * map_filename, lab_map *_lmap) {
+int read_lab_map(const char * map_filename, lab_map *_lmap) {
     FILE *ffd = fopen(map_filename, "r");
     if (ffd==NULL){
+        _lmap->_err_msg_alloc = true;
         _lmap->_err_msg = (char*)malloc(sizeof(char)*100);
         sprintf(_lmap->_err_msg, "open file: %s, error: %s", map_filename, strerror(errno));
         return EXIT_FAILURE;
@@ -39,6 +46,7 @@ int read_map(const char * map_filename, lab_map *_lmap) {
     size_t siz = __strlen(buf);
     _lmap->buf = buf;
     _lmap->buf_siz = siz;
+    _lmap->filename = map_filename;
 
     size_t off = 0, curn = 0, curm = 0;
     // read lines
@@ -150,10 +158,14 @@ fin_tag:
 }
 
 void free_lab_map(lab_map _lmap){
+    free(_lmap.filename);
     free(_lmap.buf);
+    if(_lmap._err_msg_alloc){
+        free(_lmap._err_msg);
+    }
 }
 
-bool move_lab_map(lab_map *_lmap, int player_id, char _dir) {
+bool move_lab_map(lab_map *_lmap, int player_id, int _dir) {
     bool optok = false;
     if(_lmap->pos[player_id]!=-1){ // found
         int pos_i = _lmap->pos[player_id]/_lmap->n;
@@ -199,14 +211,14 @@ bool move_lab_map(lab_map *_lmap, int player_id, char _dir) {
         // 1. lack pos
         int pos_i=0,pos_j=0;
         for(;pos_i<_lmap->m;pos_i++){
-            for(;pos_j<_lmap->n;pos_j++){
+            for(pos_j=0;pos_j<_lmap->n;pos_j++){
                 if(_lmap->ch[pos_i][pos_j]=='.'){
                     optok=true;
-                    goto posok_tag;
+                    break;
                 }
             }
+            if(optok){break;}
         }
-        posok_tag:
         // 2. pos valid
         if(optok){
             _lmap->pos[player_id] = pos_i*_lmap->n+pos_j;
@@ -217,12 +229,13 @@ bool move_lab_map(lab_map *_lmap, int player_id, char _dir) {
     return optok;
 }
 
-void write_map(const char * map_filename, lab_map *_lmap) {
+void write_lab_map(const char * map_filename, lab_map *_lmap) {
     FILE *ffd = fopen(map_filename, "w");
     if (ffd==NULL){
+        _lmap->_err_msg_alloc = true;
         _lmap->_err_msg = (char*)malloc(sizeof(char)*100);
         sprintf(_lmap->_err_msg, "open file: %s, error: %s", map_filename, strerror(errno));
-        return EXIT_FAILURE;
+        return;
     }
 
     fwrite(_lmap->buf, sizeof(char), _lmap->buf_siz, ffd);
@@ -246,7 +259,7 @@ int main(int argc, char *argv[]){
 
     #define HELP() \
         do { \
-            fprintf(stdout, "labyrinth [-m|--map FILE] [-p|--player ID] [--move DIRECTION] [--version]\n"); \
+            fprintf(stdout, "labyrinth [-m|--map FILE] [-p|--player ID] [--move DIRECTION] [-v|--version] [-h|--help]\n"); \
         } while(0)
 
     int opt_case;
@@ -263,13 +276,13 @@ int main(int argc, char *argv[]){
         break;
 
         case 'M':
-            if(__strcmp(optarg,"up")){
+            if(__strcmp(optarg,"up")==0){
                 direction = DIR_UP;
-            } else if(__strcmp(optarg,"down")){
+            } else if(__strcmp(optarg,"down")==0){
                 direction = DIR_DOWN;
-            } else if(__strcmp(optarg,"left")){
+            } else if(__strcmp(optarg,"left")==0){
                 direction = DIR_LEFT;
-            } else if(__strcmp(optarg,"right")){
+            } else if(__strcmp(optarg,"right")==0){
                 direction = DIR_RIGHT;
             } else {
                 direction = DIR_ERROR;
@@ -282,17 +295,17 @@ int main(int argc, char *argv[]){
 
         case 'h':
             HELP();
-            return 0;
+            return EXIT_SUCCESS;
         default:
-            return 1;
+            return EXIT_FAILURE;
         }
     }
     if(get_version){
         if(map_filename||player_id!=-1||direction!=DIR_NONE){
-            return 1;
+            return EXIT_FAILURE;
         }
         fprintf(stdout, "Labyrinth Game v0.0.1\n");
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     if(!map_filename){
@@ -308,22 +321,27 @@ int main(int argc, char *argv[]){
         return EXIT_FAILURE;
     }
 
-    lab_map _lmap={};
-    int res = read_map(map_filename, &_lmap);
-    if(res==EXIT_SUCCESS){ // print it
+    lab_map _lmap={.filename=NULL,.buf=NULL,._err_msg=NULL,._err_msg_alloc=false};
+    int errcode = read_lab_map(map_filename, &_lmap);
+    if(errcode==EXIT_SUCCESS){ // print it
         puts(_lmap.buf);
     } else {
-        DEBUGF("%s",_lmap._err_msg);
-        return EXIT_FAILURE;
+        goto map_fintag;
     }
 
     if(direction!=DIR_NONE){ // move it
         if(move_lab_map(&_lmap, player_id, direction)){
-            write_map(map_filename, &_lmap);
-            return EXIT_SUCCESS;
+            write_lab_map(map_filename, &_lmap);
+            puts(_lmap.buf);
+        } else {
+            errcode = EXIT_FAILURE;
         }
-        return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS;
+map_fintag:
+    if(_lmap._err_msg){
+        DEBUGF("%s",_lmap._err_msg);
+    }
+    free_lab_map(_lmap);
+    return errcode;
 }

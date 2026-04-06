@@ -1,6 +1,6 @@
-b read_map
+b read_lab_map
 b lab_map_valid
-b labyrinth.c:106
-b labyrinth.c:131
-b labyrinth.c:217
-run -m jyywiki/os2026/map.txt -p 3 -M up
+b move_lab_map
+b write_lab_map
+b labyrinth.c:330
+run -m jyywiki/os2026/y_map_6_7_move_up.txt -p 4 --move up

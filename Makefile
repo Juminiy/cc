@@ -108,8 +108,10 @@ json_valid.go.d: go/json_valid.go
 file_test.d: test/file_test.c
 packed_test.d: test/packed_test.c
 union_test.d: test/union_test.c ctr_union.o
-labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
+qsort_test.d: test/qsort_test.c
 
+# jyywiki/os2026
+labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
 labyrinth_debug: labyrinth.d
 	gdb ./labyrinth.d -x x.gdbinit
 
