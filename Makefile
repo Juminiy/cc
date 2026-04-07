@@ -109,11 +109,23 @@ file_test.d: test/file_test.c
 packed_test.d: test/packed_test.c
 union_test.d: test/union_test.c ctr_union.o
 qsort_test.d: test/qsort_test.c
+regex_test.d: test/regex_test.c
 
 # jyywiki/os2026
 labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
 labyrinth_debug: labyrinth.d
 	gdb ./labyrinth.d -x x.gdbinit
+sperf.d: jyywiki/os2026/sperf.c
+
+mprintf_hello.d: test/mprintf_hello.c
+mnormal_hello.d: test/mnormal_hello.c
+minimal_hello.d: test/minimal_hello.c
+# 	$(CC) -nostdlib -c $< -o $@.o
+# 	ld $@.o -lc --entry=_start -o $@
+	$(CC) -nostdlib -o $@ $< -lc --entry=_start
+minimal_hello2.d: test/minimal_hello.S
+	$(CC) -c $< -o $@.o
+	ld $@.o -o $@
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

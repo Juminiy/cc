@@ -9,6 +9,18 @@
 #define DEBUGF(__content_template__, ...) \
     do { fprintf(stdout, "[DEBUG] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
 
+#define INFOF(__content_template__, ...) \
+    do { fprintf(stdout, "[INFO] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
+
+#define ERRORF(__content_template__, ...) \
+    do { fprintf(stderr, "[ERROR] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
+
+#define PANICF(__content_template__, ...) \
+    do { \
+		fprintf(stderr, "[PANIC] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); \
+		exit(EXIT_FAILURE); \
+	} while(0)
+
 #if defined(__GNUC__)
 #define __typeof_(_a) typeof(_a)
 #define __max_(a, b) \
@@ -127,6 +139,14 @@ static inline char* __readfile(const char *__path) {
 	char *buf = __readstream(_pf);
 	fclose(_pf);
 	return buf;
+}
+
+static inline char* __strjoin(char * const *__ss) {
+	char *dst = NULL;
+	for(char * const *_s=__ss;*_s;_s++){
+		dst = __strcat(dst, *_s);
+	}
+	return dst;
 }
 
 #define MALLOC_TYPE(_typ,_val) _typ *_val = (_typ*)malloc(sizeof(_typ))
