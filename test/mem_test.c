@@ -65,6 +65,30 @@ void test_relloac(size_t oldsz, size_t newsz) {
     free(arr); // free3
 }
 
+typedef struct {
+    int a,b;
+    double x;
+} typa;
+
+typedef struct {
+    char *c;
+} typb;
+
+
+void test_memreaderr(){
+    // long_B cast to short_B
+    typa a = {0x2100,0x7800,1.22};
+    typb b = *(typb*)(&a);
+    printf("a=(%x,%x,%.3f)\n",a.a,a.b,a.x);
+    printf("b=(%p)\n", b.c);
+
+    // short_B cast to long_B
+    typb b1 = {.c="aaaaa"};
+    typa a1 = *(typa*)(&b1);
+    printf("a1=(%x,%x,%.3f)\n",a1.a,a1.b,a1.x);
+    printf("b1=(%p)\n", b1.c);
+}
+
 int main(int argc, char **argv) {
     srand(time(NULL));
     int numa=1,numb=2;
@@ -80,7 +104,9 @@ int main(int argc, char **argv) {
 
     // test_mset();
 
-    test_relloac(numa, numb);
+    // test_relloac(numa, numb);
+
+    test_memreaderr();
 
     return 0;
 }

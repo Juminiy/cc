@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #define DEBUGF(__content_template__, ...) \
     do { fprintf(stdout, "[DEBUG] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
@@ -64,6 +66,14 @@ static inline char* __strdup(const char *__s) {
 	char *__sdup=(char*)malloc(sizeof(char)*(__ssz+1)); // `__s`+'\0'
 	strncpy(__sdup, __s, __ssz);
 	__sdup[__ssz] = '\0';
+	return __sdup;
+}
+
+static inline char* __strdupn(const char *__s, size_t __n) {
+	if(!__s) return NULL;
+	char *__sdup=(char*)malloc(sizeof(char)*(__n+1)); // `__s`+'\0'
+	strncpy(__sdup, __s, __n);
+	__sdup[__n] = '\0';
 	return __sdup;
 }
 
@@ -147,6 +157,18 @@ static inline char* __strjoin(char * const *__ss) {
 		dst = __strcat(dst, *_s);
 	}
 	return dst;
+}
+
+static inline void __writetruncfile(const char *__path, const char *__s) {
+	int _fd = open(__path, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+	write(_fd, __s, __strlen(__s));
+	close(_fd);
+}
+
+static inline void __writeappendfile(const char *__path, const char *__s) {
+	int _fd = open(__path, O_WRONLY|O_CREAT|O_APPEND, 0666);
+	write(_fd, __s, __strlen(__s));
+	close(_fd);
 }
 
 #define MALLOC_TYPE(_typ,_val) _typ *_val = (_typ*)malloc(sizeof(_typ))

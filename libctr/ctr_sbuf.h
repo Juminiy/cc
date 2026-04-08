@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #define _KiB (size_t)(1<<10)
 #define _MiB (size_t)(1<<20)
@@ -38,6 +39,7 @@ sbuf* makeSBuf(size_t _cap);
 void freeSBuf(sbuf* _s);
 void sBufAlloc(sbuf* _s, size_t _siz);
 void sBufWrite(sbuf* _s, const char *_src);
+void sBufWriteN(sbuf *_s, const char *_src, size_t _n);
 void sBufWriteFree(sbuf* _s, char *_src);
 void sBufWriteChar(sbuf* _s, char _c);
 void sBufWriteI64(sbuf* _s, int64_t _i);
@@ -64,6 +66,8 @@ typedef struct roSBuf {
 #define roSBufStr(_buf) (_buf._p)
 #define roSBufSiz(_buf) (_buf._siz)
 roSBuf readFileAll(const char *_fpath);
+roSBuf readStreamAll(FILE *_pf);
+roSBuf readFdAll(const int _fd);
 void freeROSBuf(roSBuf _buf);
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 sbuf* makeSBuf(size_t _cap) {
     if(_cap < 0){
@@ -67,6 +68,14 @@ void sBufWrite(sbuf* _s, const char *_src) {
     _s->_siz = newsiz;
 }
 
+void sBufWriteN(sbuf *_s, const char *_src, size_t _n) {
+    size_t newsiz = _s->_siz+_n;
+    sBufAlloc(_s, _n);
+    strncpy(_s->_buf+_s->_siz, _src, _n);
+    _s->_buf[newsiz]='\0';
+    _s->_siz = newsiz;
+}
+
 void sBufWriteFree(sbuf* _s, char *_src) {
     sBufWrite(_s, _src);
     free(_src);
@@ -98,10 +107,20 @@ void sBufMergeFree(sbuf* _dst, sbuf* _src) {
 
 roSBuf readFileAll(const char *_fpath) {
     roSBuf _buf = {._p=NULL,._siz=0,._init_type=ROSBUF_INIT_NONE};
+
     FILE *_pf = fopen(_fpath,"r");
 	if(_pf==NULL){
 		return _buf;
-	}
+    }
+
+    _buf = readStreamAll(_pf);
+    fclose(_pf);
+
+    return _buf;
+}
+
+roSBuf readStreamAll(FILE *_pf) {
+    roSBuf _buf = {._p=NULL,._siz=0,._init_type=ROSBUF_INIT_NONE};
 
 	fseek(_pf, 0, SEEK_END);
 	long fsiz = ftell(_pf);
@@ -117,6 +136,32 @@ roSBuf readFileAll(const char *_fpath) {
     _buf._init_type = ROSBUF_INIT_ALLOC;
 
 	return _buf;
+}
+
+roSBuf readFdAll(const int _fd) {
+    roSBuf _buf = {._p=NULL,._siz=0,._init_type=ROSBUF_INIT_NONE};
+    sbuf *_sbuf = makeSBuf(_KiB);
+
+    char _stkbuf[_KiB*4];
+    ssize_t rd_sz = 0;
+
+    while(1){
+        rd_sz=read(_fd, _stkbuf, _KiB*4);
+        if(rd_sz==-1){
+            freeSBuf(_sbuf);
+            return _buf;
+        } else if(rd_sz==0){
+            break;
+        } else {
+            sBufWriteN(_sbuf, _stkbuf, rd_sz);
+        }
+    }
+    _buf._init_type = ROSBUF_INIT_ALLOC;
+    _buf._p = sBufStr(_sbuf);
+    _buf._siz = sBufSize(_sbuf);
+    free(_sbuf);
+
+    return _buf;
 }
 
 void freeROSBuf(roSBuf _buf) {

@@ -86,7 +86,6 @@ avltree_test.d: test/avltree_test.c ctr_tree.a ctr_seq.a
 map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
 map_std_test.d: test/map_std_test.cpp strstrpair.o
 map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
-luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
 mem_test.d: test/mem_test.c
 barray_test.d: test/barray_test.c ctr_seq.a
 bheap_test.d: test/bheap_test.c ctr_seq.a
@@ -110,12 +109,19 @@ packed_test.d: test/packed_test.c
 union_test.d: test/union_test.c ctr_union.o
 qsort_test.d: test/qsort_test.c
 regex_test.d: test/regex_test.c
+execve_test.d: test/execve_test.c
+pipe_test.d: test/pipe_test.c
+
+# external dataset
+luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
+leetcode146.d: test/leetcode146.c ctr_lru.o ctr_tree.a ctr_seq.a
 
 # jyywiki/os2026
 labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
 labyrinth_debug: labyrinth.d
 	gdb ./labyrinth.d -x x.gdbinit
-sperf.d: jyywiki/os2026/sperf.c
+sperf.d: jyywiki/os2026/sperf.c ctr_sbuf.o ctr_tree.a ctr_seq.a
+crepl.d: jyywiki/os2026/crepl.c ctr_sbuf.o
 
 mprintf_hello.d: test/mprintf_hello.c
 mnormal_hello.d: test/mnormal_hello.c
