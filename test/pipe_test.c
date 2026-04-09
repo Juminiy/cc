@@ -7,7 +7,7 @@
 #include <sys/fcntl.h>
 #include <sys/wait.h>
 
-#include "test.h"
+#include "../libctr/ctr_color.h"
 
 int pipe_commu(int _chffd, int _pffd) {
     int fds[2];

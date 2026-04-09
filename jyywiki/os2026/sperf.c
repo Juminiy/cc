@@ -8,7 +8,6 @@
 #include <sys/wait.h>
 #include <sys/fcntl.h>
 
-#include "../../test/test.h"
 #include "../../libctr/ctr_util.h"
 #include "../../libctr/ctr_sbuf.h"
 #include "../../libctr/ctr_rbtree.h"
@@ -119,6 +118,7 @@ int main(int argc, char *argv[], char *envp[]) {
         close(fds[0]);
         dup2(devnull_fd, STDOUT_FILENO);
         dup2(fds[1], STDERR_FILENO);
+        close(fds[1]);
 
         char *ch_argv[argc+2];
         ch_argv[0] = "strace";
@@ -135,7 +135,7 @@ int main(int argc, char *argv[], char *envp[]) {
             return EXIT_FAILURE;
         }
         close(fds[1]);
-        dup2(fds[0], STDIN_FILENO);
+        
         // int _buffd = open("data/test/psave.txt", O_CREAT|O_TRUNC|O_WRONLY, 0666);
         // dup2(_buffd, STDOUT_FILENO);
 
@@ -145,7 +145,9 @@ int main(int argc, char *argv[], char *envp[]) {
         
         // close(_buffd);
 
-        roSBuf curbuf = readFdAll(STDIN_FILENO);
+        roSBuf curbuf = readFdAll(fds[0]);
+        close(fds[0]);
+
         float tot_ts = 0; 
         _syscall_records rcds = make_records();
         char *pch = strtok(curbuf._p, "\n");

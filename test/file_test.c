@@ -1,18 +1,19 @@
 #include <stdio.h>
 
+#include "../libctr/ctr_util.h"
+
 int main(int argc, char *argv[]){
-    if(argc < 3) {
-        printf("Usage: <filename>:argv[1] <openmode>:argv[2]\n");
-        return 1;
-    }
-    FILE *fd = fopen(argv[1], argv[2]);
-    if(fd == NULL) {
-        perror("Error opening file");
-        return 1;
-    }
+    // if(__remove("data/test/rr/a.txt")==-1){
+    //     perror("remove");
+    //     exit(EXIT_FAILURE);
+    // }
 
-    for(;;){}
+    // if(__rmdir("data/test/rr")==-1){
+    //     perror("rmdir");
+    //     exit(EXIT_FAILURE);
+    // }
 
-    fclose(fd);
+    remove_last_line_inplace("data/test/rr.txt");
+
     return 0;
 }

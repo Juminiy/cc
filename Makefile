@@ -111,6 +111,8 @@ qsort_test.d: test/qsort_test.c
 regex_test.d: test/regex_test.c
 execve_test.d: test/execve_test.c
 pipe_test.d: test/pipe_test.c
+execve_loop_test.d: test/execve_loop_test.c
+esc_ABCD_test.d: test/esc_ABCD_test.c
 
 # external dataset
 luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
@@ -122,6 +124,9 @@ labyrinth_debug: labyrinth.d
 	gdb ./labyrinth.d -x x.gdbinit
 sperf.d: jyywiki/os2026/sperf.c ctr_sbuf.o ctr_tree.a ctr_seq.a
 crepl.d: jyywiki/os2026/crepl.c ctr_sbuf.o
+
+install: crepl.d
+	cp $< /usr/bin/crepl
 
 mprintf_hello.d: test/mprintf_hello.c
 mnormal_hello.d: test/mnormal_hello.c

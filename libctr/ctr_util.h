@@ -7,7 +7,9 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
+// logger
 #define DEBUGF(__content_template__, ...) \
     do { fprintf(stdout, "[DEBUG] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
 
@@ -56,6 +58,7 @@
 #define __swap_(_type, _v0, _v1) \
     __swap_typed(_type, _v0, _v1)
 
+// safe string function
 // safe strlen
 #define __strlen(__s) (__s ? strlen(__s): 0)
 
@@ -129,6 +132,15 @@ static inline char* __substr_2(char * __dst, const char *__s, size_t __pos, size
 	return __dst;
 }
 
+static inline char* __strjoin(char * const *__ss) {
+	char *dst = NULL;
+	for(char * const *_s=__ss;*_s;_s++){
+		dst = __strcat(dst, *_s);
+	}
+	return dst;
+}
+
+// safe file function
 static inline char* __readstream(FILE *_pf) {
 	fseek(_pf, 0, SEEK_END);
 	long fsiz = ftell(_pf);
@@ -151,14 +163,6 @@ static inline char* __readfile(const char *__path) {
 	return buf;
 }
 
-static inline char* __strjoin(char * const *__ss) {
-	char *dst = NULL;
-	for(char * const *_s=__ss;*_s;_s++){
-		dst = __strcat(dst, *_s);
-	}
-	return dst;
-}
-
 static inline void __writetruncfile(const char *__path, const char *__s) {
 	int _fd = open(__path, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 	write(_fd, __s, __strlen(__s));
@@ -169,6 +173,30 @@ static inline void __writeappendfile(const char *__path, const char *__s) {
 	int _fd = open(__path, O_WRONLY|O_CREAT|O_APPEND, 0666);
 	write(_fd, __s, __strlen(__s));
 	close(_fd);
+}
+
+static inline int __remove(const char *__filename) {
+    struct stat _fstat;
+    if(stat(__filename, &_fstat)==0 && S_ISREG(_fstat.st_mode)){
+        return remove(__filename);
+    }
+    return 0;
+}
+
+static inline int __mkdir(const char *__path, __mode_t __mode) {
+    struct stat _fstat;
+    if(stat(__path, &_fstat)){
+        return mkdir(__path, __mode);
+    }
+    return 0;   
+}
+
+static inline int __rmdir(const char *__path) {
+    struct stat _fstat;
+    if(stat(__path, &_fstat)==0 && S_ISDIR(_fstat.st_mode)){
+        return rmdir(__path);
+    }
+    return 0;
 }
 
 #define MALLOC_TYPE(_typ,_val) _typ *_val = (_typ*)malloc(sizeof(_typ))
