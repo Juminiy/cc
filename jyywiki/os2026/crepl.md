@@ -31,15 +31,14 @@ unistd API: execl, execlp, execle, execv, execvp, execvpe
    2. 将函数签名Append进/tmp/crepl/deps.h 
 
 3. 自定义功能:
-   1. #include <...> 编译检测正确性
-   2. clear, cls 清屏
-   3. Ctrl+D, Ctrl+C, exit, !q, quit 退出
-   4. 错误输出：函数重定义错误,函数定义语法错误,表达式错误
-   5. 编译错误抑制输出，编译warning抑制输出
+   1. ✅#include <...> 编译检测正确性
+   2. ✅clear, cls 清屏
+   3. ✅Ctrl+D, Ctrl+C, exit, !q, quit 退出
+   4. ✅错误输出：函数重定义错误,函数定义语法错误,表达式错误
+   5. ✅编译错误抑制输出，编译warning抑制输出
 
 4. shell功能
-   1. 光标上下左右键是: `^[[A^[[B^[[C^[[D`
-   2. 记录变量
+   1. ❌光标上下左右键是: `^[[A^[[B^[[C^[[D`
+   2. ❌记录变量
 5. BUG:
-   1. 每次表达式获取的都是上一次的执行结果，无法得到本次结果：因为fork子进程执行后退出了
-   2. 解决： waitpid/wait即可, 已解决
+   1. ✅每次表达式获取的都是上一次的执行结果，无法得到本次结果：因为fork子进程执行后退出了;解决： waitpid/wait即可, 已解决

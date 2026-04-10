@@ -63,4 +63,4 @@ typedef struct hash_inspect {
 hash_inspect hashInspect(hashtable *_ht);
 #endif
 
-#endif
+#endif // CTR_HASH_H

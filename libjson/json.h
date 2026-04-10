@@ -111,4 +111,4 @@ double json_get_num(json_value *_val, char *_path[], size_t _n);
 json_object* json_get_object(json_value *_val, char *_path[], size_t _n);
 json_array* json_get_array(json_value *_val, char *_path[], size_t _n);
 
-#endif
+#endif // LIB_JSON_H

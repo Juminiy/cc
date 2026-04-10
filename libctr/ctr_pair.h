@@ -15,4 +15,4 @@ typedef struct pair {
 #define pairGet0(pr, typ) (cast_elem_typ(pr._first, typ))
 #define pairGet1(pr, typ) (cast_elem_typ(pr._second, typ))
 
-#endif
+#endif // CTR_PAIR_H

@@ -60,4 +60,4 @@ void freeSkipNode(skipnode *_sn, skiplist *_sl);
 barray skipList2Array(skiplist *_sl);
 void skipListIter(skiplist *_sl, elem_t_vis _fn);
 
-#endif
+#endif // CTR_SKIPLIST_H

@@ -43,4 +43,4 @@ void freeLRUT(lru_t *_t);
 elem_t lruTGet(lru_t *_t, elem_t _dt);
 void lruTPut(lru_t *_t, elem_t _dt);
 
-#endif
+#endif // CTR_LRU_H

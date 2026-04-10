@@ -77,4 +77,4 @@ void bListIter(blist *_bl, elem_t_vis _fn);
 #define BLIST_ITER_FORWARD +1
 #define BLIST_ITER_BAKWARD -1
 
-#endif
+#endif // CTR_BLIST_H

@@ -28,4 +28,4 @@ bheap bHeapRemove(bheap _bh, size_t _idx);
 bool bHeapCheck(bheap _bh);
 #endif
 
-#endif
+#endif // CTR_BHEAP_H

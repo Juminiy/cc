@@ -36,4 +36,4 @@ ssize_t bArrayIndexOf(barray _ba, elem_t _dt, ssize_t _idx);
 typedef bool(*bArrayIterFunc)(size_t _idx, elem_t _dt);
 void bArrayIter(barray _ba, bArrayIterFunc _fn);
 
-#endif
+#endif // CTR_BARRAY_H

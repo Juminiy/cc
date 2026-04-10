@@ -70,4 +70,4 @@ roSBuf readStreamAll(FILE *_pf);
 roSBuf readFdAll(const int _fd);
 void freeROSBuf(roSBuf _buf);
 
-#endif
+#endif // CTR_SBUF_H

@@ -19,4 +19,4 @@ int32_t unionSetPut(union_set *_set, int32_t _x);
 int32_t unionSetGet(union_set *_set, int32_t _x);
 int32_t unionSetMerge(union_set *_set, int32_t _x, int32_t _y);
 
-#endif
+#endif // CTR_UNION_H

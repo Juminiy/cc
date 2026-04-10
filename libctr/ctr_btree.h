@@ -64,4 +64,4 @@ typedef struct btree_node_split {
 #define varBTreeNodeSplit(_lnd,_rnd,_mdata) setup_btree_node_split(_lnd,_rnd,_mdata,true)
 #define varBTreeNodeSplitNone() setup_btree_node_split(NULL,NULL,varElemNone(),false)
 
-#endif
+#endif // CTR_BTREE_H

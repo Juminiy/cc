@@ -140,7 +140,7 @@ static inline char* __strjoin(char * const *__ss) {
 	return dst;
 }
 
-// safe file function
+// safe file/dir function
 static inline char* __readstream(FILE *_pf) {
 	fseek(_pf, 0, SEEK_END);
 	long fsiz = ftell(_pf);
@@ -201,4 +201,4 @@ static inline int __rmdir(const char *__path) {
 
 #define MALLOC_TYPE(_typ,_val) _typ *_val = (_typ*)malloc(sizeof(_typ))
 
-#endif
+#endif // CTR_UTIL_H

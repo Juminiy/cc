@@ -15,4 +15,4 @@ elem_t bQueueFront(bqueue _bq);
 elem_t bQueueBack(bqueue _bq);
 elem_t bQueuePop(bqueue _bq);
 
-#endif
+#endif // CTR_BQUEUE_H

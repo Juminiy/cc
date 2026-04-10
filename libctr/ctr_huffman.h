@@ -23,4 +23,4 @@ huffman_res huffmanEncode(const char *_src);
 char* huffmanDecode(huffman_res _res);
 void freeHuffmanRes(huffman_res _res);
 
-#endif
+#endif // CTR_HUFFMAN_H

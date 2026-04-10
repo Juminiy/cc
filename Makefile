@@ -113,6 +113,7 @@ execve_test.d: test/execve_test.c
 pipe_test.d: test/pipe_test.c
 execve_loop_test.d: test/execve_loop_test.c
 esc_ABCD_test.d: test/esc_ABCD_test.c
+memalloc_test.d: test/memalloc_test.c
 
 # external dataset
 luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a

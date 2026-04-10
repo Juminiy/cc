@@ -120,4 +120,4 @@ typedef struct _node_value{
 		_val.retcode = ELEM_OPT_NONE; \
 	} while(0)
 
-#endif
+#endif // CTR_ELEMT_H

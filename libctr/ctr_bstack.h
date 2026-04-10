@@ -14,4 +14,4 @@ bool bStackEmpty(bstack _bstk);
 elem_t bStackTop(bstack _bstk);
 elem_t bStackPop(bstack _bstk);
 
-#endif
+#endif // CTR_BSTACK_H

@@ -1,5 +1,5 @@
-#ifndef CTR_BITMAP
-#define CTR_BITMAP
+#ifndef CTR_BITMAP_H
+#define CTR_BITMAP_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -20,4 +20,4 @@ bool bitMapGet(bitmap *_bm, int64_t _v);
 typedef bool(*bitMapIterFunc)(int64_t _v);
 void bitMapIter(bitmap *_bm, bitMapIterFunc _fn);
 
-#endif
+#endif // CTR_BITMAP_H

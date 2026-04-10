@@ -1,5 +1,5 @@
-#ifndef CTR_BLOOM
-#define CTR_BLOOM
+#ifndef CTR_BLOOM_H
+#define CTR_BLOOM_H
 
 #include "ctr_elemt.h"
 #include "ctr_bitmap.h"
@@ -15,4 +15,4 @@ void freeBloom(bloom _bl);
 void bloomInsert(bloom _bl, elem_t _dt);
 bool bloomGet(bloom _bl, elem_t _dt);
 
-#endif
+#endif // CTR_BLOOM_H

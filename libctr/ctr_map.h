@@ -31,4 +31,4 @@ void strstrmapIter(strstrmap _map, strstrmapIterFunc _fn);
 }
 #endif
 
-#endif
+#endif // CTR_MAP_H
