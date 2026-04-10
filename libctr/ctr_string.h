@@ -117,35 +117,6 @@ static inline bool __strcontain(char *__s, const char *__subs) {
 	return strstr(__s, __subs)!=NULL;
 }
 
-// todo: bugs
-static inline char** __strsplit_n(char *__s, const char *__sep, size_t __n) {
-	if(__n==0) {
-		return NULL;
-	}
-	size_t sn = __strlen(__s), sepn = __strlen(__sep);
-	char **seps = (char**)calloc(__strlen(__s)+1,sizeof(char*));
-	size_t pi = 0;
-	while(1){
-		char *sp = strstr(__s,__sep);
-		if(sp==NULL||__n==0){
-			seps[pi++] = __strdup(__s);
-			break;
-		} else {
-			if(sepn==0) {
-				if(sp-__s==0){
-					break;
-				}
-				sp++;
-			}
-			seps[pi++] = __strndup(__s, sp-__s);
-			__s = sp+sepn;
-		}
-		__n--;
-	}
-	seps[pi] = NULL; // free(seps+pi+1);
-	return seps;
-}
-
 static inline char* __strrepeat(char *__s, const size_t __n) {
 	char *dst=NULL;
 	for(size_t i=0;i<__n;i++){
