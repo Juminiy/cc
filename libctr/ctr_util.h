@@ -5,9 +5,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
+
+#include "ctr_string.h"
+#include "ctr_file.h"
 
 // logger
 #define DEBUGF(__content_template__, ...) \
@@ -57,147 +57,6 @@
 	do { _type _tmp=_v0; _v0=_v1; _v1=_tmp; } while(0)
 #define __swap_(_type, _v0, _v1) \
     __swap_typed(_type, _v0, _v1)
-
-// safe string function
-// safe strlen
-#define __strlen(__s) (__s ? strlen(__s): 0)
-
-// safe strdup
-static inline char* __strdup(const char *__s) {
-	if(!__s) return NULL;
-	size_t __ssz = __strlen(__s);
-	char *__sdup=(char*)malloc(sizeof(char)*(__ssz+1)); // `__s`+'\0'
-	strncpy(__sdup, __s, __ssz);
-	__sdup[__ssz] = '\0';
-	return __sdup;
-}
-
-static inline char* __strdupn(const char *__s, size_t __n) {
-	if(!__s) return NULL;
-	char *__sdup=(char*)malloc(sizeof(char)*(__n+1)); // `__s`+'\0'
-	strncpy(__sdup, __s, __n);
-	__sdup[__n] = '\0';
-	return __sdup;
-}
-
-// safe strcmp
-static inline int __strcmp(const char *__s1, const char *__s2) {
-	if(__s1 && __s2){
-		return strcmp(__s1, __s2);
-	} else {
-		return __strlen(__s1) - __strlen(__s2);
-	}
-}
-
-static inline char* __char2str(char __ch) {
-	char* __s = (char*)malloc(sizeof(char)*2);
-	__s[0] = __ch;
-	__s[1] = '\0';
-	return __s;
-}
-
-// @return dst = dst+src, self
-// @param dst must not `const char*`, must in heap
-static inline char* __strcat(char *dst, const char *src) {
-	size_t dstsz=__strlen(dst), srcsz=__strlen(src);
-	dst = (char*)realloc(dst, sizeof(char)*(dstsz+srcsz+1));
-	strncpy(dst+dstsz,src,srcsz);
-	dst[dstsz+srcsz]='\0';
-	return dst;
-}
-
-// @return dst = dst+src, deepcopy
-static inline char* __stradd(char *dst, const char *src) {
-	return __strcat(__strdup(dst), src);
-}
-
-static inline char* __substr(const char *__s, size_t __pos, size_t __len) {
-	size_t __sz = __strlen(__s);
-	if(__pos>=__sz||__pos+__len>__sz){
-		return NULL;
-	}
-	char *__dst = (char*)malloc(sizeof(char)*(__len+1));
-	strncpy(__dst, __s+__pos, __len);
-	__dst[__len] = '\0';
-	return __dst;
-}
-
-static inline char* __substr_2(char * __dst, const char *__s, size_t __pos, size_t __len) {
-	size_t __sz = __strlen(__s);
-	if(__pos>=__sz||__pos+__len>__sz){
-		return NULL;
-	}
-	strncpy(__dst, __s+__pos, __len);
-	__dst[__len] = '\0';
-	return __dst;
-}
-
-static inline char* __strjoin(char * const *__ss) {
-	char *dst = NULL;
-	for(char * const *_s=__ss;*_s;_s++){
-		dst = __strcat(dst, *_s);
-	}
-	return dst;
-}
-
-// safe file/dir function
-static inline char* __readstream(FILE *_pf) {
-	fseek(_pf, 0, SEEK_END);
-	long fsiz = ftell(_pf);
-	rewind(_pf);
-
-	char *buf = (char*)malloc(sizeof(char)*(fsiz+1));
-	fread(buf, 1, fsiz, _pf);
-	buf[fsiz]='\0';
-	return buf;
-}
-
-static inline char* __readfile(const char *__path) {
-	FILE *_pf = fopen(__path,"r");
-	if(_pf==NULL){
-		return NULL;
-	}
-
-	char *buf = __readstream(_pf);
-	fclose(_pf);
-	return buf;
-}
-
-static inline void __writetruncfile(const char *__path, const char *__s) {
-	int _fd = open(__path, O_WRONLY|O_CREAT|O_TRUNC, 0666);
-	write(_fd, __s, __strlen(__s));
-	close(_fd);
-}
-
-static inline void __writeappendfile(const char *__path, const char *__s) {
-	int _fd = open(__path, O_WRONLY|O_CREAT|O_APPEND, 0666);
-	write(_fd, __s, __strlen(__s));
-	close(_fd);
-}
-
-static inline int __remove(const char *__filename) {
-    struct stat _fstat;
-    if(stat(__filename, &_fstat)==0 && S_ISREG(_fstat.st_mode)){
-        return remove(__filename);
-    }
-    return 0;
-}
-
-static inline int __mkdir(const char *__path, __mode_t __mode) {
-    struct stat _fstat;
-    if(stat(__path, &_fstat)){
-        return mkdir(__path, __mode);
-    }
-    return 0;   
-}
-
-static inline int __rmdir(const char *__path) {
-    struct stat _fstat;
-    if(stat(__path, &_fstat)==0 && S_ISDIR(_fstat.st_mode)){
-        return rmdir(__path);
-    }
-    return 0;
-}
 
 #define MALLOC_TYPE(_typ,_val) _typ *_val = (_typ*)malloc(sizeof(_typ))
 
