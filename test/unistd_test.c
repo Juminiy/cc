@@ -14,6 +14,7 @@ void test_access(char *filename) {
 
 int main(int argc, char *argv[], char *envp[]){
 
+	// argv[1]: dir, argv[2]: exe.d
 	if(argc<3){
 		PANICF("lack argv[1,2]");
 	}
@@ -24,6 +25,8 @@ int main(int argc, char *argv[], char *envp[]){
 	pid_t chpid = fork();
 	if(chpid==0){
 		chdir(argv[1]);
+
+		test_access(argv[2]);
 
 		char buf[256];
 		printf("ch-workdir: %s\n",getcwd(buf,256));

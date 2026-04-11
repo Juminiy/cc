@@ -115,6 +115,8 @@ execve_loop_test.d: test/execve_loop_test.c
 esc_ABCD_test.d: test/esc_ABCD_test.c
 memalloc_test.d: test/memalloc_test.c
 unistd_test.d: test/unistd_test.c
+getsys_info.d: test/getsys_info.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
+inline_asm_test.d: test/inline_asm_test.c
 
 # external dataset
 luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a

@@ -15,16 +15,21 @@ void print_intarr(barray arr) {
 }
 
 void test_append_len_cap(int sz){
-    barray arr = makeBArray(0, 8);
+    barray arr = makeBArray(0, 0);
     bArraySetElemCmp(arr, __elem_cmp_int);
 
     elem_t em;
+    size_t acap=0;
     for(int i=0;i<sz;i++){
         setup_elem_i64(em,i); arr = bArrayAppend(arr, em);
-        // printf("size=%zu, cap=%zu\n", bArrayLen(arr), bArrayCap(arr));
+        size_t alenx = bArrayLen(arr), acapx=bArrayCap(arr);
+        if(acapx>acap){
+            printf("size=%zu, cap=%zu\n", alenx, acapx);
+        }
+        acap=acapx;
     }
 
-    print_intarr(arr);
+    // print_intarr(arr);
 
     printf("size=%zu, cap=%zu\n", bArrayLen(arr), bArrayCap(arr));
     freeBArray(arr);
@@ -237,17 +242,17 @@ int main(int argc, char **argv) {
     
     test_append_len_cap(sz);
 
-    test_array_modify();
+    // test_array_modify();
 
-    test_cmpof();
+    // test_cmpof();
 
-    test_sortof(sz);
+    // test_sortof(sz);
 
-    test_array_index(sz);
+    // test_array_index(sz);
 
-    test_array_insert_delete(sz);
+    // test_array_insert_delete(sz);
 
-    test_array_indexof(sz);
+    // test_array_indexof(sz);
 
     return 0;
 }

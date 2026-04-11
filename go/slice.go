@@ -1,9 +1,20 @@
 package main
 
+import (
+	"os"
+	"strconv"
+)
+
 func main() {
+	sz, _ := strconv.Atoi(os.Args[1])
 	arr := make([]int, 0, 0)
-	for i := 0; i < 1000; i++ {
+	cx := cap(arr)
+	for i := 0; i < sz; i++ {
 		arr = append(arr, i)
-		println(len(arr), cap(arr))
+		cpx := cap(arr)
+		if cpx > cx {
+			println("size=", len(arr), ", cap=", cap(arr))
+		}
+		cx = cpx
 	}
 }

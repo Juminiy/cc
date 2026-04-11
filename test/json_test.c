@@ -18,7 +18,7 @@ void opt_json_value(json_value* value,
     if (_encode){
         char *_s = NULL;
         print_time_ms(
-            _s = json_stringify(value); ,
+            _s = json_stringify_indent(value,2); ,
             "json encode time"
         );
         if(_print){
@@ -69,7 +69,7 @@ void test_json_decode(const char *_path){
         );
         
         if(val){
-            opt_json_value(val,true,false,true);
+            opt_json_value(val,true,true,true);
         }
     } else {
         printf("path:%s no buffer\n",_path);

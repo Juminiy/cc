@@ -129,7 +129,6 @@ roSBuf readStreamAll(FILE *_pf) {
     char *_content = (char*)malloc(sizeof(char)*(fsiz+1));
     _content[fsiz] = '\0';
 	fread(_content, 1, fsiz, _pf);
-	fclose(_pf);
 
     _buf._p = _content;
     _buf._siz = fsiz;

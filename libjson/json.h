@@ -98,6 +98,7 @@ bool json_nvalid(const char *_str, size_t _n);
 json_value* json_parse(const char *_str);
 json_value* json_nparse(const char *_str, size_t _n);
 char* json_stringify(const json_value *_val);
+char* json_stringify_indent(const json_value *_val, size_t _x);
 
 // JSON PATH API
 json_value* json_get_value(json_value *_val, char *_path[], size_t _n);
