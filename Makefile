@@ -117,6 +117,7 @@ memalloc_test.d: test/memalloc_test.c
 unistd_test.d: test/unistd_test.c
 getsys_info.d: test/getsys_info.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
 inline_asm_test.d: test/inline_asm_test.c
+ipc_bypipe.d: test/ipc_bypipe.c
 
 # external dataset
 luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
