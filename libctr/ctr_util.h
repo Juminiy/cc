@@ -10,15 +10,19 @@
 #include "ctr_file.h"
 
 // logger
+#undef DEBUGF
 #define DEBUGF(__content_template__, ...) \
     do { fprintf(stdout, "[DEBUG] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
 
+#undef INFOF
 #define INFOF(__content_template__, ...) \
     do { fprintf(stdout, "[INFO] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
 
+#undef ERRORF
 #define ERRORF(__content_template__, ...) \
     do { fprintf(stderr, "[ERROR] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); } while(0)
 
+#undef PANICF
 #define PANICF(__content_template__, ...) \
     do { \
 		fprintf(stderr, "[PANIC] "__content_template__"\n" __VA_OPT__(,) __VA_ARGS__); \

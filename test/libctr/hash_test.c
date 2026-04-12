@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../libctr/ctr_hash.h"
+#include "../../libctr/ctr_hash.h"
 #include "strstrpair.h"
 
 int elem_i64_hash(elem_t em) {

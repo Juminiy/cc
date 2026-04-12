@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
     //     exit(EXIT_FAILURE);
     // }
 
-    remove_last_line_inplace("data/test/rr.txt");
+    // remove_last_line_inplace("data/test/rr.txt");
 
     return 0;
 }

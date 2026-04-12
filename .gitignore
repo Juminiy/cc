@@ -57,6 +57,7 @@ dkms.conf
 # local binary file
 *.out
 
-data/
 .idea/
+.vscode/
+data/
 bin/

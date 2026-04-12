@@ -1,4 +1,4 @@
-#include "../libjson/json.h"
+#include "../../libjson/json.h"
 
 void output_valid(const char *_path) {
     roSBuf buf = readFileAll(_path);

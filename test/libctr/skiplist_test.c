@@ -1,5 +1,5 @@
-#include "../libctr/ctr_skiplist.h"
-#include "../libctr/ctr_rbtree.h"
+#include "../../libctr/ctr_skiplist.h"
+#include "../../libctr/ctr_rbtree.h"
 
 #include <time.h>
 #include <stdlib.h>

@@ -103,7 +103,7 @@ void json_object_encode_indent(json_object *_obj, sbuf *buf, size_t _c, size_t _
 void json_array_encode_indent(json_array *_arr, sbuf *buf, size_t _c, size_t _x);
 void json_value_encode_indent(const json_value *_val, sbuf *buf, size_t _c, size_t _x);
 #define sbuf_writenspace(__buf,__n) \
-    do { \ 
+    do { \
         for(int i=0;i<__n;i++) { sBufWriteChar(__buf,' '); } \
     } while(0)
 #define sbuf_writelf(__buf) \

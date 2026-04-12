@@ -4,7 +4,7 @@
 
 #include <wait.h>
 
-#include "../libctr/ctr_util.h"
+#include "../../libctr/ctr_util.h"
 
 void test_access(char *filename) {
 	int fok = access(filename, R_OK|W_OK|X_OK|F_OK);

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../libctr/ctr_util.h"
+#include "../../libctr/ctr_util.h"
 
 typedef struct cmd{
     char *path;

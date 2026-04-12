@@ -156,7 +156,7 @@ int main(int argc, char *argv[], char *envp[]) {
             if (namesz<=0){
                 break;
             }
-            char *rcd_name = __strdupn(pch, namesz);
+            char *rcd_name = __strndup(pch, namesz);
             char *tsptr = strchr(pch, '<');
             if(!tsptr){
                 break;

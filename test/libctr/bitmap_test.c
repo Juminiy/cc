@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../libctr/ctr_bitmap.h"
+#include "../../libctr/ctr_bitmap.h"
 
 bool printnum(int64_t vi){
     // printf("%ld ", vi);

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../libctr/ctr_rbtree.h"
+#include "../../libctr/ctr_rbtree.h"
 
 #include <stdlib.h>
 #include <time.h>

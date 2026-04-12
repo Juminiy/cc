@@ -6,6 +6,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#undef FATAL
+#undef FATALF
+#undef ERR
+#undef ERRF
+#undef WARN
+#undef WARNF
+#undef INFO
+#undef INFOF
+#undef DEBUG
+#undef DEBUGF
+
 #define FATAL(msg) \
     do { fprintf(stderr, "[FATAL] %s, sys_error: %s\n", msg, strerror(errno)); exit(EXIT_FAILURE); } while(0)
 #define FATALF(__content_template__, ...) \

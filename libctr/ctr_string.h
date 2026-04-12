@@ -172,4 +172,6 @@ static inline char* __strreplace_n(char *__s, const char *__old, char *__new, si
 	return dst;
 }
 
+// todo: string split
+
 #endif // CTR_STRING_H

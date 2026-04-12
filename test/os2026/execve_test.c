@@ -4,7 +4,7 @@
 
 #include <sys/fcntl.h>
 
-#include "../libctr/ctr_color.h"
+#include "../../libctr/ctr_color.h"
 
 int test_execve(int argc, char *argv[], char *envp[]) {
     if(argc<2){

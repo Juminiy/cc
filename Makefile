@@ -2,7 +2,7 @@ optargs=-Wunused-result -O2 -std=c99
 debugargs=-g -O0 -std=c99 -DIDEBUG
 cplargs=$(debugargs)
 
-VPATH = libctr:libjson:libsocket/tcp:test:jyywiki/os2026
+VPATH = libctr:libjson:libsocket/tcp:jyywiki/os2026:test:test/libctr:test/libjson:test/os2026
 vpath %.o
 
 %.o: %.c
@@ -62,67 +62,6 @@ json_path.o: libjson/json_path.c
 json.a: json.o json_encode.o json_decode.o json_parse.o json_path.o
 	ar rcs $@ $^
 
-test: 
-
-strstrpair.o: test/strstrpair.c
-fdset_test.d: test/fdset_test.c skt_fdset.o
-poll_test.d: test/poll_test.c
-args_test.d: test/args_test.c
-str_test.d: test/str_test.c ctr_sbuf.o
-klist_test.d: test/klist_test.c
-select_test.d: test/select_test.c
-logf_test.d: test/logf_test.c
-mt_test.d: test/mt_test.c
-os_test.d: test/os_test.c
-net_test.d: test/net_test.c net_util.o ctr_blist.o
-blist_test.d: test/blist_test.c ctr_blist.o
-bdeque_test.d: test/bdeque_test.c ctr_seq.a
-bstree_test.d: test/bstree_test.c ctr_tree.a ctr_seq.a 
-	$(CC) -o $@ $^ $(cplargs) -lm
-rbtree_test.d: test/rbtree_test.c ctr_tree.a ctr_seq.a
-	$(CC) -o $@ $^ $(cplargs) -lm
-avltree_test.d: test/avltree_test.c ctr_tree.a ctr_seq.a 
-	$(CC) -o $@ $^ $(cplargs) -lm
-map_avl_test.d: test/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
-map_std_test.d: test/map_std_test.cpp strstrpair.o
-map_zoo_test.d: test/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
-mem_test.d: test/mem_test.c
-barray_test.d: test/barray_test.c ctr_seq.a
-bheap_test.d: test/bheap_test.c ctr_seq.a
-skiplist_test.d: test/skiplist_test.c ctr_skiplist.o ctr_tree.a ctr_seq.a
-lru_test.d: test/lru_test.c ctr_lru.o ctr_tree.a ctr_seq.a
-lfu_test.d: test/lfu_test.c ctr_lfu.o ctr_tree.a ctr_seq.a
-size_test.d: test/size_test.c
-gcc_test.d: test/gcc_test.c
-hash_test.d: test/hash_test.c ctr_hash.o ctr_tree.a ctr_seq.a strstrpair.o
-bitmap_test.d: test/bitmap_test.c ctr_bitmap.o
-bloom_test.d: test/bloom_test.c ctr_bloom.o ctr_bitmap.o strstrpair.o
-pair_test.d: test/pair_test.c
-btree_test.d: test/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
-huffman_test.d: test/huffman_test.c ctr_huffman.o ctr_map.o ctr_tree.a ctr_seq.a 
-json_test.d: test/json_test.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
-json_valid.d: test/json_valid.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
-json_valid.go.d: go/json_valid.go
-	go build -o $@ $<
-file_test.d: test/file_test.c
-packed_test.d: test/packed_test.c
-union_test.d: test/union_test.c ctr_union.o
-qsort_test.d: test/qsort_test.c
-regex_test.d: test/regex_test.c
-execve_test.d: test/execve_test.c
-pipe_test.d: test/pipe_test.c
-execve_loop_test.d: test/execve_loop_test.c
-esc_ABCD_test.d: test/esc_ABCD_test.c
-memalloc_test.d: test/memalloc_test.c
-unistd_test.d: test/unistd_test.c
-getsys_info.d: test/getsys_info.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
-inline_asm_test.d: test/inline_asm_test.c
-ipc_bypipe.d: test/ipc_bypipe.c
-
-# external dataset
-luogu_p3369.d: test/luogu_p3369.c ctr_tree.a ctr_seq.a
-leetcode146.d: test/leetcode146.c ctr_lru.o ctr_tree.a ctr_seq.a
-
 # jyywiki/os2026
 labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
 labyrinth_debug: labyrinth.d
@@ -130,18 +69,76 @@ labyrinth_debug: labyrinth.d
 sperf.d: jyywiki/os2026/sperf.c ctr_sbuf.o ctr_tree.a ctr_seq.a
 crepl.d: jyywiki/os2026/crepl.c ctr_sbuf.o
 
-install: crepl.d
-	cp $< /usr/bin/crepl
+# test/libctr
+strstrpair.o: test/libctr/strstrpair.c
+klist_test.d: test/libctr/klist_test.c
+blist_test.d: test/libctr/blist_test.c ctr_blist.o
+bdeque_test.d: test/libctr/bdeque_test.c ctr_seq.a
+bstree_test.d: test/libctr/bstree_test.c ctr_tree.a ctr_seq.a 
+	$(CC) -o $@ $^ $(cplargs) -lm
+rbtree_test.d: test/libctr/rbtree_test.c ctr_tree.a ctr_seq.a
+	$(CC) -o $@ $^ $(cplargs) -lm
+avltree_test.d: test/libctr/avltree_test.c ctr_tree.a ctr_seq.a 
+	$(CC) -o $@ $^ $(cplargs) -lm
+map_avl_test.d: test/libctr/map_avl_test.c   strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
+map_std_test.d: test/libctr/map_std_test.cpp strstrpair.o
+map_zoo_test.d: test/libctr/map_zoo_test.cpp strstrpair.o ctr_map.o ctr_tree.a ctr_seq.a
+barray_test.d: test/libctr/barray_test.c ctr_seq.a
+bheap_test.d: test/libctr/bheap_test.c ctr_seq.a
+skiplist_test.d: test/libctr/skiplist_test.c ctr_skiplist.o ctr_tree.a ctr_seq.a
+lru_test.d: test/libctr/lru_test.c ctr_lru.o ctr_tree.a ctr_seq.a
+lfu_test.d: test/libctr/lfu_test.c ctr_lfu.o ctr_tree.a ctr_seq.a
+hash_test.d: test/libctr/hash_test.c ctr_hash.o ctr_tree.a ctr_seq.a strstrpair.o
+bitmap_test.d: test/libctr/bitmap_test.c ctr_bitmap.o
+bloom_test.d: test/libctr/bloom_test.c ctr_bloom.o ctr_bitmap.o strstrpair.o
+pair_test.d: test/libctr/pair_test.c
+btree_test.d: test/libctr/btree_test.c ctr_btree.o ctr_seq.a strstrpair.o
+huffman_test.d: test/libctr/huffman_test.c ctr_huffman.o ctr_map.o ctr_tree.a ctr_seq.a 
+union_test.d: test/libctr/union_test.c ctr_union.o
+luogu_p3369.d: test/libctr/luogu_p3369.c ctr_tree.a ctr_seq.a
+leetcode146.d: test/libctr/leetcode146.c ctr_lru.o ctr_tree.a ctr_seq.a
 
-mprintf_hello.d: test/mprintf_hello.c
-mnormal_hello.d: test/mnormal_hello.c
-minimal_hello.d: test/minimal_hello.c
-# 	$(CC) -nostdlib -c $< -o $@.o
-# 	ld $@.o -lc --entry=_start -o $@
+# test/libjson
+json_test.d: test/libjson/json_test.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
+json_valid.d: test/libjson/json_valid.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
+json_valid.go.d: go/json_valid.go
+	go build -o $@ $<
+
+# test/os2026
+execve_test.d: test/os2026/execve_test.c
+pipe_test.d: test/os2026/pipe_test.c
+execve_loop_test.d: test/os2026/execve_loop_test.c
+esc_ABCD_test.d: test/os2026/esc_ABCD_test.c
+unistd_test.d: test/os2026/unistd_test.c
+inline_asm_test.d: test/os2026/inline_asm_test.c
+ipc_bypipe.d: test/os2026/ipc_bypipe.c
+mprintf_hello.d: test/os2026/mprintf_hello.c
+mnormal_hello.d: test/os2026/mnormal_hello.c
+minimal_hello.d: test/os2026/minimal_hello.c
 	$(CC) -nostdlib -o $@ $< -lc --entry=_start
-minimal_hello2.d: test/minimal_hello.S
+minimal_hello2.d: test/os2026/minimal_hello.S
 	$(CC) -c $< -o $@.o
 	ld $@.o -o $@
+
+# test
+fdset_test.d: test/fdset_test.c skt_fdset.o
+poll_test.d: test/poll_test.c
+args_test.d: test/args_test.c
+str_test.d: test/str_test.c ctr_sbuf.o
+select_test.d: test/select_test.c
+logf_test.d: test/logf_test.c
+mt_test.d: test/mt_test.c
+os_test.d: test/os_test.c
+net_test.d: test/net_test.c net_util.o ctr_blist.o
+mem_test.d: test/mem_test.c
+size_test.d: test/size_test.c
+gcc_test.d: test/gcc_test.c
+file_test.d: test/file_test.c
+packed_test.d: test/packed_test.c
+qsort_test.d: test/qsort_test.c
+regex_test.d: test/regex_test.c
+memalloc_test.d: test/memalloc_test.c
+getsys_info.d: test/getsys_info.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

@@ -1,5 +1,5 @@
-#include "../libctr/ctr_lru.h"
-#include "../libctr/ctr_elemt.h"
+#include "../../libctr/ctr_lru.h"
+#include "../../libctr/ctr_elemt.h"
 
 typedef struct {
     lru_t *c;
