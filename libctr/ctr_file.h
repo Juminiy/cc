@@ -52,7 +52,7 @@ static inline int __remove(const char *__filename) {
     return 0;
 }
 
-static inline int __mkdir(const char *__path, __mode_t __mode) {
+static inline int __mkdir(const char *__path, mode_t __mode) {
     struct stat _fstat;
     if(stat(__path, &_fstat)){
         return mkdir(__path, __mode);

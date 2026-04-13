@@ -10,7 +10,7 @@ export LIBRARY_PATH=$LIBRARY_PATH:~/.local/lib
 export CPATH=$CPATH:~/.local/include
 export CC=gcc
 
-cd ../thirdparty
+cd thirdparty/
 git clone https://github.com/stclib/STC.git
 cd STC
 

@@ -119,8 +119,6 @@ int main() {
     int deps_h_fd  = open(_deps_h_path, O_CREAT|O_TRUNC|O_RDWR, _FMODE);
     int funcs_c_fd = open(_funcs_c_path, O_CREAT|O_TRUNC|O_RDWR, _FMODE);
     write(funcs_c_fd, _include_hdr, __strlen(_include_hdr));
-    int funcs_c_dup_fd = open(_funcs_c_dup_path, O_CREAT|O_TRUNC|O_RDWR, _FMODE);
-    write(funcs_c_dup_fd, _include_hdr, __strlen(_include_hdr));
     
     size_t bufsz = 512;
     char *buf = (char*)malloc(sizeof(char)*bufsz);
@@ -150,8 +148,13 @@ int main() {
         } else if(func_def_ptr){ // funcs
             write(deps_h_fd, buf, func_decl_ptr-buf+1);
             write(deps_h_fd, ";\n", 2);
+
+            int funcs_c_dup_fd = open(_funcs_c_dup_path, O_CREAT|O_TRUNC|O_RDWR, _FMODE);
+            char *funcs_content = __readfile(_funcs_c_path);
+            write(funcs_c_dup_fd, funcs_content, __strlen(funcs_content));
             write(funcs_c_dup_fd, buf, func_def_ptr-buf+1);
             write(funcs_c_dup_fd, "\n", 1);
+            close(funcs_c_dup_fd);
             
             // compile funcs.c
             __fork_catch_err(

@@ -2,7 +2,7 @@ optargs=-Wunused-result -O2 -std=c99
 debugargs=-g -O0 -std=c99 -DIDEBUG
 cplargs=$(debugargs)
 
-VPATH = libctr:libjson:libsocket/tcp:jyywiki/os2026:test:test/libctr:test/libjson:test/os2026
+VPATH = libctr:libjson:libsocket/tcp:jyywiki/labs:test:test/libctr:test/libjson:test/os2026
 vpath %.o
 
 %.o: %.c
@@ -62,12 +62,12 @@ json_path.o: libjson/json_path.c
 json.a: json.o json_encode.o json_decode.o json_parse.o json_path.o
 	ar rcs $@ $^
 
-# jyywiki/os2026
-labyrinth.d: jyywiki/os2026/labyrinth.c ctr_union.o
+# jyywiki/labs
+labyrinth.d: jyywiki/labs/labyrinth.c ctr_union.o
 labyrinth_debug: labyrinth.d
-	gdb ./labyrinth.d -x x.gdbinit
-sperf.d: jyywiki/os2026/sperf.c ctr_sbuf.o ctr_tree.a ctr_seq.a
-crepl.d: jyywiki/os2026/crepl.c ctr_sbuf.o
+# 	gdb ./labyrinth.d -x x.gdbinit
+sperf.d: jyywiki/labs/sperf.c ctr_sbuf.o ctr_tree.a ctr_seq.a
+crepl.d: jyywiki/labs/crepl.c ctr_sbuf.o
 
 # test/libctr
 strstrpair.o: test/libctr/strstrpair.c
@@ -139,6 +139,8 @@ qsort_test.d: test/qsort_test.c
 regex_test.d: test/regex_test.c
 memalloc_test.d: test/memalloc_test.c
 getsys_info.d: test/getsys_info.c json.a ctr_tree.a ctr_seq.a ctr_sbuf.o
+muslgcc_test.d: test/muslgcc_test.c
+# 	gdb $@ -x test/muslgcc.gdbinit
 
 clean:
 	rm -rf *.o *.a *.so *.out *.dSYM

@@ -2,7 +2,7 @@
 
 make labyrinth.d
 
-filedir="jyywiki/os2026/data"
+filedir="jyywiki/labs/data"
 commands=(
 # valid print
 "./labyrinth.d -m $filedir/y_map_6_7.txt -p 0"

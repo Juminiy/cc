@@ -31,7 +31,7 @@ if __name__ == "__main__":
                     ps_tree[proc_parent_id] = []
                 ps_tree[proc_parent_id].append(proc_id)
     
-    with open('jyywiki/os2026/data/proc.json','w') as proc_jfile:
+    with open('jyywiki/labs/data/proc.json','w') as proc_jfile:
         for ppid,chs in ps_tree.items():
             ps_tree[ppid] = sorted(chs)
         proc_jfile.write(json.dumps({
