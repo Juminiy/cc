@@ -119,6 +119,8 @@ minimal_hello.d: test/os2026/minimal_hello.c
 minimal_hello2.d: test/os2026/minimal_hello.S
 	$(CC) -c $< -o $@.o
 	ld $@.o -o $@
+my_execvp.d: test/os2026/my_execvp.c
+bcopy_test.d: test/bcopy_test.c
 
 # test
 fdset_test.d: test/fdset_test.c skt_fdset.o
